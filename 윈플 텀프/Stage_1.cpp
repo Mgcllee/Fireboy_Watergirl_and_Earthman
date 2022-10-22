@@ -1,9 +1,12 @@
-#include"Main_head.h"
+#pragma once
+#include"MapMgr.h"
 
 void Stage_1(int order) {
 	if (order == 0) {
-		water = { 600,730 };
-		fire = { 700,730 };
+		water.x = 600;
+		water.y = 730;
+		fire.x = 700;
+		fire.y = 730;
 
 		fire.on = TRUE;
 		water.on = TRUE;

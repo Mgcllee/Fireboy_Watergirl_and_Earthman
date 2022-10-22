@@ -1,24 +1,18 @@
-#include"Main_head.h"
-#pragma comment(lib,"winmm.lib")
-#pragma comment (lib, "msimg32.lib")
+#pragma once
+#include"stdafx.h"
+#include "ImageMgr.h"
+#include "MapMgr.h"
 
-#define IDC_BUTTON1 100
-#define IDC_BUTTON2 200
-#define IDC_BUTTON3 300
-#define IDC_BUTTON4 350
 HINSTANCE g_hInst;
-LPCTSTR IpszClass = L"fire boy and water girl";
-LPCTSTR IpszWindowName = L"window programming";
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void LoadSound(HWND hWnd);
-DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
 	HWND hWnd;
 	MSG Message;
 	WNDCLASSEX WndClass;
+	LPCTSTR IpszClass = L"fire boy and water girl";
+	LPCTSTR IpszWindowName = L"window programming";
+
 	g_hInst = hInstance;
 
 	WndClass.cbSize = sizeof(WndClass);
@@ -35,6 +29,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	WndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&WndClass);
 
+	LoadImages();
+
 	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -47,23 +43,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	return Message.wParam;
 }
 
-MCI_OPEN_PARMS      mciOpenParms;
-MCI_PLAY_PARMS       mciPlayParms;
-MCI_STATUS_PARMS   mciStatus;
-
-UINT wDeviceID = 0;
-
-BOOL playsound = FALSE;
-static int stage = 0;
-static BOOL clear = FALSE;
-static int average = 0;
-static BOOL time_over = FALSE;
-static BOOL red_door_open = FALSE, blue_door_open = FALSE;
-static int count = 0;
-static int red_total = 0;
-static int blue_total = 0;
-static BOOL stair =FALSE;
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
@@ -71,11 +50,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HDC memdc;
 	static HBITMAP hbitmap;
 	HBRUSH hBrush, oldBrush;
-	static CImage robby, buttonimg, stage1, Jewelry_blue, Jewelry_red, red_water_center, red_water_left, red_water_right, blue_water_center, blue_water_left, blue_water_right, green_water_center, green_water_left, green_water_right, die, retryimg, endimg, backimg, door_red, door_blue, button_img, clear_img,red_stair,blue_stair,rect;
-	static CImage zero, one, two, three, four, five, six, seven, eight, nine, clock, timeout;
-	static CImage block_w, block_h,foot_block;
-	static CImage Fire[5], Water[5];
-	static int F_Frame = 0, W_Frame = 0;
+
 	static HWND start_button, retry_button, end_button, next_button;
 	static int mx, my;
 	static BOOL back = FALSE;
@@ -83,105 +58,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int blue_count = 0;
 	int red_count = 0;
 	static int stair_red_x=0, stair_blue_x = 0;
-	TCHAR text[30];
-	switch (uMsg) {
-	case WM_CREATE:
-	{
-		robby.Load(L"Resource\\로비 이미지 초안 2.png");
-		buttonimg.Load(L"Resource\\플레이 버튼 158.60.png");
-		stage1.Load(L"Resource\\맵 기본.png");
-		Jewelry_blue.Load(L"Resource\\파랑 보석 28.24.png");
-		Jewelry_red.Load(L"Resource\\빨강 보석 29.24.png");
-		red_water_center.Load(L"Resource\\빨강 가운데물 21.14.png");
-		red_water_left.Load(L"Resource\\빨강 왼쪽물 24.25.png");
-		red_water_right.Load(L"Resource\\빨강 오른쪽물 24.25.png");
-		blue_water_center.Load(L"Resource\\파랑 가운데물 23.14.png");
-		blue_water_left.Load(L"Resource\\파랑 왼쪽물 23.23.png");
-		blue_water_right.Load(L"Resource\\파랑 오른쪽물 23.23.png");
-		green_water_center.Load(L"Resource\\초록 가운데물 23.14.png");
-		green_water_left.Load(L"Resource\\초록 왼쪽물 24.25.png");
-		green_water_right.Load(L"Resource\\초록 오른물 24.25.png");
-		die.Load(L"Resource\\죽었을 때 159.89.png");
-		endimg.Load(L"Resource\\end.png");
-		retryimg.Load(L"Resource\\retry.png");
-		backimg.Load(L"Resource\\dieimg.png");
-		door_red.Load(L"Resource\\빨강 문 60.104.png");
-		door_blue.Load(L"Resource\\파랑 문 60.104.png");
-		button_img.Load(L"Resource\\버튼 42.16.png");
-		red_stair.Load(L"Resource\\빨강 계단 50.73.png");
-		blue_stair.Load(L"Resource\\파랑 계단 54.77.png");
-		clear_img.Load(L"Resource\\클리어.png");
-		zero.Load(L"Resource\\0.png");
-		one.Load(L"Resource\\1.png");
-		two.Load(L"Resource\\2.png");
-		three.Load(L"Resource\\3.png");
-		four.Load(L"Resource\\4.png");
-		five.Load(L"Resource\\5.png");
-		six.Load(L"Resource\\6.png");
-		seven.Load(L"Resource\\7.png");
-		eight.Load(L"Resource\\8.png");
-		nine.Load(L"Resource\\9.png");
-		clock.Load(L"Resource\\시계.png");
-		timeout.Load(L"Resource\\타임아웃.png");
-		Fire[0].Load(L"Resource\\빨강 정지 215.411.png");        // 정지
-		Fire[1].Load(L"Resource\\빨강 정지 215.411.png");        // 상승
-		Fire[2].Load(L"Resource\\빨강 오른쪽 342.271.png");    // 우측
-		Fire[3].Load(L"Resource\\빨강 하강 215.411.png");        // 하단
-		Fire[4].Load(L"Resource\\빨강 왼쪽 342.271.png");        // 좌측
-
-		Water[0].Load(L"Resource\\파랑 정지 207.480.png");        // 정지
-		Water[1].Load(L"Resource\\파랑 정지 207.480.png");        // 상승
-		Water[2].Load(L"Resource\\파랑 오른쪽 376.480.png");        // 우측
-		Water[3].Load(L"Resource\\파랑 하강 203.553.png");        // 하단
-		Water[4].Load(L"Resource\\파랑 왼쪽 376.480.png");        // 좌측
-
-		block_w.Load(L"Resource\\block1.png");
-		block_h.Load(L"Resource\\block2.png");
-		foot_block.Load(L"Resource\\발판.png");
-		rect.Load(L"Resource\\상자 40.40.png");
-	}
-	if (stage == 0)
-	{
-		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
-		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)buttonimg));
-	}
-	playsound = TRUE;
-	if (playsound)
-	{
-		LoadSound(hWnd);
-	}
-	for (int i = 0; i < 20; i++)
-	{
-		if (Jewelry[i].On)
-		{
-			if (i < 10)
-			{
-
-				red_count++;
-			}
-			else if (i >= 10)
-			{
-				blue_count++;
-			}
-		}
-	}
-	red_total = red_count;
-	blue_total = blue_count;
 	
-SetTimer(hWnd, 1, 30, NULL);
-	SetTimer(hWnd, 2, 100, NULL);
-	SetTimer(hWnd, 3, 50, NULL);
-	SetTimer(hWnd, 4, 50, NULL);
-	break;
-	//case WM_MOUSEMOVE:
-	//	mx = LOWORD(lParam);
-	//	my = HIWORD(lParam);
-	//	InvalidateRect(hWnd, NULL, FALSE);
-	//	break;
-	//case WM_RBUTTONUP:
-	//	clear = TRUE;
-	//	InvalidateRect(hWnd, NULL, FALSE);
+	switch (uMsg) {
+	case WM_CREATE: {
+		if (stage == 0)
+		{
+			start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
+			SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)buttonimg));
+		}
+		playsound = TRUE;
+		if (playsound)
+		{
+			LoadSound(hWnd);
+			for (int i = 0; i < 20; i++)
+			{
+				if (Jewelry[i].On)
+				{
+					if (i < 10)
+					{
+
+						red_count++;
+					}
+					else if (i >= 10)
+					{
+						blue_count++;
+					}
+				}
+			}
+			red_total = red_count;
+			blue_total = blue_count;
+
+			SetTimer(hWnd, 1, 30, NULL);
+			SetTimer(hWnd, 2, 100, NULL);
+			SetTimer(hWnd, 3, 50, NULL);
+			SetTimer(hWnd, 4, 50, NULL);
+			break;
+		}
 		break;
+	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_BUTTON1:
@@ -452,13 +366,13 @@ SetTimer(hWnd, 1, 30, NULL);
 			}
 			break;
 		case 2:
-			++F_Frame;
-			if (F_Frame >= 8) {
-				F_Frame = 0;
+			++fire.Frame;
+			if (fire.Frame >= 8) {
+				fire.Frame = 0;
 			}
-			++W_Frame;
-			if (W_Frame >= 8) {
-				W_Frame = 0;
+			++water.Frame;
+			if (water.Frame >= 8) {
+				water.Frame = 0;
 			}
 			break;
 		case 3:
@@ -699,477 +613,40 @@ SetTimer(hWnd, 1, 30, NULL);
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
-
 	case WM_KEYDOWN:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = TRUE;
-		Loop();
+		Loop(true);
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
+		Loop(false);
 		water.is_Move = FALSE;
 		water.wid_a = 0;
 		water.is_Speed_Down = TRUE;
 		fire.is_Move = FALSE;
 		fire.wid_a = 0;
-		F_Frame = 0;
-		W_Frame=0;
+		water.Frame = 0;
+		fire.Frame=0;
 		fire.is_Speed_Down = TRUE;
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
-	case WM_PAINT:
+	case WM_PAINT: {
 		hDC = BeginPaint(hWnd, &ps);
 		hbitmap = CreateCompatibleBitmap(hDC, 1200, 800);
 		memdc = CreateCompatibleDC(hDC);
 		SelectObject(memdc, hbitmap);
-		if (stage == 0)
-		{
-			robby.Draw(memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
-		}
-		else if (stage == 1)
-		{
-			stage1.Draw(memdc, 0, 0, 1190, 765, 0, 480 - average, 640, 480);
 
-			for (int i = 0; i < 20 && Ft[i].x != NULL; ++i)
-			{
-				foot_block.Draw(memdc, Ft[i].x, Ft[i].y, Ft[i].wid, Ft[i].hei, 0, 0, 111, 23);
-			}
-			
-		//	block_w.Draw(memdc, block[0].x+block[0].image_x, block[0].y, 100+block[0].image_x, 30, -block[0].image_x, 0, 83+block[0].image_x, 25);
+		DrawMap(&memdc, stage);
+		DrawPlayer(&memdc, 0, &water);
+		DrawPlayer(&memdc, 0, &fire);
+		DrawTimer(&memdc, time);
 
-			door_red.Draw(memdc, red_door.x, red_door.y, 60, 100, red_door.image_x, red_door.image_y, 60, 104);
-			door_blue.Draw(memdc, blue_door.x, blue_door.y, 60, 100, blue_door.image_x, blue_door.image_y, 60, 104);
-			//button_img.Draw(memdc, button[0].x, button[0].y - button[0].image_y, 40, button[0].image_y, 0, 0, button[0].image_x, button[0].image_y);
-		
-
-			if (fire.on)
-			{
-				if (fire.Down == TRUE && fire.dic == 0) {
-					Fire[3].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-				}
-				else if (fire.dic == 0) {
-					Fire[0].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-				}
-				else if (fire.dic == -1) {
-					Fire[4].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-				}
-				else if (fire.dic == 1) {
-					Fire[2].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-				}
-			}
-
-			if (water.on)
-			{
-				if (water.Down == TRUE && water.dic == 0) {
-					Water[3].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 140, 0, 0, 203, 553);
-				}
-				else if (water.dic == 0) {
-					Water[0].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0, 0, 207, 400);
-				}
-				else if (water.dic == -1) {
-					Water[4].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-				}
-				else if (water.dic == 1) {
-					Water[2].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-				}
-			}
-			clock.Draw(memdc, 525, 0, 150, 50, 0, 0, 154, 54);
-			switch (time / 60) {
-			case 0:
-				zero.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-			switch ((time % 60) / 10) {
-			case 0:
-				zero.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-			switch ((time % 60) % 10) {
-			case 0:
-				zero.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-		}
-		else if (stage == 2)
-		{
-			stage1.Draw(memdc, 0, 0, 1190, 765, 0, 480 - average, 640, 480);
-
-			for (int i = 0; i < 20 && Ft[i].x != NULL; ++i)
-			{
-				foot_block.Draw(memdc, Ft[i].x, Ft[i].y, Ft[i].wid, Ft[i].hei, 0, 0, 111, 23);
-			}
-
-
-			//	block_w.Draw(memdc, block[0].x+block[0].image_x, block[0].y, 100+block[0].image_x, 30, -block[0].image_x, 0, 83+block[0].image_x, 25);
-
-			door_red.Draw(memdc, red_door.x, red_door.y, 60, 100, red_door.image_x, red_door.image_y, 60, 104);
-			door_blue.Draw(memdc, blue_door.x, blue_door.y, 60, 100, blue_door.image_x, blue_door.image_y, 60, 104);
-			//button_img.Draw(memdc, button[0].x, button[0].y - button[0].image_y, 40, button[0].image_y, 0, 0, button[0].image_x, button[0].image_y);
-
-			if (fire.on)
-			{
-				if (fire.Down == TRUE && fire.dic == 0) {
-					Fire[3].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-				}
-				else if (fire.dic == 0) {
-					Fire[0].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-				}
-				else if (fire.dic == -1) {
-					Fire[4].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-				}
-				else if (fire.dic == 1) {
-					Fire[2].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-				}
-			}
-
-			if (water.on)
-			{
-				if (water.Down == TRUE && water.dic == 0) {
-					Water[3].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 140, 0, 0, 203, 553);
-				}
-				else if (water.dic == 0) {
-					Water[0].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0, 0, 207, 400);
-				}
-				else if (water.dic == -1) {
-					Water[4].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-				}
-				else if (water.dic == 1) {
-					Water[2].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-				}
-			}
-
-			clock.Draw(memdc, 525, 0, 150, 50, 0, 0, 154, 54);
-			switch (time / 60) {
-			case 0:
-				zero.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-			switch ((time % 60) / 10) {
-			case 0:
-				zero.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-			switch ((time % 60) % 10) {
-			case 0:
-				zero.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 1:
-				one.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 2:
-				two.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 3:
-				three.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 4:
-				four.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 5:
-				five.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 6:
-				six.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 7:
-				seven.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 8:
-				eight.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			case 9:
-				nine.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-				break;
-			}
-		}
-		else if (stage == 3)
-		{
-		stage1.Draw(memdc, 0, 0, 1190, 765, 0, 480 - average, 640, 480);
-
-		for (int i = 0; i < 20 && Ft[i].x != NULL; ++i)
-		{
-			foot_block.Draw(memdc, Ft[i].x, Ft[i].y, Ft[i].wid, Ft[i].hei, 0, 0, 111, 23);
-		}
-
-		rect.Draw(memdc, Rt.x-50, Rt.y-50, 50, 50, 0, 0, 40, 40);
-
-
-		block_w.Draw(memdc, block[0].x+block[0].image_x, block[0].y, 100+block[0].image_x, 30, -block[0].image_x, 0, 83+block[0].image_x, 25);
-
-		door_red.Draw(memdc, red_door.x, red_door.y, 60, 100, red_door.image_x, red_door.image_y, 60, 104);
-		door_blue.Draw(memdc, blue_door.x, blue_door.y, 60, 100, blue_door.image_x, blue_door.image_y, 60, 104);
-
-		button_img.Draw(memdc, button[0].x, button[0].y - button[0].image_y, 40, button[0].image_y, 0, 0, button[0].image_x, button[0].image_y);
-
-		if (fire.on)
-		{
-			if (fire.Down == TRUE && fire.dic == 0) {
-				Fire[3].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-			}
-			else if (fire.dic == 0) {
-				Fire[0].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0, 0, 215, 411);
-			}
-			else if (fire.dic == -1) {
-				Fire[4].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-			}
-			else if (fire.dic == 1) {
-				Fire[2].Draw(memdc, fire.x - 60, fire.y - 100 + average, 60, 100, 0 + 342 * F_Frame, 0, 342, 271);
-			}
-		}
-
-		if (water.on)
-		{
-			if (water.Down == TRUE && water.dic == 0) {
-				Water[3].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 140, 0, 0, 203, 553);
-			}
-			else if (water.dic == 0) {
-				Water[0].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0, 0, 207, 400);
-			}
-			else if (water.dic == -1) {
-				Water[4].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-			}
-			else if (water.dic == 1) {
-				Water[2].Draw(memdc, water.x - 60, water.y - 100 + average, 60, 100, 0 + 376 * W_Frame, 0, 376, 400);
-			}
-		}
-
-		clock.Draw(memdc, 525, 0, 150, 50, 0, 0, 154, 54);
-		switch (time / 60) {
-		case 0:
-			zero.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 1:
-			one.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 2:
-			two.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 3:
-			three.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 4:
-			four.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 5:
-			five.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 6:
-			six.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 7:
-			seven.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 8:
-			eight.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 9:
-			nine.Draw(memdc, 530, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		}
-		switch ((time % 60) / 10) {
-		case 0:
-			zero.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 1:
-			one.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 2:
-			two.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 3:
-			three.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 4:
-			four.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 5:
-			five.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 6:
-			six.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 7:
-			seven.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 8:
-			eight.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 9:
-			nine.Draw(memdc, 585, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		}
-		switch ((time % 60) % 10) {
-		case 0:
-			zero.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 1:
-			one.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 2:
-			two.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 3:
-			three.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 4:
-			four.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 5:
-			five.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 6:
-			six.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 7:
-			seven.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 8:
-			eight.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		case 9:
-			nine.Draw(memdc, 620, 0, 50, 50, 0, 0, 50, 50);
-			break;
-		}
-		}
+		// 사망시 연기 Anim
 		if (Die.On)
 		{
 			die.Draw(memdc, Die.x, Die.y, 100, 100, Die.image_x, Die.image_y, 159, 89);
@@ -1185,12 +662,12 @@ SetTimer(hWnd, 1, 30, NULL);
 		}
 		if (stair)
 		{
-			red_stair.Draw(memdc, red_door.x, red_door.y+30, 50, 80, stair_red_x, 0, 50, 73);
-			blue_stair.Draw(memdc, blue_door.x , red_door.y+30 , 50, 80, stair_blue_x, 0, 54, 77);
+			red_stair.Draw(memdc, red_door.x, red_door.y + 30, 50, 80, stair_red_x, 0, 50, 73);
+			blue_stair.Draw(memdc, blue_door.x, red_door.y + 30, 50, 80, stair_blue_x, 0, 54, 77);
 			fire.on = FALSE;
 			water.on = FALSE;
 		}
-		//switch()
+
 		if (back)
 		{
 			backimg.Draw(memdc, 0, 0, 1200, 800, 0, 0, 1200, 800);
@@ -1202,8 +679,10 @@ SetTimer(hWnd, 1, 30, NULL);
 			clear = FALSE;
 			mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 		}
+
 		BitBlt(hDC, 0, 0, 1200, 800, memdc, 0, 0, SRCCOPY);
-		if (clear == FALSE && back==FALSE )
+		
+		if (clear == FALSE && back == FALSE)
 		{
 			for (int i = 0; i < 20; i++)
 			{
@@ -1270,6 +749,7 @@ SetTimer(hWnd, 1, 30, NULL);
 		DeleteDC(memdc);
 		EndPaint(hWnd, &ps);
 		break;
+	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		DeleteObject(hbitmap);
@@ -1277,399 +757,4 @@ SetTimer(hWnd, 1, 30, NULL);
 		break;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave)
-{
-	DWORD Result;
-	mciOpenParms.lpstrDeviceType = L"MPEGvideo";
-	mciOpenParms.lpstrElementName = lpszWave;
-	Result = mciSendCommand(wDeviceID, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD)(LPVOID)&mciOpenParms);
-	if (Result)
-		return Result;
-	wDeviceID = mciOpenParms.wDeviceID;
-	mciPlayParms.dwCallback = (DWORD)hWnd;
-	if (Result)
-		return Result;
-	return 0;
-}
-
-void LoadSound(HWND hWnd)
-{
-	DWORD SelectBGM;
-
-	//if (stage == 0)
-	//{
-	//	mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-	//	SelectBGM = LoadWAV(hWnd, L"BGM\\브금1.mp3");//여기에 재생하고싶은 mp3파일의 경로를 입력하면 된다.
-	//	SelectBGM = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-	//}
-	//else if (stage == 1)
-	//{
-	//	mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-	//	SelectBGM = LoadWAV(hWnd, L"BGM\\브금2.mp3");//여기에 재생하고싶은 mp3파일의 경로를 입력하면 된다.
-	//	SelectBGM = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-	//}
-	//else if (stage == 2)
-	//{
-	//	mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-	//	SelectBGM = LoadWAV(hWnd, L"BGM\\브금3.mp3");//여기에 재생하고싶은 mp3파일의 경로를 입력하면 된다.
-	//	SelectBGM = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-	//}
-	//else if (stage == 3)
-	//{
-	//	mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-	//	SelectBGM = LoadWAV(hWnd, L"BGM\\브금4.mp3");//여기에 재생하고싶은 mp3파일의 경로를 입력하면 된다.
-	//	SelectBGM = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-	//}
-	//else if (stage == 4)
-	//{
-	//	mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-	//	SelectBGM = LoadWAV(hWnd, L"BGM\\브금5.mp3");//여기에 재생하고싶은 mp3파일의 경로를 입력하면 된다.
-	//	SelectBGM = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms);
-	//}
-}
-
-void Jump() {
-	if (fire.Down) {
-		if (fire.y + (fire.v + fire.g) > fire.ground) {
-			fire.is_Jumping = FALSE;
-			fire.Down = FALSE;
-			fire.v = 50;
-			fire.y = fire.ground;
-		}
-		if (fire.y < fire.ground) {
-			fire.v = fire.v + fire.g;
-			fire.y = fire.y + fire.v;
-		}
-	}
-	if (water.Down) {
-		if (water.y + (water.v + water.g) > water.ground) {
-			water.is_Jumping = FALSE;
-			water.Down = FALSE;
-			water.v = 50;
-			water.y = water.ground;
-		}
-		if (water.y < water.ground) {
-			water.v = water.v + water.g;
-			water.y = water.y + water.v;
-		}
-	}
-	if (water.is_Jumping == TRUE) {
-		if (!water.Down) {
-			if (water.v >= 0) {
-				water.v = water.v - water.g;
-				water.y = water.y - (water.v / 2);
-			}
-			else {
-				water.Down = TRUE;    // 상태 변화
-			}
-		}
-	}
-	if (fire.is_Jumping == TRUE) {
-		if (!fire.Down) {
-			if (fire.v > 0) {
-				fire.v = fire.v - fire.g;
-				fire.y = fire.y - (fire.v / 2);
-			}
-			else {
-				fire.Down = TRUE;    // 상태 변화
-			}
-		}
-	}
-}
-
-void Wid_Move() {
-	if (water.is_Move) {
-		if (water.dic == 1) {
-			if (water.wid_v <= 10) {
-				water.wid_v = water.wid_v + water.wid_a;
-			}
-			water.x = water.x + water.wid_v;
-		}
-		else if (water.dic == -1) {
-			if (water.wid_v <= 10) {
-				water.wid_v = water.wid_v + water.wid_a;
-			}
-			water.x = water.x - water.wid_v;
-		}
-	}
-	if (water.is_Speed_Down) {
-		if (water.dic == 1) {
-			water.wid_a += 1;
-			water.wid_v = water.wid_v - water.wid_a;
-			water.x = water.x + water.wid_v;
-			if (water.wid_v <= 0) {
-				water.wid_v = 0;
-				water.wid_a = 0;
-				water.dic = 0;
-				water.is_Speed_Down = FALSE;
-			}
-		}
-		else if (water.dic == -1) {
-			water.wid_a += 1;
-			water.wid_v = water.wid_v - water.wid_a;
-			water.x = water.x - water.wid_v;
-			if (water.wid_v <= 0) {
-				water.wid_v = 0;
-				water.wid_a = 0;
-				water.dic = 0;
-				water.is_Speed_Down = FALSE;
-			}
-		}
-	}
-	if (fire.is_Move) {
-		if (fire.dic == 1) {
-			if (fire.wid_v <= 10) {
-				fire.wid_v = fire.wid_v + fire.wid_a;
-			}
-			fire.x = fire.x + fire.wid_v;
-		}
-		else if (fire.dic == -1) {
-			if (fire.wid_v <= 10) {
-				fire.wid_v = fire.wid_v + fire.wid_a;
-			}
-			fire.x = fire.x - fire.wid_v;
-		}
-	}
-	if (fire.is_Speed_Down) {
-		if (fire.dic == 1) {
-			fire.wid_a += 1;
-			fire.wid_v = fire.wid_v - fire.wid_a;
-			fire.x = fire.x + fire.wid_v;
-			if (fire.wid_v <= 0) {
-				fire.wid_v = 0;
-				fire.wid_a = 0;
-				fire.dic = 0;
-				fire.is_Speed_Down = FALSE;
-			}
-		}
-		else if (fire.dic == -1) {
-			fire.wid_a += 1;
-			fire.wid_v = fire.wid_v - fire.wid_a;
-			fire.x = fire.x - fire.wid_v;
-			if (fire.wid_v <= 0) {
-				fire.wid_v = 0;
-				fire.wid_a = 0;
-				fire.dic = 0;
-				fire.is_Speed_Down = FALSE;
-			}
-		}
-	}
-}
-
-void Push() {
-	if (water.is_Push == FALSE && fire.is_Push == FALSE) {
-		if (water.y == Rt.y && abs(water.x - Rt.x) <= 60) {			// 불과 접촉
-			water.is_Push = TRUE;
-		}
-		if (fire.y == Rt.y && abs(fire.x - Rt.x) <=60) {		// 물과 접촉
-			fire.is_Push = TRUE;
-		}
-	}
-	// 충돌 체크
-	if (water.is_Push == TRUE && water.y == Rt.y && abs(water.x - Rt.x) <= 60) {
-		if (Rt.dic == 0) {
-			Rt.dic = water.dic;
-		}
-
-		if (Rt.dic == water.dic) {
-			if (Rt.dic == 1) {
-				Rt.x = water.x + 60;
-			}
-			else if (Rt.dic == -1) {
-				Rt.x = water.x - 60;
-			}
-		}
-	}
-	else if (water.is_Push == TRUE && Rt.dic != water.dic) {
-		Rt.dic = 0;
-		water.is_Push = FALSE;
-		return;
-	}
-
-	if (fire.is_Push == TRUE && fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {
-		if (Rt.dic == 0) {
-			Rt.dic = fire.dic;
-		}
-
-		if (Rt.dic == fire.dic) {
-			if (Rt.dic == 1) {
-				Rt.x = fire.x + 60;
-			}
-			else if (Rt.dic == -1) {
-				Rt.x = fire.x - 60;
-			}
-		}
-	}
-	else if (fire.is_Push == TRUE && Rt.dic != fire.dic) {
-		Rt.dic = 0;
-		fire.is_Push = FALSE;
-		return;
-	}
-
-	for (int i = 0; i < 20 && Ft[i].x != NULL; ++i) {
-		if ((Rt.y == Ft[i].y && Ft[i].x > Rt.x - 60) || (Rt.y == Ft[i].y && Ft[i].x + Ft[i].wid < Rt.x)) {
-			Rt.Down = TRUE;
-		}
-	}
-	if (Rt.Down) {
-		if (Rt.y + (Rt.v + Rt.g) >= 730) {
-			Rt.v = 0;
-			Rt.y = 730;
-			Rt.Down = FALSE;
-			return;
-		}
-		if (Rt.y <=730) {
-			Rt.v = Rt.v + Rt.g;
-			Rt.y = Rt.y + Rt.v;
-			return;
-		}
-	}
-}
-
-void Climb() {
-	double a = (hill.x + (hill.x - hill.wid)) / 2;
-	double b = (hill.y + (hill.y + hill.hei)) / 2;
-
-	if (hill.dic == 1) {
-		double A = (-1) * (hill.hei / hill.wid);
-		double B = b - A * a;
-
-		if (hill.x - hill.wid < fire.x && fire.x - 20 <= hill.x) {
-			if (fire.is_Speed_Down == TRUE) {
-				if (fire.y < fire.ground) {
-
-					fire.wid_a += 1;
-					if (water.wid_v <= 10) {
-						water.wid_v = water.wid_v + water.wid_a;
-					}
-					water.x = water.x - water.wid_v;
-					fire.y = (int)(A * fire.x + B) + 10;
-					return;
-				}
-				else {
-					fire.y = fire.ground;
-					fire.is_Speed_Down = FALSE;
-				}
-			}
-			else {
-				fire.y = (int)(A * fire.x + B) + 10;
-			}
-		}
-		if (hill.x - hill.wid < water.x && water.x - 20 <= hill.x) {
-			water.y = (int)(A * water.x + B) + 10;
-			water.ground = (int)(A * water.x + B) + 10;
-		}
-	}
-	else if (hill.dic == -1) {
-		double A = (hill.hei / hill.wid);
-		double B = b - A * a;
-
-	}
-}
-
-void Foot() {
-	for (int i = 0; i < 20; ++i) {
-		if (Ft[i].W_On) {
-			if (Ft[i].x> water.x || (water.x - 60) > (Ft[i].x + Ft[i].wid)) {    // 밖으로 나갔을 경우
-				bool signal = FALSE;
-				for (int beam = water.y; beam < 730; ++beam) {            // 빔 쏘기
-					for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
-						if (((Ft[j].y + average) - beam) < 10 && ((Ft[j].y + average) - beam) > -10) {
-							if (Ft[j].x < water.x - 30 && water.x - 30 < Ft[j].x + Ft[j].wid) {            // if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid)
-								water.ground = beam;
-								Ft[j].W_On = FALSE;
-								signal = TRUE;
-							}
-						}
-					}
-				}
-				if (!signal) {
-					water.ground = 730;
-				}
-				if (water.is_Jumping == FALSE) {
-					water.v = 0;
-					water.Down = TRUE;
-				}
-				Ft[i].W_On = FALSE;
-			}
-		}
-		if (Ft[i].F_On) {
-			if (Ft[i].x > fire.x || fire.x - 60 > Ft[i].x + Ft[i].wid) {    // 밖으로 나갔을 경우
-				bool signal = FALSE;
-				for (int beam = fire.y; beam < 730; ++beam) {            // 빔 쏘기
-					for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
-						if ((Ft[j].y + average) - beam < 10 && (Ft[j].y + average) - beam > -10) {
-							if (Ft[j].x < fire.x && fire.x - 60 < Ft[j].x + Ft[j].wid) {
-								fire.ground = beam;
-								Ft[j].W_On = FALSE;
-								signal = TRUE;
-							}
-						}
-					}
-				}
-				if (!signal) {
-					fire.ground = 730;
-				}
-				if (fire.is_Jumping == FALSE) {
-					fire.v = 0;
-					fire.Down = TRUE;
-				}
-				Ft[i].F_On = FALSE;
-			}
-		}
-		if (water.is_Jumping == TRUE) {
-			if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid) {
-				if ((water.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (water.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {    // 머리 부닥치기
-					water.v = 0;
-					water.Down = TRUE;
-				}
-				if (Ft[i].y + average - water.y <= 5 && Ft[i].y + average - water.y > -20) {        // 안착
-					water.is_Jumping = FALSE;
-					water.Down = FALSE;
-					water.v = 50;
-					water.y = Ft[i].y + average;
-					water.ground = Ft[i].y + average;
-					Ft[i].W_On = TRUE;
-				}
-			}
-			if (Ft[i].y + average > water.y - 60 && Ft[i].y + Ft[i].hei + average < water.y) {
-				if (Ft[i].x - 5 - water.x < 20 && Ft[i].x - 5 - water.x > 0) {
-					water.wid_a = 0;
-					water.wid_v = 0;
-				}
-				if ((water.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (water.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
-					water.wid_a = 0;
-					water.wid_v = 0;
-				}
-			}
-		}
-		if (fire.is_Jumping == TRUE) {
-			if (Ft[i].x< fire.x && fire.x - 60 < Ft[i].x + Ft[i].wid) {
-				if ((fire.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (fire.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {
-					fire.v = 0;
-					fire.Down = TRUE;
-				}
-				if (Ft[i].y + average - fire.y <= 5 && Ft[i].y + average - fire.y > -20) {
-					fire.is_Jumping = FALSE;
-					fire.Down = FALSE;
-					fire.v = 50;
-					fire.y = Ft[i].y + average;
-					fire.ground = Ft[i].y + average;
-					Ft[i].F_On = TRUE;
-				}
-			}
-			if (Ft[i].y + average > fire.y - 70 && Ft[i].y + Ft[i].hei + average < fire.y) {
-				if (Ft[i].x - 5 - fire.x < 20 && Ft[i].x - 5 - fire.x > 0) {
-					fire.wid_a = 0;
-					fire.wid_v = 0;
-				}
-				if ((fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
-					fire.wid_a = 0;
-					fire.wid_v = 0;
-				}
-			}
-		}
-	}
 }

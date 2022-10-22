@@ -34,3 +34,12 @@
 # BGM
 *.mp3
 *.wav
+
+## Folders
+Debug/
+Release/
+x64/
+.vs/
+**/Debug/
+**/Release/
+**/x64/
