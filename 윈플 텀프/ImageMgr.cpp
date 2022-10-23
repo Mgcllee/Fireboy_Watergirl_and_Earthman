@@ -87,6 +87,7 @@ void DrawMap(HDC* memdc, short stage)
 			foot_block.Draw(*memdc, Ft[i].x, Ft[i].y, Ft[i].wid, Ft[i].hei, 0, 0, 111, 23);
 		}
 
+
 		door_red.Draw(*memdc, red_door.x, red_door.y, 60, 100, red_door.image_x, red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, blue_door.x, blue_door.y, 60, 100, blue_door.image_x, blue_door.image_y, 60, 104);
 	}

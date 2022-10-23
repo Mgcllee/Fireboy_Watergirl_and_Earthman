@@ -60,14 +60,14 @@ void Loop(bool keyDown)
 		}
 	}
 	else if (false == keyDown) {
-		/*water.is_Move = FALSE;
+		water.is_Move = FALSE;
 		water.wid_a = 0;
 		water.is_Speed_Down = TRUE;
 		fire.is_Move = FALSE;
 		fire.wid_a = 0;
-		F_Frame = 0;
-		W_Frame = 0;
-		fire.is_Speed_Down = TRUE;*/
+		water.Frame = 0;
+		fire.Frame = 0;
+		fire.is_Speed_Down = TRUE;
 	}
 }
 

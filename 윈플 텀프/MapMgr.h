@@ -4,7 +4,6 @@
 
 extern RECTANGLE Rt;
 
-extern BOOL playsound;
 extern int stage;
 extern BOOL clear;
 extern int average;
@@ -15,7 +14,9 @@ extern int red_total;
 extern int blue_total;
 extern BOOL stair;
 
-extern OBJECT Jewelry[20];	// 0~9±îÁö ÆÄ¶ûº¸¼® 10~19±îÁö »¡°­º¸¼®
+extern std::unordered_map<int, OBJECT> Red_Jewel;
+extern std::unordered_map<int, OBJECT> Blue_Jewel;
+
 extern OBJECT Trap[90];		// 0~19±îÁö ÆÄ¶û °¡¿îµ¥ ¹° 20~29±îÁö ÆÄ¶û ¿Þ.¿À 30~49±îÁö »¡°­ °¡¿îµ¥ ¹° 50~59±îÁö »¡°­¹° ¿Þ.¿À 60~79 ÃÊ·Ï °¡¿îµ¥ 80~89 ÃÊ·Ï¿Þ.¿À
 extern OBJECT Die;
 extern OBJECT blue_door;

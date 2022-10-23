@@ -157,9 +157,6 @@
     </ClCompile>
     <ClCompile Include="Back_Ground.cpp" />
     <ClCompile Include="MapMgr.cpp" />
-    <ClCompile Include="Stage_1.cpp" />
-    <ClCompile Include="Stage_2.cpp" />
-    <ClCompile Include="Stage_3.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>

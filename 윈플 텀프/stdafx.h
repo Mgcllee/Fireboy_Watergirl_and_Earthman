@@ -1,8 +1,9 @@
 #pragma once
-#include<windows.h>
+#include <windows.h>
 #include <tchar.h>
 #include <atlimage.h>
-#include<mmsystem.h>
+#include <mmsystem.h>
+#include <unordered_map>
 
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
@@ -32,8 +33,8 @@ struct FootHold {
 
 class PLAYER {
 public:
-	int x;
-	int y;
+	int x, y;		// 좌상단 좌표
+	int hei, wid;	// 이미지 크기
 
 	int ground = 730;
 	float g = 4;			// 중력 조절로 점프 높이 조정
@@ -43,11 +44,11 @@ public:
 	int dic = 0;
 	short Frame = 0;
 
-	CImage Anim[5];
-	int C_img_Frame;
-	int C_img_x, C_img_y;
-	int C_img_X_Size_01, C_img_Y_Size_01;
-	int C_img_X_Size_02, C_img_Y_Size_02;
+	CImage Anim[5]{};
+	int C_img_Frame{};
+	int C_img_x{}, C_img_y{};
+	int C_img_X_Size_01{}, C_img_Y_Size_01{};
+	int C_img_X_Size_02{}, C_img_Y_Size_02{};
 
 	bool on = TRUE;
 	bool is_Move = FALSE;
@@ -73,11 +74,34 @@ struct RECTANGLE {
 	bool Down = FALSE;
 };
 
-struct OBJECT {
-	int image_x, image_y;
-	int x, y;
-	int wid = 111, hei = 23;
+class OBJECT {
+
+public:
+	int image_x{}, image_y{};
+	int x{}, y{};
+	int wid{}, hei{};
 	bool On = FALSE;
+
+	OBJECT() {};
+	OBJECT(int pos_x, int pos_y, int WID, int HEI, bool ON) : x(pos_x), y(pos_y), wid(WID), hei(HEI), On(ON)
+	{
+		image_x = 0;
+		image_y = 0;
+		On = FALSE;
+	}
+
+	bool Collision(PLAYER* pl) {
+		if (x <= pl->x && (pl->x + pl->wid) <= x + wid && (pl->y - pl->hei) - x <= 0.1f) {
+			pl->y = y - pl->hei;
+			return true;
+		}
+		if (x <= pl->x && (pl->x + pl->wid) <= x + wid && pl->y - (y + hei) < 0.1f) {
+			pl->Down;
+			return true;
+		}
+		return false;
+	}
+
 };
 
 extern PLAYER water;
