@@ -80,8 +80,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_BUTTON1:	// First Start
-			currentStage.stage = 1;
-			currentStage.Stage_1(0);
+			/*currentStage.stage = 1;
+			currentStage.Stage_1(0);*/
+			stageIndex++;
 			SetTimer(hWnd, 5, 1000, NULL);
 			LoadSound(hWnd);
 			DestroyWindow(start_button);
