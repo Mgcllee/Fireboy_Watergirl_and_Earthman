@@ -20,10 +20,7 @@ void LoadSound(HWND hWnd);
 
 void Loop(bool keyDown);
 
-void Push();
-void Jump();
-void Wid_Move();
-void Foot();
+
 
 struct FootHold {
 	int x = 0, y = 0;
