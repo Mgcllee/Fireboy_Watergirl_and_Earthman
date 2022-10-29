@@ -3,11 +3,11 @@
 
 StageMgr::StageMgr()
 {
-	myStage[0].Stage_1(0);
+	myStage[0].Stage_1();
 	myStage[0].stage = 0;
-	myStage[1].Stage_1(1);
+	myStage[1].Stage_1();
 	myStage[1].stage = 1;
-	myStage[2].Stage_1(2);
+	myStage[2].Stage_1();
 	isUse[0] = true;
 	isUse[1] = true;
 }

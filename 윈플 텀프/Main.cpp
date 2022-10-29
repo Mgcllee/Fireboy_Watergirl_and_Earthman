@@ -9,6 +9,7 @@ StageMgr myStageMgr;
 
 int stageIndex = 0;
 
+// 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
 	HWND hWnd;
@@ -19,6 +20,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	g_hInst = hInstance;
 
+	// 윈도우 값 초기화
 	WndClass.cbSize = sizeof(WndClass);
 	WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	WndClass.lpfnWndProc = (WNDPROC)WndProc;
@@ -33,12 +35,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	WndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&WndClass);
 
+	// 전체 이미지 초기화
 	myImageMgr.LoadImages();
 
+	// 메인 윈도우 생성
 	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, NULL, (HMENU)NULL, hInstance, NULL);
+	
+	// 메인 윈도우 Set Visible
 	ShowWindow(hWnd, nCmdShow);
+	
+	// 메인 윈도우 Update Data
 	UpdateWindow(hWnd);
 
+	// 윈도우 Main Message Loop
 	while (GetMessage(&Message, 0, 0, 0))
 	{
 		TranslateMessage(&Message);
@@ -47,6 +56,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	return Message.wParam;
 }
 
+/*
+	[메인 윈도우 작업 함수]
+	1. WM_CREATE : 최초 초기화
+
+	2. WM_COMMAND : 키 입력
+					(IDC_BUTTON1 : Title 화면 시작 버튼,
+					 IDC_BUTTON2 : Game Over 화면에서 재시작 버튼)
+					 IDC_BUTTON3 : Game Over 화면에서 프로그램 종료 버튼,
+					 IDC_BUTTON4 : Stage Clear 성공시 다음 스테이지로 이동)
+
+	3. WM_TIMER : 타이머 호출시 실행, 내부 switch문에서 timer의 ID를 사용해 해당 작업을 수행
+					(Timer ID : case WM_CREATE 에 있는 SetTimer 함수의 2번째 파라미터)
+					(Timer ID 1 : User 입력에 따른 캐릭터 이동과 충돌체크,
+					 Timer ID 2 : 캐릭터(Fire boy, Water girl)의 애니메이션 프레임 (총 8개)
+					 Timer ID 3 : 오브젝트 애니메이션 전용
+					 Timer ID 4 : 캐릭터 출구, Stage_03의 이동 발판 애니메이션 (Timer ID 3 와 호출 시간이 다름)
+					 Timer ID 5 : 제한 시간 (time변수) 초과할 경우 화면 갱신 ()
+	
+	4. WM_KEYDOWN : 키가 눌렸을 때 동작
+
+	5. WM_KEYUP : 키가 (눌렸다가) 올라갈 때 동작
+
+	6. WM_PAINT : 메인 윈도우에 오브젝트 그리기
+
+	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
+*/
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
@@ -68,8 +103,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE: {
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
-
-		// LoadSound(hWnd);
 
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
@@ -95,13 +128,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (currentStage.stage)
 			{
 			case 1:
-				currentStage.Stage_1(0);
+				currentStage.Stage_1();
 				break;
 			case 2:
-				currentStage.Stage_2(0);
+				currentStage.Stage_2();
 				break;
 			case 3:
-				currentStage.Stage_3(0);
+				currentStage.Stage_3();
 				break;
 			}
 			LoadSound(hWnd);
@@ -135,13 +168,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (currentStage.stage)
 			{
 			case 1:
-				currentStage.Stage_1(0);
+				currentStage.Stage_1();
 				break;
 			case 2:
-				currentStage.Stage_2(0);
+				currentStage.Stage_2();
 				break;
 			case 3:
-				currentStage.Stage_3(0);
+				currentStage.Stage_3();
 				break;
 			}
 			/*for (int i = 0; i < 20; i++)
@@ -172,7 +205,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
-
 	case WM_TIMER:			// m/s Timer Function
 		switch (wParam) {
 		case 1:				// 캐릭터 이동과 충돌체크
@@ -180,8 +212,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.Jump();
 			currentStage.Foot();
 			currentStage.Push();
-
-
 
 			//if (stage > 0)
 			//{
@@ -324,10 +354,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (++water.Frame >= 8) water.Frame = 0;
 			break;
 
-		case 3:				// 
+		case 3:				// 보석, 함정, 사망, 문 애니메이션 처리와 스테이지 클리어 조건 충족시 후처리(Next 윈도우와 배경처리)
 			blue_count = 0;
 			red_count = 0;
 
+			// 파랑 보석 애니메이션
 			for (auto& bj : currentStage.Blue_Jewel) {
 				if (bj.second.On) {
 					blue_count += 1;
@@ -339,6 +370,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			// 빨강 보석 애니메이션
 			for (auto& rj : currentStage.Red_Jewel) {
 				if (rj.second.On) {
 					red_count += 1;
@@ -349,9 +381,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
+
+			// 
 			currentStage.red_total = red_count;
 			currentStage.blue_total = blue_count;
 
+			// 함정(빨강, 파랑, 초록 우물)의 애니메이션
 			for (int i = 0; i < 90; i++) // 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
 			{
 				if (currentStage.Trap[i].On)
@@ -407,8 +442,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			// Fire bot, Water girl 중 1명이라도 사망 && 현재 Stage가 1 이상인 경우 (Stage 0은 Title 화면)
 			if (currentStage.Die.On && currentStage.stage > 0)
 			{
+				// 캐릭터 (Fire, Water 공통) 사망시 나오는 연기 애니메이션 
 				currentStage.Die.image_x += 159;
 				if (currentStage.Die.image_x == 7950)
 				{
@@ -429,6 +466,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			// 스테이스 클리어 후 문으로 들어가는 애니메이션
 			if (currentStage.stair)
 			{
 				stair_red_x += 50;
@@ -446,6 +484,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			// 현재 스테이지 클리어 후 배경 처리(뒷 배경 어둡게)와 "Next" 버튼 윈도우 생성
 			if (currentStage.clear)
 			{
 				if (currentStage.count == 0)
@@ -455,6 +494,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					currentStage.count = 1;
 				}
 			}
+
+			// "Stage_03() 에서 나오는 X축 이동 바" 의 동작 버튼 애니메이션 (버튼 42.16.PNG 파일 참고)
 			for (int i = 0; i < 5; i++)
 			{
 				if (currentStage.button[i].On)
@@ -482,7 +523,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case 4:
-			// 파랑, 빨강 출구 애니메이션
+			// Fire bot 출구 애니메이션
 			if (currentStage.red_door.On)
 			{
 				if (currentStage.red_door.image_x == 1260)
@@ -503,6 +544,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					//문 다열림
 				}
 			}
+
+			// Water girl 출구 애니메이션
 			if (currentStage.blue_door.On)
 			{
 				if (currentStage.blue_door.image_x == 1260)
@@ -514,7 +557,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					currentStage.blue_door.image_x += 60;
 				}
 			}
-			else//문이 열리다가 중간에 이탈하면 다시 닫힘
+
+			//문이 열리다가 중간에 이탈하면 다시 닫힘
+			else 
 			{
 				currentStage.blue_door_open = FALSE;
 				if (currentStage.blue_door.image_x > 0)
@@ -524,6 +569,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+			// Stage_03() 에서 나오는 X축 이동 바 (block1.PNG 파일 참고)
 			for (int i = 0; i < 5; i++)
 			{
 				if (currentStage.block[i].On)
@@ -543,7 +589,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 
-		case 5:				//타임아웃시 할 동작
+		case 5:
+			//타임아웃시 할 동작
 			if (--time == 0)
 			{
 				currentStage.time_over = TRUE;
@@ -559,7 +606,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
-
 	case WM_KEYDOWN:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = TRUE;

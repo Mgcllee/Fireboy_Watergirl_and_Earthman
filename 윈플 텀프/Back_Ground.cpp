@@ -1,6 +1,7 @@
 #pragma once
 #include"stdafx.h"
 
+// 윈도우 프로그래밍에서 키 동시 입력을 위한 함수 (제거 예정)
 void Loop(bool keyDown)
 {
 	if (true == keyDown) {
@@ -71,6 +72,7 @@ void Loop(bool keyDown)
 	}
 }
 
+// WAV형식 음원 분석 함수 (LoadSound()함수에서만 호출)
 DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave)
 {
 	MCI_OPEN_PARMS	mciOpenParms;
@@ -89,6 +91,7 @@ DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave)
 	return 0;
 }
 
+// WAV형식 음원 스테이지에 맞게 출력하기 (Main.cpp에서 스테이지 변경시 호출 필요)
 void LoadSound(HWND hWnd)
 {
 	DWORD SelectBGM{};
