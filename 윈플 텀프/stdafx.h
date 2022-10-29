@@ -20,10 +20,7 @@ void LoadSound(HWND hWnd);
 
 void Loop(bool keyDown);
 
-void Push();
-void Jump();
-void Wid_Move();
-void Foot();
+
 
 struct FootHold {
 	int x = 0, y = 0;
@@ -70,17 +67,17 @@ struct RECTANGLE {
 	int y, dic = 0;
 
 	float g = 4;			// 중력 조절로 점프 높이 조정
-	float v = 0;
+	float v = 0;			// 이동 속도
 	bool Down = FALSE;
 };
 
 class OBJECT {
 
 public:
-	int image_x{}, image_y{};
-	int x{}, y{};
-	int wid{}, hei{};
-	bool On = FALSE;
+	int image_x{}, image_y{};	// 이미지 
+	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 좌표
+	int wid{}, hei{};			// 가로길이, 세로길이
+	bool On = FALSE;			// 사용 여부
 
 	OBJECT() {};
 	OBJECT(int pos_x, int pos_y, int WID, int HEI, bool ON) : x(pos_x), y(pos_y), wid(WID), hei(HEI), On(ON)
@@ -90,6 +87,7 @@ public:
 		On = FALSE;
 	}
 
+	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
 	bool Collision(PLAYER* pl) {
 		if (x <= pl->x && (pl->x + pl->wid) <= x + wid && (pl->y - pl->hei) - x <= 0.1f) {
 			pl->y = y - pl->hei;
@@ -101,7 +99,6 @@ public:
 		}
 		return false;
 	}
-
 };
 
 extern PLAYER water;
