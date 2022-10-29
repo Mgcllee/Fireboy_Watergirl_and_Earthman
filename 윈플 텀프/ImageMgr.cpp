@@ -1,6 +1,7 @@
 #pragma once
 #include"ImageMgr.h"
 
+// PNG파일 읽어오기
 void ImageMgr::LoadImages() {
 	robby.Load(L"Resource\\로비 이미지 초안 2.png");
 	buttonimg.Load(L"Resource\\플레이 버튼 158.60.png");
@@ -67,6 +68,7 @@ void ImageMgr::LoadImages() {
 	rect.Load(L"Resource\\상자 40.40.png");
 }
 
+// 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 {
 	if (stageNum == 0)
@@ -119,6 +121,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	}
 }
 
+// 스테이지 진행 화면에서 중앙, 상단에 있는 Timer 그리기
 void ImageMgr::DrawTimer(HDC* memdc, short time) {
 	clock.Draw(*memdc, 525, 0, 150, 50, 0, 0, 154, 54);
 	switch (time / 60) {
@@ -219,6 +222,7 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 	}
 }
 
+// Fire boy와 Water girl의 애니메이션 재생 함수
 void ImageMgr::DrawPlayer(HDC* memdc, short Frame, PLAYER* pl, Stage& stage) {
 	if (pl->on)
 	{
