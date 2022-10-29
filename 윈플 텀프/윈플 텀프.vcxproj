@@ -151,20 +151,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameSound.cpp" />
     <ClCompile Include="ImageMgr.cpp" />
     <ClCompile Include="Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Back_Ground.cpp" />
-    <ClCompile Include="MapMgr.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageMgr.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameSound.h" />
     <ClInclude Include="ImageMgr.h" />
-    <ClInclude Include="MapMgr.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageMgr.h" />
     <ClInclude Include="stdafx.h" />

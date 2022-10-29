@@ -112,12 +112,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDC_BUTTON1:	// First Start
-			/*currentStage.stage = 1;
-			currentStage.Stage_1(0);*/
+		case IDC_BUTTON1:
 			stageIndex++;
 			SetTimer(hWnd, 5, 1000, NULL);
-			LoadSound(hWnd);
+			//LoadSound(hWnd);
 			DestroyWindow(start_button);
 			break;
 		case IDC_BUTTON2:	// Restart Game
@@ -137,7 +135,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				currentStage.Stage_3();
 				break;
 			}
-			LoadSound(hWnd);
+			//LoadSound(hWnd);
 
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);

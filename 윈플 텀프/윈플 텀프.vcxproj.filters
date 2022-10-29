@@ -27,16 +27,13 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MapMgr.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Stage.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="StageMgr.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSound.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +44,13 @@
     <ClInclude Include="ImageMgr.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MapMgr.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Stage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="StageMgr.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSound.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
