@@ -30,7 +30,7 @@ struct FootHold {
 
 class PLAYER {
 public:
-	int x, y;		// 좌상단 좌표
+	int x, y;		// 우하단 좌표
 	int hei, wid;	// 이미지 크기
 
 	int ground = 730;
@@ -82,23 +82,64 @@ public:
 	OBJECT() {};
 	OBJECT(int pos_x, int pos_y, int WID, int HEI, bool ON) : x(pos_x), y(pos_y), wid(WID), hei(HEI), On(ON)
 	{
-		image_x = 0;
-		image_y = 0;
-		On = FALSE;
+		this->image_x = 0;
+		this->image_y = 0;
 	}
 
 	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
-	bool Collision(PLAYER* pl) {
-		if (x <= pl->x && (pl->x + pl->wid) <= x + wid && (pl->y - pl->hei) - x <= 0.1f) {
-			pl->y = y - pl->hei;
+	bool Collision(PLAYER& pl) {
+		/*if (	((x - wid <= (pl->x - pl->wid)	&& (pl->x - pl->wid)	<= x + wid) 
+			||	(x - wid <=	pl->x				&&	pl->x				<= x + wid))
+			&&	((y <= pl->y && pl->y <= y + hei)
+			||	(pl->y - pl->hei >= y && pl->y - pl->hei <= y + hei))) {
+			On = false;
 			return true;
-		}
-		if (x <= pl->x && (pl->x + pl->wid) <= x + wid && pl->y - (y + hei) < 0.1f) {
-			pl->Down;
+		}*/
+	
+		if (pl.y <= y - hei) {
+			this->On = false;
+			// exit(true);
 			return true;
-		}
+		} 
+
 		return false;
 	}
+
+	/*
+	
+	for (int i = 0; i < 20; i++)
+				{
+					if (i >= 10)
+					{  
+						if (((	fire.x - 50 <= Jewelry[i].x + 28	&&	 fire.x - 50	>= Jewelry[i].x) 
+						|| (	fire.x		<= Jewelry[i].x + 28	&&	 fire.x			>= Jewelry[i].x)) 
+						 
+						&& ((	fire.y - 80	>= Jewelry[i].y			&& fire.y - 80		<= Jewelry[i].y + 25)
+						|| (	fire.y		>= Jewelry[i].y			&& fire.y			<= Jewelry[i].y + 25)))
+
+						{
+							Jewelry[i].On = FALSE;
+						}
+						else if (fire.x - 50 <= Jewelry[i].x && fire.x >= Jewelry[i].x && fire.y - 80 <= Jewelry[i].y && fire.y >= Jewelry[i].y)
+						{
+							Jewelry[i].On = FALSE;
+						}
+					}
+					if (i < 10)
+					{
+						if (((water.x - 50 <= Jewelry[i].x + 28 && water.x - 50 >= Jewelry[i].x) || (water.x <= Jewelry[i].x + 28 && water.x >= Jewelry[i].x)) && ((water.y - 80 >= Jewelry[i].y && water.y - 80 <= Jewelry[i].y + 25) || (water.y >= Jewelry[i].y && water.y <= Jewelry[i].y + 25)))
+						{
+							Jewelry[i].On = FALSE;
+						}
+						else if (water.x - 50 <= Jewelry[i].x && water.x >= Jewelry[i].x && water.y - 80 <= Jewelry[i].y && water.y >= Jewelry[i].y)
+						{
+							Jewelry[i].On = FALSE;
+						}
+					}
+				}
+				
+	
+	*/
 };
 
 extern PLAYER water;

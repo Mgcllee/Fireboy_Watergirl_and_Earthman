@@ -211,33 +211,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.Foot();
 			currentStage.Push();
 
-			//if (stage > 0)
-			//{
-			//	for (int i = 0; i < 20; i++)
-			//	{
-			//		if (i >= 10)
-			//		{
-			//			if (((fire.x - 50 <= Jewelry[i].x + 28 && fire.x - 50 >= Jewelry[i].x) || (fire.x <= Jewelry[i].x + 28 && fire.x >= Jewelry[i].x)) && ((fire.y - 80 >= Jewelry[i].y && fire.y - 80 <= Jewelry[i].y + 25) || (fire.y >= Jewelry[i].y && fire.y <= Jewelry[i].y + 25)))
-			//			{
-			//				Jewelry[i].On = FALSE;
-			//			}
-			//			else if (fire.x - 50 <= Jewelry[i].x && fire.x >= Jewelry[i].x && fire.y - 80 <= Jewelry[i].y && fire.y >= Jewelry[i].y)
-			//			{
-			//				Jewelry[i].On = FALSE;
-			//			}
-			//		}
-			//		if (i < 10)
-			//		{
-			//			if (((water.x - 50 <= Jewelry[i].x + 28 && water.x - 50 >= Jewelry[i].x) || (water.x <= Jewelry[i].x + 28 && water.x >= Jewelry[i].x)) && ((water.y - 80 >= Jewelry[i].y && water.y - 80 <= Jewelry[i].y + 25) || (water.y >= Jewelry[i].y && water.y <= Jewelry[i].y + 25)))
-			//			{
-			//				Jewelry[i].On = FALSE;
-			//			}
-			//			else if (water.x - 50 <= Jewelry[i].x && water.x >= Jewelry[i].x && water.y - 80 <= Jewelry[i].y && water.y >= Jewelry[i].y)
-			//			{
-			//				Jewelry[i].On = FALSE;
-			//			}
-			//		}
-			//	}
+			for (auto& rj : currentStage.Red_Jewel) {
+				rj.second.Collision(fire);
+			}
+
+			//if (currentStage.stage > 0)
+			//{	
 			//	for (int i = 0; i < 90; i++)	// 0~19±îÁö ÆÄ¶û °¡¿îµ¥ 20~24 ÆÄ¶û¿Þ 25~29ÆÄ¶û¿À 30~49 »¡°­ °¡¿îµ¥ 50~54~»¡°­¿Þ 55~59»¡°­¿À 60~79ÃÊ·Ï °¡¿îµ¥ 80~84ÃÊ·Ï¿Þ 85~89ÃÊ·Ï¿À
 			//	{
 			//		if (i < 30)
@@ -356,29 +335,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			blue_count = 0;
 			red_count = 0;
 
-			// ÆÄ¶û º¸¼® ¾Ö´Ï¸ÞÀÌ¼Ç
-			for (auto& bj : currentStage.Blue_Jewel) {
-				if (bj.second.On) {
-					blue_count += 1;
-					bj.second.image_x += 29;
-					if (bj.second.image_x == 1160)
-					{
-						bj.second.image_x = 0;
-					}
-				}
-			}
-
-			// »¡°­ º¸¼® ¾Ö´Ï¸ÞÀÌ¼Ç
-			for (auto& rj : currentStage.Red_Jewel) {
-				if (rj.second.On) {
-					red_count += 1;
-					rj.second.image_x += 28;
-					if (rj.second.image_x == 1120)
-					{
-						rj.second.image_x = 0;
-					}
-				}
-			}
+			//// ÆÄ¶û º¸¼® ¾Ö´Ï¸ÞÀÌ¼Ç
+			//for (auto& bj : currentStage.Blue_Jewel) {
+			//	if (bj.second.On) {
+			//		blue_count += 1;
+			//		bj.second.image_x += 29;
+			//		if (bj.second.image_x == 1160)
+			//		{
+			//			bj.second.image_x = 0;
+			//		}
+			//	}
+			//}
+			//// »¡°­ º¸¼® ¾Ö´Ï¸ÞÀÌ¼Ç
+			//for (auto& rj : currentStage.Red_Jewel) {
+			//	if (rj.second.On) {
+			//		red_count += 1;
+			//		rj.second.image_x += 28;
+			//		if (rj.second.image_x == 1120)
+			//		{
+			//			rj.second.image_x = 0;
+			//		}
+			//	}
+			//}
 
 			// 
 			currentStage.red_total = red_count;
@@ -627,9 +605,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SelectObject(memdc, hbitmap);
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
-		myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
-		myImageMgr.DrawPlayer(&memdc, 0, &fire, currentStage);
-		myImageMgr.DrawTimer(&memdc, time);
+		if (currentStage.stage) {
+			myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
+			myImageMgr.DrawPlayer(&memdc, 0, &fire, currentStage);
+			myImageMgr.DrawTimer(&memdc, time);
+		}
 
 		// »ç¸Á½Ã ¿¬±â Anim
 		if (currentStage.Die.On)	myImageMgr.die.Draw(memdc, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
@@ -662,14 +642,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if (currentStage.clear == FALSE && back == FALSE)
 		{
-			for (auto& bj : currentStage.Blue_Jewel) {
-				myImageMgr.Jewelry_blue.Draw(hDC, bj.second.x, bj.second.y, 28, 25, bj.second.image_x, 0, 28, 24);
-			}
-
-			for (auto& rj : currentStage.Red_Jewel) {
-				myImageMgr.Jewelry_red.Draw(hDC, rj.second.x, rj.second.y, 28, 25, rj.second.image_x, 0, 28, 24);
-			}
-
 			for (int i = 0; i < 90; i++) // 0~19±îÁö ÆÄ¶û °¡¿îµ¥ ¹° 20~29±îÁö ÆÄ¶û ¿Þ.¿À 30~49±îÁö »¡°­ °¡¿îµ¥ ¹° 50~59±îÁö »¡°­¹° ¿Þ.¿À 60~79 ÃÊ·Ï °¡¿îµ¥ 80~89 ÃÊ·Ï¿Þ.¿À
 			{
 				if (currentStage.Trap[i].On)

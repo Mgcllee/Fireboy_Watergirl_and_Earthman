@@ -1,4 +1,5 @@
 #pragma once
+#include "Stage.h"
 #include"ImageMgr.h"
 
 // PNG파일 읽어오기
@@ -84,6 +85,15 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
 		}
 
+		for (auto& rj : stage.Red_Jewel) {
+			if (rj.second.On)
+				Jewelry_red.Draw(*memdc, rj.second.x, rj.second.y, 28, 25, rj.second.image_x, 0, 28, 24);
+		}
+		
+		for (auto& bj : stage.Blue_Jewel) {
+			if (bj.second.On)
+				Jewelry_blue.Draw(*memdc, bj.second.x, bj.second.y, 28, 25, bj.second.image_x, 0, 28, 24);
+		}
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
