@@ -1,8 +1,6 @@
 #pragma once
 #include<wtypes.h>
 
-#pragma pack(push, 1)
-
 #define S2CLoading 0
 #define S2CChangeStage 1
 #define C2SSelectRole 2
@@ -17,6 +15,7 @@
 #define S2CJewelryVisibility 11
 #define S2CDoorOpen 12
 
+#pragma pack(push, 1)
 
 struct S2CLoadingPacket { // 다른 클라이언트 기다리기위한 패킷
 	unsigned char size;
