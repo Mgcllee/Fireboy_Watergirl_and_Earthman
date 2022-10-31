@@ -14,7 +14,7 @@
 #define S2CExitGame 8
 #define C2SRetry 9
 #define S2CResetStage 10
-
+#define S2CJewelryVisibility 11
 
 struct S2CLoadingPacket { // 다른 클라이언트 기다리기위한 패킷
 	unsigned char size;
@@ -88,6 +88,13 @@ struct S2CResetStagePacket { // 클라이언트에게 스테이지 새로 세팅하라는 패킷
 	unsigned char size;
 	char type;
 	short stageNum;
+};
+
+struct S2CJewelryVisibilityPacket { // 서버에서 보석을 먹었다고 판단 후, 클라이언트에게 정보를 전달
+	unsigned char size;
+	char type;
+	char jewelryType; // 어떤 종류의 보석인지
+	int index; // 몇번째 인덱스에 저장된 보석인지
 };
 
 #pragma pack(pop)
