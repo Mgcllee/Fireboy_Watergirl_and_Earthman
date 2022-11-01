@@ -20,8 +20,6 @@ void LoadSound(HWND hWnd);
 
 void Loop(bool keyDown);
 
-
-
 struct FootHold {
 	int x = 0, y = 0;
 	int wid = 111, hei = 23;
@@ -30,16 +28,16 @@ struct FootHold {
 
 class PLAYER {
 public:
-	int x, y;		// 우하단 좌표
-	int hei, wid;	// 이미지 크기
+	int x, y;					// 우하단 좌표
+	int hei = 100, wid = 60;	// 캐릭터 크기
 
-	int ground = 730;
+	int ground = 730;		// Stage의 바닥 높이 (상단이 y = 0, 내려갈수록 +)
 	float g = 4;			// 중력 조절로 점프 높이 조정
-	float v = 50;
-	float wid_a = 0;
-	float wid_v = 0;
-	int dic = 0;
-	short Frame = 0;
+	float v = 50;			// 속도
+	float wid_a = 0;		// 좌우 가속도
+	float wid_v = 0;		// 좌우 속도
+	int dic = 0;			// 이동 방향
+	short Frame = 0;		// 애니메이션 프레임
 
 	CImage Anim[5]{};
 	int C_img_Frame{};
@@ -72,12 +70,12 @@ struct RECTANGLE {
 };
 
 class OBJECT {
+	bool On = FALSE;			// 사용 여부
 
 public:
-	int image_x{}, image_y{};	// 이미지 
+	int image_x{}, image_y{};	// 이미지 프레임 기준점 (스프라이트 이미지)
 	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 좌표
 	int wid{}, hei{};			// 가로길이, 세로길이
-	bool On = FALSE;			// 사용 여부
 
 	OBJECT() {};
 	OBJECT(int pos_x, int pos_y, int WID, int HEI, bool ON) : x(pos_x), y(pos_y), wid(WID), hei(HEI), On(ON)
@@ -88,58 +86,23 @@ public:
 
 	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
 	bool Collision(PLAYER& pl) {
-		/*if (	((x - wid <= (pl->x - pl->wid)	&& (pl->x - pl->wid)	<= x + wid) 
-			||	(x - wid <=	pl->x				&&	pl->x				<= x + wid))
-			&&	((y <= pl->y && pl->y <= y + hei)
-			||	(pl->y - pl->hei >= y && pl->y - pl->hei <= y + hei))) {
-			On = false;
+		if  (
+			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
+			&& 
+			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) <= (hei + pl.hei) / 2)
+			) {
 			return true;
-		}*/
-	
-		if (pl.y <= y - hei) {
-			this->On = false;
-			// exit(true);
-			return true;
-		} 
-
-		return false;
+		}
+		else return false;
 	}
 
-	/*
-	
-	for (int i = 0; i < 20; i++)
-				{
-					if (i >= 10)
-					{  
-						if (((	fire.x - 50 <= Jewelry[i].x + 28	&&	 fire.x - 50	>= Jewelry[i].x) 
-						|| (	fire.x		<= Jewelry[i].x + 28	&&	 fire.x			>= Jewelry[i].x)) 
-						 
-						&& ((	fire.y - 80	>= Jewelry[i].y			&& fire.y - 80		<= Jewelry[i].y + 25)
-						|| (	fire.y		>= Jewelry[i].y			&& fire.y			<= Jewelry[i].y + 25)))
+	void SetVisible(bool in) {
+		On = in;
+	}
 
-						{
-							Jewelry[i].On = FALSE;
-						}
-						else if (fire.x - 50 <= Jewelry[i].x && fire.x >= Jewelry[i].x && fire.y - 80 <= Jewelry[i].y && fire.y >= Jewelry[i].y)
-						{
-							Jewelry[i].On = FALSE;
-						}
-					}
-					if (i < 10)
-					{
-						if (((water.x - 50 <= Jewelry[i].x + 28 && water.x - 50 >= Jewelry[i].x) || (water.x <= Jewelry[i].x + 28 && water.x >= Jewelry[i].x)) && ((water.y - 80 >= Jewelry[i].y && water.y - 80 <= Jewelry[i].y + 25) || (water.y >= Jewelry[i].y && water.y <= Jewelry[i].y + 25)))
-						{
-							Jewelry[i].On = FALSE;
-						}
-						else if (water.x - 50 <= Jewelry[i].x && water.x >= Jewelry[i].x && water.y - 80 <= Jewelry[i].y && water.y >= Jewelry[i].y)
-						{
-							Jewelry[i].On = FALSE;
-						}
-					}
-				}
-				
-	
-	*/
+	bool GetVisible() {
+		return On;
+	}
 };
 
 extern PLAYER water;

@@ -10,23 +10,22 @@ void Stage::Stage_1() {
 	fire.on = TRUE;
 	water.on = TRUE;
 
+	if(Red_Jewel.empty() && Blue_Jewel.empty())
 	{
-		Die.On = FALSE;
+		Die.SetVisible(false);
 		Red_Jewel.clear();
 		Blue_Jewel.clear();
 
-		for (int i = 0; i < 90; i++)
-		{
-			Trap[i].image_x = 0;
-			Trap[i].image_y = 0;
-			Trap[i].x = 0;
-			Trap[i].y = 0;
-			Trap[i].wid = 20;
-			Trap[i].hei = 20;
-		}
+		Trap.reserve(3);
 
-		Blue_Jewel.try_emplace(0, OBJECT{ 300, 450, 0, 0, TRUE });
-		Red_Jewel.try_emplace(0, OBJECT{ 900, 450, 0, 0, TRUE });
+		for (auto& t : Trap) {
+			t = OBJECT{0, 0, 20, 20, FALSE};
+		}
+		
+		if (Blue_Jewel.size() == 0 && Red_Jewel.size() == 0) {
+			Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, TRUE });
+			Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, TRUE });
+		}
 
 		blue_door = OBJECT{ 480, 300, 0, 0, FALSE };
 		red_door = OBJECT{ 630, 300, 0, 0, FALSE };
@@ -548,7 +547,7 @@ void Stage::Push() {
 void Stage::Foot() {
 	for (int i = 0; i < 20; ++i) {	// 발판의 최대수가 20개이므로 최대치 20
 		if (Ft[i].W_On) {
-			if (Ft[i].x > water.x || (water.x - 60) > (Ft[i].x + Ft[i].wid)) {    // 밖으로 나갔을 경우
+			if (Ft[i].x > water.x || (water.x - water.wid) > (Ft[i].x + Ft[i].wid)) {    // 밖으로 나갔을 경우
 				bool signal = FALSE;
 				for (int beam = water.y; beam < 730; ++beam) {            // 빔 쏘기
 					for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사

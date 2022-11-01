@@ -85,16 +85,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
 		}
 
-		for (auto& rj : stage.Red_Jewel) {
-			if (rj.second.On)
-				Jewelry_red.Draw(*memdc, rj.second.x, rj.second.y, 28, 25, rj.second.image_x, 0, 28, 24);
-		}
-		
-		for (auto& bj : stage.Blue_Jewel) {
-			if (bj.second.On)
-				Jewelry_blue.Draw(*memdc, bj.second.x, bj.second.y, 28, 25, bj.second.image_x, 0, 28, 24);
-		}
-
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 	}
@@ -237,16 +227,16 @@ void ImageMgr::DrawPlayer(HDC* memdc, short Frame, PLAYER* pl, Stage& stage) {
 	if (pl->on)
 	{
 		if ((pl->Down == TRUE) && pl->dic == 0) {
-			pl->Anim[3].Draw(*memdc, pl->x - 60, pl->y - 100 + stage.average, 60, 100, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
+			pl->Anim[3].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
 		}
 		else if (pl->dic == 0) {
-			pl->Anim[1].Draw(*memdc, pl->x - 60, pl->y - 100 + stage.average, 60, 100, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
+			pl->Anim[1].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
 		}
 		else if (pl->dic == -1) {
-			pl->Anim[4].Draw(*memdc, pl->x - 60, pl->y - 100 + stage.average, 60, 100, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
+			pl->Anim[4].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
 		}
 		else if (pl->dic == 1) {
-			pl->Anim[2].Draw(*memdc, pl->x - 60, pl->y - 100 + stage.average, 60, 100, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
+			pl->Anim[2].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
 		}
 	}
 }
