@@ -12,5 +12,5 @@ public:
 	Stage& getStage(int index);
 
 private:
-	bool isUse[3] = { false };
+	bool isUse[4] = { false };
 };

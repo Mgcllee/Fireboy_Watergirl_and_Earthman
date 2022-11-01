@@ -6,6 +6,7 @@
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
+Stage currentStage;
 
 int stageIndex = 0;
 
@@ -47,6 +48,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	// 메인 윈도우 Update Data
 	UpdateWindow(hWnd);
 
+	// 스테이지 열기
+	currentStage = myStageMgr.getStage(stageIndex);
+
 	// 윈도우 Main Message Loop
 	while (GetMessage(&Message, 0, 0, 0))
 	{
@@ -85,7 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
-	HDC hDC;
+	HDC hDC; 
 	static HDC memdc;
 	static HBITMAP hbitmap;
 	HBRUSH hBrush, oldBrush;
@@ -97,8 +101,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
 
-	Stage currentStage = myStageMgr.getStage(stageIndex);
-
 	switch (uMsg) {
 	case WM_CREATE: {
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
@@ -108,21 +110,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, 2, 100, NULL);
 		SetTimer(hWnd, 3, 50, NULL);
 		SetTimer(hWnd, 4, 50, NULL);
+		SetTimer(hWnd, 5, 1000, NULL);
 		break;
 	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_BUTTON1:
-			stageIndex++;
+			stageIndex = 1;
+			currentStage = myStageMgr.getStage(stageIndex);
 			SetTimer(hWnd, 5, 1000, NULL);
-			//LoadSound(hWnd);
+			// LoadSound(hWnd);
 			DestroyWindow(start_button);
 			break;
 		case IDC_BUTTON2:	// Restart Game
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
-
 			switch (currentStage.stage)
 			{
 			case 1:
@@ -136,7 +139,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			//LoadSound(hWnd);
-
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);
 			SetTimer(hWnd, 3, 50, NULL);
@@ -212,126 +214,151 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.Push();
 
 			for (auto& rj : currentStage.Red_Jewel) {
-				rj.second.Collision(fire);
+				if (rj.Collision(fire)) {
+					rj.SetVisible(false);
+				}
 			}
 
-			//if (currentStage.stage > 0)
-			//{	
-			//	for (int i = 0; i < 90; i++)	// 0~19까지 파랑 가운데 20~24 파랑왼 25~29파랑오 30~49 빨강 가운데 50~54~빨강왼 55~59빨강오 60~79초록 가운데 80~84초록왼 85~89초록오
-			//	{
-			//		if (i < 30)
-			//		{
-			//			if (((fire.x - 50 <= Trap[i].x + 28 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 28 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
-			//			{
-			//				fire.on = FALSE;
-			//				Die.On = TRUE;
-			//				Die.x = Trap[i].x;
-			//				Die.y = Trap[i].y-100;
-			//			}
-			//		}
-			//		if (i >= 30 && i < 60)
-			//		{
-			//			if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
-			//			{
-			//				water.on = FALSE;
-			//				Die.On = TRUE;
-			//				Die.x = Trap[i].x;
-			//				Die.y = Trap[i].y-100;
-			//			}
-			//		}
-			//		if (i >= 60 && i < 90)
-			//		{
-			//			if (((fire.x - 50 <= Trap[i].x + 25 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 25 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
-			//			{
-			//				fire.on = FALSE;
-			//				Die.On = TRUE;
-			//				Die.x = Trap[i].x;
-			//				Die.y = Trap[i].y-100;
-			//			}
-			//			if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
-			//			{
-			//				water.on = FALSE;
-			//				Die.On = TRUE;
-			//				Die.x = Trap[i].x;
-			//				Die.y = Trap[i].y-100;
-			//			}
-			//		}
-			//	}
-			//	for (int i = 0; i < 5; i++)
-			//	{
-			//		if (((fire.x - 50 <= button[i].x + 40 && fire.x - 50 >= button[i].x) || (fire.x <= button[i].x + 40 && fire.x >= button[i].x)) && ((fire.y - 80 >= button[i].y - button[i].image_y && fire.y - 80 <= button[i].y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else if (((water.x - 50 <= button[i].x + 40 && water.x - 50 >= button[i].x) || (water.x <= button[i].x + 40 && water.x >= button[i].x)) && ((water.y - 80 >= button[i].y - button[i].image_y && water.y - 80 <= button[i].y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else if (fire.x >= button[i].x && fire.x - 50 <= button[i].x && ((fire.y - 80 >= button[i].y && fire.y - 80 <= button[i].y - -button[i].image_y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y - -button[i].image_y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else if (water.x >= button[i].x && water.x - 50 <= button[i].x && ((water.y - 80 >= button[i].y && water.y - 80 <= button[i].y - -button[i].image_y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y - -button[i].image_y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else
-			//		{
-			//			button[i].On = FALSE;
-			//		}
-			//	}
-			//	for (int i = 0; i < 5; i++)
-			//	{
-			//		if (((Rt.x - 50 <= button[i].x + 40 && Rt.x - 50 >= button[i].x) || (Rt.x <= button[i].x + 40 && Rt.x >= button[i].x)) && ((Rt.y - 50 >= button[i].y - button[i].image_y && Rt.y - 50 <= button[i].y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else if (Rt.x >= button[i].x && Rt.x - 50 <= button[i].x && ((Rt.y - 80 >= button[i].y && Rt.y - 80 <= button[i].y - -button[i].image_y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y - -button[i].image_y)))
-			//		{
-			//			button[i].On = TRUE;
-			//		}
-			//		else
-			//		{
-			//			button[i].On = FALSE;
-			//		}
-			//	}
-			//	if (((fire.x - 50 <= red_door.x + 40 && fire.x - 50 >= red_door.x) || (fire.x <= red_door.x + 40 && fire.x >= red_door.x)) && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y + 100) || (fire.y >= red_door.y - 100 && fire.y <= red_door.y + 100)))
-			//	{
-			//		red_door.On = TRUE;
-			//	}
-			//	else if (fire.x >= red_door.x && fire.x - 50 <= red_door.x && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y) || (fire.y >= red_door.y + 100 && fire.y <= red_door.y + 100)))
-			//	{
-			//		red_door.On = TRUE;
-			//	}
-			//	else
-			//	{
-			//		red_door.On = FALSE;
-			//	}
-			//	if (((water.x - 50 <= blue_door.x + 40 && water.x - 50 >= blue_door.x) || (water.x <= blue_door.x + 40 && water.x >= blue_door.x)) && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
-			//	{
-			//		blue_door.On = TRUE;
-			//	}
-			//	else if (water.x >= blue_door.x && water.x - 50 <= blue_door.x && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
-			//	{
-			//		blue_door.On = TRUE;
-			//	}
-			//	else
-			//	{
-			//		blue_door.On = FALSE;
-			//	}
-			//	if (blue_door_open &&red_door_open&&red_total == 0 && blue_total == 0 && stage > 0)
-			//	{
-			//		stair = TRUE;
-			//	}
-			//}
+			for (auto& bj : currentStage.Blue_Jewel) {
+				if (bj.Collision(water)) {
+					bj.SetVisible(false);
+				}
+			}
+
+			if (currentStage.stage > 0)
+			{	
+				// 0~19까지 파랑 가운데 20~24 파랑왼 25~29파랑오
+				// 30~49 빨강 가운데 50~54~빨강왼 55~59빨강오 
+				// 60~79초록 가운데 80~84초록왼 85~89초록오
+
+				for (auto& t : currentStage.Trap) {
+					if (t.Collision(fire)) {
+						fire.on = FALSE;
+						currentStage.Die.SetVisible(true);
+						currentStage.Die.x = t.x;
+						currentStage.Die.y = t.y - 100;
+					}
+				}
+
+			/*	for (int i = 0; i < 90; i++)
+				{
+					if (i < 30)
+					{
+						if (((fire.x - 50 <= Trap[i].x + 28 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 28 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+						{
+							fire.on = FALSE;
+							Die.On = TRUE;
+							Die.x = Trap[i].x;
+							Die.y = Trap[i].y-100;
+						}
+					}
+
+					if (i >= 30 && i < 60)
+					{
+						if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
+						{
+							water.on = FALSE;
+							Die.On = TRUE;
+							Die.x = Trap[i].x;
+							Die.y = Trap[i].y-100;
+						}
+					}
+
+					if (i >= 60 && i < 90)
+					{
+						if (((fire.x - 50 <= Trap[i].x + 25 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 25 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+						{
+							fire.on = FALSE;
+							Die.On = TRUE;
+							Die.x = Trap[i].x;
+							Die.y = Trap[i].y-100;
+						}
+						if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
+						{
+							water.on = FALSE;
+							Die.On = TRUE;
+							Die.x = Trap[i].x;
+							Die.y = Trap[i].y-100;
+						}
+					}
+				}*/
+
+				/*for (int i = 0; i < 5; i++)
+				{
+					if (((fire.x - 50 <= button[i].x + 40 && fire.x - 50 >= button[i].x) || (fire.x <= button[i].x + 40 && fire.x >= button[i].x)) && ((fire.y - 80 >= button[i].y - button[i].image_y && fire.y - 80 <= button[i].y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y)))
+					{
+						button[i].On = TRUE;
+					}
+					else if (((water.x - 50 <= button[i].x + 40 && water.x - 50 >= button[i].x) || (water.x <= button[i].x + 40 && water.x >= button[i].x)) && ((water.y - 80 >= button[i].y - button[i].image_y && water.y - 80 <= button[i].y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y)))
+					{
+						button[i].On = TRUE;
+					}
+					else if (fire.x >= button[i].x && fire.x - 50 <= button[i].x && ((fire.y - 80 >= button[i].y && fire.y - 80 <= button[i].y - -button[i].image_y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y - -button[i].image_y)))
+					{
+						button[i].On = TRUE;
+					}
+					else if (water.x >= button[i].x && water.x - 50 <= button[i].x && ((water.y - 80 >= button[i].y && water.y - 80 <= button[i].y - -button[i].image_y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y - -button[i].image_y)))
+					{
+						button[i].On = TRUE;
+					}
+					else
+					{
+						button[i].On = FALSE;
+					}
+				}
+				for (int i = 0; i < 5; i++)
+				{
+					if (((Rt.x - 50 <= button[i].x + 40 && Rt.x - 50 >= button[i].x) || (Rt.x <= button[i].x + 40 && Rt.x >= button[i].x)) && ((Rt.y - 50 >= button[i].y - button[i].image_y && Rt.y - 50 <= button[i].y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y)))
+					{
+						button[i].On = TRUE;
+					}
+					else if (Rt.x >= button[i].x && Rt.x - 50 <= button[i].x && ((Rt.y - 80 >= button[i].y && Rt.y - 80 <= button[i].y - -button[i].image_y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y - -button[i].image_y)))
+					{
+						button[i].On = TRUE;
+					}
+					else
+					{
+						button[i].On = FALSE;
+					}
+				}
+				if (((fire.x - 50 <= red_door.x + 40 && fire.x - 50 >= red_door.x) || (fire.x <= red_door.x + 40 && fire.x >= red_door.x)) && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y + 100) || (fire.y >= red_door.y - 100 && fire.y <= red_door.y + 100)))
+				{
+					red_door.On = TRUE;
+				}
+				else if (fire.x >= red_door.x && fire.x - 50 <= red_door.x && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y) || (fire.y >= red_door.y + 100 && fire.y <= red_door.y + 100)))
+				{
+					red_door.On = TRUE;
+				}
+				else
+				{
+					red_door.On = FALSE;
+				}
+				if (((water.x - 50 <= blue_door.x + 40 && water.x - 50 >= blue_door.x) || (water.x <= blue_door.x + 40 && water.x >= blue_door.x)) && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
+				{
+					blue_door.On = TRUE;
+				}
+				else if (water.x >= blue_door.x && water.x - 50 <= blue_door.x && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
+				{
+					blue_door.On = TRUE;
+				}
+				else
+				{
+					blue_door.On = FALSE;
+				}
+				if (blue_door_open &&red_door_open&&red_total == 0 && blue_total == 0 && stage > 0)
+				{
+					stair = TRUE;
+				}*/
+			}
 			break;
 
 		case 2:				// 캐릭터 프레임
-			if (++fire.Frame >= 8) fire.Frame = 0;
+			if (++fire.Frame >= 8)	fire.Frame = 0;
 			if (++water.Frame >= 8) water.Frame = 0;
 			break;
 
 		case 3:				// 보석, 함정, 사망, 문 애니메이션 처리와 스테이지 클리어 조건 충족시 후처리(Next 윈도우와 배경처리)
+			/*
 			blue_count = 0;
 			red_count = 0;
 
@@ -358,14 +385,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//	}
 			//}
 
-			// 
 			currentStage.red_total = red_count;
 			currentStage.blue_total = blue_count;
 
 			// 함정(빨강, 파랑, 초록 우물)의 애니메이션
 			for (int i = 0; i < 90; i++) // 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
 			{
-				if (currentStage.Trap[i].On)
+				if (currentStage.Trap[i].GetVisible())
 				{
 					if (i < 20)
 					{
@@ -419,14 +445,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// Fire bot, Water girl 중 1명이라도 사망 && 현재 Stage가 1 이상인 경우 (Stage 0은 Title 화면)
-			if (currentStage.Die.On && currentStage.stage > 0)
+			if (currentStage.Die.GetVisible() && currentStage.stage > 0)
 			{
 				// 캐릭터 (Fire, Water 공통) 사망시 나오는 연기 애니메이션 
 				currentStage.Die.image_x += 159;
 				if (currentStage.Die.image_x == 7950)
 				{
 					back = TRUE;
-					currentStage.Die.On = FALSE;
+					currentStage.Die.SetVisible(FALSE);
 					currentStage.Die.image_x = 0;
 
 					KillTimer(hWnd, 1);
@@ -434,6 +460,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					KillTimer(hWnd, 3);
 					KillTimer(hWnd, 4);
 					KillTimer(hWnd, 5);
+
 					retry_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 300, 500, 200, 100, hWnd, (HMENU)IDC_BUTTON2, g_hInst, NULL);
 					SendMessage(retry_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.retryimg));
 					end_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 700, 500, 200, 100, hWnd, (HMENU)IDC_BUTTON3, g_hInst, NULL);
@@ -474,11 +501,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// "Stage_03() 에서 나오는 X축 이동 바" 의 동작 버튼 애니메이션 (버튼 42.16.PNG 파일 참고)
 			for (int i = 0; i < 5; i++)
 			{
-				if (currentStage.button[i].On)
+				if (currentStage.button[i].GetVisible())
 				{
 					if (currentStage.button[i].image_y == 7)
 					{
-						currentStage.block[i].On = TRUE;
+						currentStage.block[i].SetVisible(false);
 					}
 					else if (currentStage.button[i].image_y > 7)
 					{
@@ -489,7 +516,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					if (currentStage.button[i].image_y == 15)
 					{
-						currentStage.block[i].On = FALSE;
+						currentStage.block[i].SetVisible(false);
 					}
 					else if (currentStage.button[i].image_y < 15)
 					{
@@ -497,10 +524,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
+			*/
 			break;
 		case 4:
+			/*
 			// Fire bot 출구 애니메이션
-			if (currentStage.red_door.On)
+			if (currentStage.red_door.GetVisible())
 			{
 				if (currentStage.red_door.image_x == 1260)
 				{
@@ -522,7 +551,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// Water girl 출구 애니메이션
-			if (currentStage.blue_door.On)
+			if (currentStage.blue_door.GetVisible())
 			{
 				if (currentStage.blue_door.image_x == 1260)
 				{
@@ -548,7 +577,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// Stage_03() 에서 나오는 X축 이동 바 (block1.PNG 파일 참고)
 			for (int i = 0; i < 5; i++)
 			{
-				if (currentStage.block[i].On)
+				if (currentStage.block[i].GetVisible())
 				{
 					if (currentStage.block[i].image_x > -40)
 					{
@@ -563,10 +592,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
+			*/
 			break;
 
 		case 5:
 			//타임아웃시 할 동작
+			/*
 			if (--time == 0)
 			{
 				currentStage.time_over = TRUE;
@@ -578,6 +609,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				KillTimer(hWnd, 5);
 			}
+			*/
 			break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
@@ -609,10 +641,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
 			myImageMgr.DrawPlayer(&memdc, 0, &fire, currentStage);
 			myImageMgr.DrawTimer(&memdc, time);
+
+			for (auto& rj : currentStage.Red_Jewel) {
+				if (rj.GetVisible())
+					myImageMgr.Jewelry_red.Draw(memdc, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
+			}
+
+			for (auto& bj : currentStage.Blue_Jewel) {
+				if (bj.GetVisible())
+					myImageMgr.Jewelry_blue.Draw(memdc, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
+			}
 		}
 
 		// 사망시 연기 Anim
-		if (currentStage.Die.On)	myImageMgr.die.Draw(memdc, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
+		if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(memdc, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
 
 		if (currentStage.clear)	back = TRUE;
 
@@ -640,52 +682,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		BitBlt(hDC, 0, 0, 1200, 800, memdc, 0, 0, SRCCOPY);
 
-		if (currentStage.clear == FALSE && back == FALSE)
-		{
-			for (int i = 0; i < 90; i++) // 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
-			{
-				if (currentStage.Trap[i].On)
-				{
-					if (i < 20)
-					{
-						myImageMgr.blue_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
-					}
-					if (i >= 20 && i < 25)
-					{
-						myImageMgr.blue_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
-					}
-					if (i >= 25 && i < 30)
-					{
-						myImageMgr.blue_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
-					}
-					if (i >= 30 && i < 50)
-					{
-						myImageMgr.red_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 21, 14);
-					}
-					if (i >= 50 && i < 55)
-					{
-						myImageMgr.red_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-					}
-					if (i >= 55 && i < 60)
-					{
-						myImageMgr.red_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-					}
-					if (i >= 60 && i < 80)
-					{
-						myImageMgr.green_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
-					}
-					if (i >= 80 && i < 85)
-					{
-						myImageMgr.green_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-					}
-					if (i >= 85 && i < 90)
-					{
-						myImageMgr.green_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-					}
-				}
-			}
-
-		}
+		//if (currentStage.clear == FALSE && back == FALSE)
+		//{
+		//	for (int i = 0; i < 90; i++) // 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 |||| 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
+		//	{
+		//		if (currentStage.Trap[i].GetVisible())
+		//		{
+		//			
+		//			if (i < 20)
+		//			{
+		//				myImageMgr.blue_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
+		//			}
+		//			if (i >= 20 && i < 25)
+		//			{
+		//				myImageMgr.blue_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
+		//			}
+		//			if (i >= 25 && i < 30)
+		//			{
+		//				myImageMgr.blue_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
+		//			}
+		//			
+		//			if (i >= 30 && i < 50)
+		//			{
+		//				myImageMgr.red_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 21, 14);
+		//			}
+		//			if (i >= 50 && i < 55)
+		//			{
+		//				myImageMgr.red_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
+		//			}
+		//			if (i >= 55 && i < 60)
+		//			{
+		//				myImageMgr.red_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
+		//			}
+		//			
+		//			if (i >= 60 && i < 80)
+		//			{
+		//				myImageMgr.green_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
+		//			}
+		//			if (i >= 80 && i < 85)
+		//			{
+		//				myImageMgr.green_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
+		//			}
+		//			if (i >= 85 && i < 90)
+		//			{
+		//				myImageMgr.green_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
+		//			}
+		//		}
+		//	}
+		//}
 
 		DeleteDC(hDC);
 		DeleteObject(hbitmap);

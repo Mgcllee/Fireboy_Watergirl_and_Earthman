@@ -17,10 +17,11 @@ public:
 	int blue_total;						// 파랑 보석 총 개수
 	BOOL stair;							// Fire boy와 Water girl 이 문 안 계단을 올라감
 
-	std::unordered_map<int, OBJECT> Red_Jewel;
-	std::unordered_map<int, OBJECT> Blue_Jewel;
+	std::vector<OBJECT> Red_Jewel;
+	std::vector<OBJECT> Blue_Jewel;
+	std::vector<OBJECT> Trap;
 
-	OBJECT Trap[90];		// 우물 함정 애니메이션(수정필요) 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
+	// OBJECT Trap[90];		// 우물 함정 애니메이션(수정필요) 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
 	OBJECT Die;				// 사망시 나오는 연기
 	OBJECT blue_door;
 	OBJECT red_door;
@@ -29,6 +30,7 @@ public:
 	FootHold Ft[20];		// 발판 오브젝트
 
 public:
+	void Stage_0() {}
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();
