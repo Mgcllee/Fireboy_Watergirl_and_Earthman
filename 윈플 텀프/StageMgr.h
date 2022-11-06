@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include"Stage.h"
 
-#define MAX_STAGE 5
+#define MAX_STAGE 6
 
 class StageMgr
 {

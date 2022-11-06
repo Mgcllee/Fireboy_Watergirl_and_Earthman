@@ -1,6 +1,7 @@
 #include<iostream>
 #include<WS2tcpip.h>
-
+#include<array>
+#include<mutex>
 #include"protocol.h"
 
 #pragma comment(lib, "ws2_32")
@@ -8,7 +9,24 @@
 using namespace std;
 
 void Display_Err(int Errcode);
+void ConstructPacket(char* recvPacket); // 패킷 재조립
+void ProcessPacket(char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
+void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
+void SelectRole(); // mutex 필요 => 두 클라이언트가 동시에 같은 케릭터 선택을 해버리면 안됨
+void MovePacket(); // 움직일 때 마다, 전송
+void CheckJewelryEat();// 쥬얼리 습득 확인
+void CheckOpenDoor(); // 문 열리는 조건 확인
 
+
+DWORD WINAPI ClientWorkThread(LPVOID arg);
+
+
+struct threadInfo {
+	HANDLE h = NULL;
+	SOCKET clientSocket;
+};
+array<threadInfo, 3> threadHandles;
+//map<socket, Role> 하는게 나을듯?
 
 int main(int argv, char** argc)
 {
@@ -52,9 +70,44 @@ int main(int argv, char** argc)
 			closesocket(listenSocket);
 			WSACleanup();
 			return 1;
-		}		
+		}
+		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(clientSocket), 0, NULL);//인자가 clientSocket이 아닐 수 있음
+		threadHandles[i].clientSocket = clientSocket;
+		if (i == 0) {
+			//sendpakcet(loading);
+		}
+		if (i == 1) {
+			//sendpakcet(change Stage - Select); // 두 클라이언트 모두에게
+		}
 	}
+
 	closesocket(listenSocket);
 	WSACleanup();
 
+}
+
+void Display_Err(int Errcode)
+{
+	LPVOID lpMsgBuf;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPWSTR)&lpMsgBuf, 0, NULL);
+	wcout << "ErrorCode: " << Errcode << " - " << (WCHAR*)lpMsgBuf << endl;
+	LocalFree(lpMsgBuf);
+}
+
+DWORD WINAPI ClientWorkThread(LPVOID arg)
+{
+	SOCKET socket = *reinterpret_cast<SOCKET*>(arg);
+	while (true) {
+		//recv();
+	}
+	return 0;
+}
+
+void ProcessPacket(char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
+{
+	//changePacket() => send S2CChangeRolePacket
+	//selectPacket() => mutex Role container and send S2CSelectPacket
+	//movePacket(); => 여기서 충돌 체크, 보석 체크 => 여기서 보석을 다 먹었다면 두 클라이언트에게 문 여는 패킷 전송, 문 들어가라는 패킷도 전송해야되네
 }

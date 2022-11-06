@@ -68,40 +68,67 @@ void ImageMgr::LoadImages() {
 	block_h.Load(L"Resource\\block2.png");
 	foot_block.Load(L"Resource\\발판.png");
 	rect.Load(L"Resource\\상자 40.40.png");
+
+
+	lobby.Load(L"Resource\\로비 이미지 초안.png");
+	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
+	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
 }
 
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 {
-	if (stageNum == 0)
+	if (stageNum == 0)//start 버튼
 	{
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+
 	}
-	else if (stageNum == 1)
-	{
-		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
+	else if (stageNum == 1) {
+		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		if (currneClientNum == 1) {
+			one.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
-		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
 		}
+		else if (currneClientNum == 2) {
+			two.Draw(*memdc, 0, 0, 60, 100, 0, 0, 60, 104);
 
-		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
-		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+		}
+		else if (currneClientNum == 3) {
+			three.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+
+		}
+		fraction.Draw(*memdc, 450, 450, 150, 150, 0, 0, 48, 48);
+		three.Draw(*memdc, 550, 450, 150, 150, 0, 0, 50, 50);
 	}
-	else if (stageNum == 2)
-	{
-		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
+	else if (stageNum == 2) {
+		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
-		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
-		}
-
-		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
-		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 	}
 	else if (stageNum == 3)
+	{
+		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
+
+		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		{
+			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+		}
+
+		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
+		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+	}
+	else if (stageNum == 4)
+	{
+		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
+
+		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		{
+			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+		}
+
+		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
+		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+	}
+	else if (stageNum == 5)
 	{
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 

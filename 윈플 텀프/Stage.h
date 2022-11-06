@@ -32,6 +32,7 @@ public:
 public:
 	void lobby () {}
 	void Loading();
+	void SelectCharacter();
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();

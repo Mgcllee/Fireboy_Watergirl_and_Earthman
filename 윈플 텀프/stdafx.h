@@ -110,3 +110,4 @@ extern PLAYER fire;
 
 extern MCI_PLAY_PARMS	mciPlayParms;
 extern BOOL				keybuffer[256];
+extern int currneClientNum;
