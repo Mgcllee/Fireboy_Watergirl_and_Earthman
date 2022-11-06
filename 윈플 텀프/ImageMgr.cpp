@@ -40,6 +40,7 @@ void ImageMgr::LoadImages() {
 	nine.Load(L"Resource\\9.png");
 	clock.Load(L"Resource\\시계.png");
 	timeout.Load(L"Resource\\타임아웃.png");
+	fraction.Load(L"Resource\\fraction.png");
 
 	fire.Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
 	fire.Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승

@@ -30,7 +30,8 @@ public:
 	FootHold Ft[20];		// 발판 오브젝트
 
 public:
-	void Stage_0() {}
+	void lobby () {}
+	void Loading();
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();

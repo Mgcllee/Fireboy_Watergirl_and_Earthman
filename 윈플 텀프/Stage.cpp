@@ -1,5 +1,9 @@
 #include "Stage.h"
 
+void Stage::Loading()
+{
+}
+
 // 스테이지 내부 오브젝트 위치 설정
 void Stage::Stage_1() {
 	water.x = 600;
