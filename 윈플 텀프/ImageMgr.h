@@ -15,6 +15,10 @@ public:
 
 	CImage fireStopImage;
 	CImage waterStopImage;
+
+	CImage leftArrow, rightArrow;
+	CImage me, player1, player2;
+	CImage selectBtn;
 public:
 	void LoadImages();
 	void DrawMap(HDC* memdc, short stageNum, Stage& stage);

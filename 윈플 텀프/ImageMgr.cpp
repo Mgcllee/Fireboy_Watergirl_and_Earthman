@@ -73,6 +73,14 @@ void ImageMgr::LoadImages() {
 	lobby.Load(L"Resource\\로비 이미지 초안.png");
 	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
 	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
+	
+	leftArrow.Load(L"Resource\\left_arrow.png");
+	rightArrow.Load(L"Resource\\right_arrow.png");
+	me.Load(L"Resource\\me.png");
+	player1.Load(L"Resource\\player1.png");
+	player2.Load(L"Resource\\player2.png");
+	selectBtn.Load(L"Resource\\select_btn.png");
+
 }
 
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
@@ -83,18 +91,18 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
 	}
-	else if (stageNum == 1) {
+	else if (stageNum == 1) {//load Scene
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		if (currneClientNum == 1) {
 			one.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
 
 		}
 		else if (currneClientNum == 2) {
-			two.Draw(*memdc, 0, 0, 60, 100, 0, 0, 60, 104);
+			two.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
 
 		}
 		else if (currneClientNum == 3) {
-			three.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+			three.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
 
 		}
 		fraction.Draw(*memdc, 450, 450, 150, 150, 0, 0, 48, 48);
@@ -102,6 +110,16 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	}
 	else if (stageNum == 2) {
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+
+		me.Draw(*memdc, 100, 100, 150, 150, 0, 0, 403, 317);
+		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 403, 317);
+		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
+
+		leftArrow.Draw(*memdc, 50, 300, 70, 70, 0, 0, 300, 300);
+		rightArrow.Draw(*memdc, 300, 300, 70, 70, 0, 0, 300, 300);
+		selectBtn.Draw(*memdc, 500, 450, 150, 150, 0, 0, 484, 393);
+
+
 
 	}
 	else if (stageNum == 3)

@@ -102,7 +102,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int blue_count = 0;
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
-
+	currentStage = myStageMgr.getStage(stageIndex);
 	switch (uMsg) {
 	case WM_CREATE: {
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
@@ -119,7 +119,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam)) {
 		case IDC_BUTTON1:
 			stageIndex = 1;
-			currentStage = myStageMgr.getStage(stageIndex);
+			//currentStage = myStageMgr.getStage(stageIndex);
 			SetTimer(hWnd, 5, 1000, NULL);
 			// LoadSound(hWnd);
 			DestroyWindow(start_button);
@@ -128,18 +128,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
-			switch (currentStage.stage)
+			/*switch (currentStage.stage)
 			{
-			case 1:
+			case 3:
 				currentStage.Stage_1();
 				break;
-			case 2:
+			case 4:
 				currentStage.Stage_2();
 				break;
-			case 3:
+			case 5:
 				currentStage.Stage_3();
 				break;
-			}
+			}*/
 			//LoadSound(hWnd);
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);
@@ -165,20 +165,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.clear = FALSE;
 			fire.on = TRUE;
 			water.on = TRUE;
-			currentStage.stage += 1;
+			//currentStage.stage += 1;
+			stageIndex += 1;
 			time = 300;
-			switch (currentStage.stage)
+			/*switch (currentStage.stage)
 			{
-			case 1:
+			case 3:
 				currentStage.Stage_1();
 				break;
-			case 2:
+			case 4:
 				currentStage.Stage_2();
 				break;
-			case 3:
+			case 5:
 				currentStage.Stage_3();
 				break;
-			}
+			}*/
 			/*for (int i = 0; i < 20; i++)
 			{
 				if (Jwewlry.find(i)->second.On)
@@ -639,6 +640,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SelectObject(memdc, hbitmap);
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
+		//»èÁ¦
+		if(stageIndex == 1)
+			currneClientNum += 1;
+		if (currneClientNum == 4) {
+			stageIndex += 1;
+			currneClientNum = 0;
+		}
+		//
+
 		if (currentStage.stage > 2) {
 			myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
 			myImageMgr.DrawPlayer(&memdc, 0, &fire, currentStage);
