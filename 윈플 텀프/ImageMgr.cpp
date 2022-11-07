@@ -111,20 +111,26 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	else if (stageNum == 2) {
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
+		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
-		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
-		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
 
-		leftArrow.Draw(*memdc, 50, 280, 70, 70, 0, 0, 300, 300);
-		rightArrow.Draw(*memdc, 330, 280, 70, 70, 0, 0, 300, 300);
-
+		//if(나의 캐릭터에 따라서)
 		fireStopImage.Draw(*memdc, 170, 200, 100, 200, 0, 0, 215, 411);
 		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
 
+		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
+		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+
+		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
+		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
+
+
+
+		//버튼으로 수정 해야됨
 		selectBtn.Draw(*memdc, 500, 450, 150, 150, 0, 0, 484, 393);
-
-
-
+		leftArrow.Draw(*memdc, 50, 280, 70, 70, 0, 0, 300, 300);
+		rightArrow.Draw(*memdc, 330, 280, 70, 70, 0, 0, 300, 300);
+		//select 버튼이나 화살표는 main으로 빼야하는지??
 	}
 	else if (stageNum == 3)
 	{

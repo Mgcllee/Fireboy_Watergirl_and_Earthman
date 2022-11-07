@@ -4,6 +4,7 @@
 #include <atlimage.h>
 #include <mmsystem.h>
 #include <unordered_map>
+#include <array>
 
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
@@ -103,6 +104,14 @@ public:
 	bool GetVisible() {
 		return On;
 	}
+};
+
+//client Info
+struct clientInfo {
+	int id;// 다른 클라이언트 식별 정보
+	short role; // 어떤 캐릭터 인지
+
+	//좌표가 필요 하겠지?
 };
 
 extern PLAYER water;
