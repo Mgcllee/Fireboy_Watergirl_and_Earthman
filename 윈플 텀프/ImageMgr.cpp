@@ -111,12 +111,16 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	else if (stageNum == 2) {
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
-		me.Draw(*memdc, 100, 100, 150, 150, 0, 0, 403, 317);
-		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 403, 317);
+		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
+		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
 		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
 
-		leftArrow.Draw(*memdc, 50, 300, 70, 70, 0, 0, 300, 300);
-		rightArrow.Draw(*memdc, 300, 300, 70, 70, 0, 0, 300, 300);
+		leftArrow.Draw(*memdc, 50, 280, 70, 70, 0, 0, 300, 300);
+		rightArrow.Draw(*memdc, 330, 280, 70, 70, 0, 0, 300, 300);
+
+		fireStopImage.Draw(*memdc, 170, 200, 100, 200, 0, 0, 215, 411);
+		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
+
 		selectBtn.Draw(*memdc, 500, 450, 150, 150, 0, 0, 484, 393);
 
 
