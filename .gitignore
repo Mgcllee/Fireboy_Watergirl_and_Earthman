@@ -43,3 +43,7 @@ x64/
 **/Debug/
 **/Release/
 **/x64/
+.vs/윈플 텀프/v17/Browse.VC.db
+*.suo
+*.db
+*.suo
