@@ -4,6 +4,7 @@
 
 // PNG파일 읽어오기
 void ImageMgr::LoadImages() {
+	loading.Load(L"Resource\\로딩중 이미지.png");
 	robby.Load(L"Resource\\로비 이미지 초안 2.png");
 	buttonimg.Load(L"Resource\\플레이 버튼 158.60.png");
 	stage1.Load(L"Resource\\맵 기본.png");
@@ -69,6 +70,7 @@ void ImageMgr::LoadImages() {
 	rect.Load(L"Resource\\상자 40.40.png");
 }
 
+
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 {
@@ -118,6 +120,10 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
+	}
+	else
+	{
+		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 	}
 }
 
