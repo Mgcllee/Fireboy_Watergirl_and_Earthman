@@ -8,10 +8,10 @@
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
 
-#define IDC_BUTTON1 100
-#define IDC_BUTTON2 200
-#define IDC_BUTTON3 300
-#define IDC_BUTTON4 350
+#define BTN_START 100
+#define BTN_RESTART 200
+#define BTN_QUIT 300
+#define BTN_NEXT_STAGE 350
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

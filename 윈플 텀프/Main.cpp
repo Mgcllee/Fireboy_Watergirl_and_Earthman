@@ -10,6 +10,8 @@ Stage currentStage;
 
 int stageIndex = 0;
 
+int currneClientNum = 1;
+
 // 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
@@ -41,10 +43,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	// 메인 윈도우 생성
 	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, NULL, (HMENU)NULL, hInstance, NULL);
-	
+
 	// 메인 윈도우 Set Visible
 	ShowWindow(hWnd, nCmdShow);
-	
+
 	// 메인 윈도우 Update Data
 	UpdateWindow(hWnd);
 
@@ -77,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 					 Timer ID 3 : 오브젝트 애니메이션 전용
 					 Timer ID 4 : 캐릭터 출구, Stage_03의 이동 발판 애니메이션 (Timer ID 3 와 호출 시간이 다름)
 					 Timer ID 5 : 제한 시간 (time변수) 초과할 경우 화면 갱신 ()
-	
+
 	4. WM_KEYDOWN : 키가 눌렸을 때 동작
 
 	5. WM_KEYUP : 키가 (눌렸다가) 올라갈 때 동작
@@ -85,14 +87,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	6. WM_PAINT : 메인 윈도우에 오브젝트 그리기
 
 	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
-*/
+*/ 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
-	HDC hDC; 
+	HDC hDC;
 	static HDC memdc;
 	static HBITMAP hbitmap;
-	HBRUSH hBrush, oldBrush;
 
 	static HWND start_button, retry_button, end_button, next_button;
 	static BOOL back = FALSE;
@@ -101,9 +102,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
 
+	// 현재 스테이지 획득
+	currentStage = myStageMgr.getStage(stageIndex);
+	
 	switch (uMsg) {
-	case WM_CREATE: {
-		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
+	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
+		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
 
 		SetTimer(hWnd, 1, 30, NULL);
@@ -115,30 +119,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDC_BUTTON1:
+		case BTN_START:
 			stageIndex = 1;
-			currentStage = myStageMgr.getStage(stageIndex);
 			SetTimer(hWnd, 5, 1000, NULL);
-			// LoadSound(hWnd);
 			DestroyWindow(start_button);
 			break;
-		case IDC_BUTTON2:	// Restart Game
+		case BTN_RESTART:
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
-			switch (currentStage.stage)
-			{
-			case 1:
-				currentStage.Stage_1();
-				break;
-			case 2:
-				currentStage.Stage_2();
-				break;
-			case 3:
-				currentStage.Stage_3();
-				break;
-			}
-			//LoadSound(hWnd);
+
+			currentStage = myStageMgr.getStage(stageIndex);
+
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);
 			SetTimer(hWnd, 3, 50, NULL);
@@ -149,7 +141,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(retry_button);
 			DestroyWindow(end_button);
 			break;
-		case IDC_BUTTON3:	// Game Quit
+
+		case BTN_QUIT:
 			back = FALSE;
 			currentStage.time_over = FALSE;
 			DestroyWindow(retry_button);
@@ -158,25 +151,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DeleteObject(hbitmap);
 			DeleteDC(memdc);
 			break;
-		case IDC_BUTTON4:	// Next Stage
+
+		case BTN_NEXT_STAGE:
 			back = FALSE;
 			currentStage.clear = FALSE;
 			fire.on = TRUE;
 			water.on = TRUE;
-			currentStage.stage += 1;
 			time = 300;
-			switch (currentStage.stage)
-			{
-			case 1:
-				currentStage.Stage_1();
-				break;
-			case 2:
-				currentStage.Stage_2();
-				break;
-			case 3:
-				currentStage.Stage_3();
-				break;
-			}
+			currentStage = myStageMgr.getStage(++stageIndex);
+			
 			/*for (int i = 0; i < 20; i++)
 			{
 				if (Jwewlry.find(i)->second.On)
@@ -191,6 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}*/
+
 			currentStage.red_total = red_count;
 			currentStage.blue_total = blue_count;
 			currentStage.count = 0;
@@ -199,13 +183,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SetTimer(hWnd, 3, 50, NULL);
 			SetTimer(hWnd, 4, 50, NULL);
 			SetTimer(hWnd, 5, 1000, NULL);
-			LoadSound(hWnd);
 			DestroyWindow(next_button);
 			break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
-	case WM_TIMER:			// m/s Timer Function
+	case WM_TIMER:
 		switch (wParam) {
 		case 1:				// 캐릭터 이동과 충돌체크
 			currentStage.Wid_Move();
@@ -226,7 +209,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			if (currentStage.stage > 0)
-			{	
+			{
 				// 0~19까지 파랑 가운데 20~24 파랑왼 25~29파랑오
 				// 30~49 빨강 가운데 50~54~빨강왼 55~59빨강오 
 				// 60~79초록 가운데 80~84초록왼 85~89초록오
@@ -240,115 +223,115 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 
-			/*	for (int i = 0; i < 90; i++)
-				{
-					if (i < 30)
+				/*	for (int i = 0; i < 90; i++)
 					{
-						if (((fire.x - 50 <= Trap[i].x + 28 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 28 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+						if (i < 30)
 						{
-							fire.on = FALSE;
-							Die.On = TRUE;
-							Die.x = Trap[i].x;
-							Die.y = Trap[i].y-100;
+							if (((fire.x - 50 <= Trap[i].x + 28 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 28 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+							{
+								fire.on = FALSE;
+								Die.On = TRUE;
+								Die.x = Trap[i].x;
+								Die.y = Trap[i].y-100;
+							}
 						}
-					}
 
-					if (i >= 30 && i < 60)
-					{
-						if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
+						if (i >= 30 && i < 60)
 						{
-							water.on = FALSE;
-							Die.On = TRUE;
-							Die.x = Trap[i].x;
-							Die.y = Trap[i].y-100;
+							if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
+							{
+								water.on = FALSE;
+								Die.On = TRUE;
+								Die.x = Trap[i].x;
+								Die.y = Trap[i].y-100;
+							}
 						}
-					}
 
-					if (i >= 60 && i < 90)
-					{
-						if (((fire.x - 50 <= Trap[i].x + 25 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 25 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+						if (i >= 60 && i < 90)
 						{
-							fire.on = FALSE;
-							Die.On = TRUE;
-							Die.x = Trap[i].x;
-							Die.y = Trap[i].y-100;
+							if (((fire.x - 50 <= Trap[i].x + 25 && fire.x - 50 >= Trap[i].x) || (fire.x <= Trap[i].x + 25 && fire.x >= Trap[i].x)) && ((fire.y - 80 >= Trap[i].y && fire.y - 80 <= Trap[i].y + 25) || (fire.y >= Trap[i].y && fire.y <= Trap[i].y + 25)))
+							{
+								fire.on = FALSE;
+								Die.On = TRUE;
+								Die.x = Trap[i].x;
+								Die.y = Trap[i].y-100;
+							}
+							if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
+							{
+								water.on = FALSE;
+								Die.On = TRUE;
+								Die.x = Trap[i].x;
+								Die.y = Trap[i].y-100;
+							}
 						}
-						if (((water.x - 50 <= Trap[i].x + 25 && water.x - 50 >= Trap[i].x) || (water.x <= Trap[i].x + 25 && water.x >= Trap[i].x)) && ((water.y - 80 >= Trap[i].y && water.y - 80 <= Trap[i].y + 25) || (water.y >= Trap[i].y && water.y <= Trap[i].y + 25)))
-						{
-							water.on = FALSE;
-							Die.On = TRUE;
-							Die.x = Trap[i].x;
-							Die.y = Trap[i].y-100;
-						}
-					}
-				}*/
+					}*/
 
-				/*for (int i = 0; i < 5; i++)
-				{
-					if (((fire.x - 50 <= button[i].x + 40 && fire.x - 50 >= button[i].x) || (fire.x <= button[i].x + 40 && fire.x >= button[i].x)) && ((fire.y - 80 >= button[i].y - button[i].image_y && fire.y - 80 <= button[i].y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y)))
+					/*for (int i = 0; i < 5; i++)
 					{
-						button[i].On = TRUE;
+						if (((fire.x - 50 <= button[i].x + 40 && fire.x - 50 >= button[i].x) || (fire.x <= button[i].x + 40 && fire.x >= button[i].x)) && ((fire.y - 80 >= button[i].y - button[i].image_y && fire.y - 80 <= button[i].y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y)))
+						{
+							button[i].On = TRUE;
+						}
+						else if (((water.x - 50 <= button[i].x + 40 && water.x - 50 >= button[i].x) || (water.x <= button[i].x + 40 && water.x >= button[i].x)) && ((water.y - 80 >= button[i].y - button[i].image_y && water.y - 80 <= button[i].y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y)))
+						{
+							button[i].On = TRUE;
+						}
+						else if (fire.x >= button[i].x && fire.x - 50 <= button[i].x && ((fire.y - 80 >= button[i].y && fire.y - 80 <= button[i].y - -button[i].image_y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y - -button[i].image_y)))
+						{
+							button[i].On = TRUE;
+						}
+						else if (water.x >= button[i].x && water.x - 50 <= button[i].x && ((water.y - 80 >= button[i].y && water.y - 80 <= button[i].y - -button[i].image_y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y - -button[i].image_y)))
+						{
+							button[i].On = TRUE;
+						}
+						else
+						{
+							button[i].On = FALSE;
+						}
 					}
-					else if (((water.x - 50 <= button[i].x + 40 && water.x - 50 >= button[i].x) || (water.x <= button[i].x + 40 && water.x >= button[i].x)) && ((water.y - 80 >= button[i].y - button[i].image_y && water.y - 80 <= button[i].y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y)))
+					for (int i = 0; i < 5; i++)
 					{
-						button[i].On = TRUE;
+						if (((Rt.x - 50 <= button[i].x + 40 && Rt.x - 50 >= button[i].x) || (Rt.x <= button[i].x + 40 && Rt.x >= button[i].x)) && ((Rt.y - 50 >= button[i].y - button[i].image_y && Rt.y - 50 <= button[i].y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y)))
+						{
+							button[i].On = TRUE;
+						}
+						else if (Rt.x >= button[i].x && Rt.x - 50 <= button[i].x && ((Rt.y - 80 >= button[i].y && Rt.y - 80 <= button[i].y - -button[i].image_y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y - -button[i].image_y)))
+						{
+							button[i].On = TRUE;
+						}
+						else
+						{
+							button[i].On = FALSE;
+						}
 					}
-					else if (fire.x >= button[i].x && fire.x - 50 <= button[i].x && ((fire.y - 80 >= button[i].y && fire.y - 80 <= button[i].y - -button[i].image_y) || (fire.y >= button[i].y - button[i].image_y && fire.y <= button[i].y - -button[i].image_y)))
+					if (((fire.x - 50 <= red_door.x + 40 && fire.x - 50 >= red_door.x) || (fire.x <= red_door.x + 40 && fire.x >= red_door.x)) && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y + 100) || (fire.y >= red_door.y - 100 && fire.y <= red_door.y + 100)))
 					{
-						button[i].On = TRUE;
+						red_door.On = TRUE;
 					}
-					else if (water.x >= button[i].x && water.x - 50 <= button[i].x && ((water.y - 80 >= button[i].y && water.y - 80 <= button[i].y - -button[i].image_y) || (water.y >= button[i].y - button[i].image_y && water.y <= button[i].y - -button[i].image_y)))
+					else if (fire.x >= red_door.x && fire.x - 50 <= red_door.x && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y) || (fire.y >= red_door.y + 100 && fire.y <= red_door.y + 100)))
 					{
-						button[i].On = TRUE;
+						red_door.On = TRUE;
 					}
 					else
 					{
-						button[i].On = FALSE;
+						red_door.On = FALSE;
 					}
-				}
-				for (int i = 0; i < 5; i++)
-				{
-					if (((Rt.x - 50 <= button[i].x + 40 && Rt.x - 50 >= button[i].x) || (Rt.x <= button[i].x + 40 && Rt.x >= button[i].x)) && ((Rt.y - 50 >= button[i].y - button[i].image_y && Rt.y - 50 <= button[i].y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y)))
+					if (((water.x - 50 <= blue_door.x + 40 && water.x - 50 >= blue_door.x) || (water.x <= blue_door.x + 40 && water.x >= blue_door.x)) && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
 					{
-						button[i].On = TRUE;
+						blue_door.On = TRUE;
 					}
-					else if (Rt.x >= button[i].x && Rt.x - 50 <= button[i].x && ((Rt.y - 80 >= button[i].y && Rt.y - 80 <= button[i].y - -button[i].image_y) || (Rt.y >= button[i].y - button[i].image_y && Rt.y <= button[i].y - -button[i].image_y)))
+					else if (water.x >= blue_door.x && water.x - 50 <= blue_door.x && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
 					{
-						button[i].On = TRUE;
+						blue_door.On = TRUE;
 					}
 					else
 					{
-						button[i].On = FALSE;
+						blue_door.On = FALSE;
 					}
-				}
-				if (((fire.x - 50 <= red_door.x + 40 && fire.x - 50 >= red_door.x) || (fire.x <= red_door.x + 40 && fire.x >= red_door.x)) && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y + 100) || (fire.y >= red_door.y - 100 && fire.y <= red_door.y + 100)))
-				{
-					red_door.On = TRUE;
-				}
-				else if (fire.x >= red_door.x && fire.x - 50 <= red_door.x && ((fire.y - 80 >= red_door.y && fire.y - 80 <= red_door.y) || (fire.y >= red_door.y + 100 && fire.y <= red_door.y + 100)))
-				{
-					red_door.On = TRUE;
-				}
-				else
-				{
-					red_door.On = FALSE;
-				}
-				if (((water.x - 50 <= blue_door.x + 40 && water.x - 50 >= blue_door.x) || (water.x <= blue_door.x + 40 && water.x >= blue_door.x)) && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
-				{
-					blue_door.On = TRUE;
-				}
-				else if (water.x >= blue_door.x && water.x - 50 <= blue_door.x && ((water.y - 80 >= blue_door.y && water.y - 80 <= blue_door.y) || (water.y >= blue_door.y + 100 && water.y <= blue_door.y + 100)))
-				{
-					blue_door.On = TRUE;
-				}
-				else
-				{
-					blue_door.On = FALSE;
-				}
-				if (blue_door_open &&red_door_open&&red_total == 0 && blue_total == 0 && stage > 0)
-				{
-					stair = TRUE;
-				}*/
+					if (blue_door_open &&red_door_open&&red_total == 0 && blue_total == 0 && stage > 0)
+					{
+						stair = TRUE;
+					}*/
 			}
 			break;
 
@@ -447,7 +430,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// Fire bot, Water girl 중 1명이라도 사망 && 현재 Stage가 1 이상인 경우 (Stage 0은 Title 화면)
 			if (currentStage.Die.GetVisible() && currentStage.stage > 0)
 			{
-				// 캐릭터 (Fire, Water 공통) 사망시 나오는 연기 애니메이션 
+				// 캐릭터 (Fire, Water 공통) 사망시 나오는 연기 애니메이션
 				currentStage.Die.image_x += 159;
 				if (currentStage.Die.image_x == 7950)
 				{
@@ -564,7 +547,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			//문이 열리다가 중간에 이탈하면 다시 닫힘
-			else 
+			else
 			{
 				currentStage.blue_door_open = FALSE;
 				if (currentStage.blue_door.image_x > 0)
@@ -637,7 +620,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SelectObject(memdc, hbitmap);
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
-		if (currentStage.stage) {
+		//삭제
+		if(stageIndex == 1)
+			currneClientNum += 1;
+		if (currneClientNum == 4) {
+			stageIndex += 1;
+			currneClientNum = 0;
+		}
+		//
+
+		if (currentStage.stage > 2) {
 			myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
 			myImageMgr.DrawPlayer(&memdc, 0, &fire, currentStage);
 			myImageMgr.DrawTimer(&memdc, time);
