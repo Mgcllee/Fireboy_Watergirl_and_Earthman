@@ -19,6 +19,11 @@ void CheckOpenDoor(); // 문 열리는 조건 확인
 
 
 DWORD WINAPI ClientWorkThread(LPVOID arg);
+struct MyThread
+{
+    int iIndex = 0;
+    SOCKET sock = 0;
+};
 
 
 struct threadInfo {
@@ -26,17 +31,23 @@ struct threadInfo {
 	SOCKET clientSocket;
 };
 array<threadInfo, 3> threadHandles;
+
+//HANDLE loadFlag; =>웨이트포실긍
+
 //map<socket, Role> 하는게 나을듯?
 
 int main(int argv, char** argc)
 {
 	wcout.imbue(std::locale("korean"));
 
+
 	WSADATA WSAData;
 	if (WSAStartup(MAKEWORD(2, 2), &WSAData) != 0) {
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
+	
+	//loadFlag= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET) {
@@ -59,26 +70,47 @@ int main(int argv, char** argc)
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
+	
+	array<SOCKET, 3> clientSocket;
 
 	for (int i = 0; i < 3; i++)
 	{
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
-		SOCKET clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
-		if (clientSocket == INVALID_SOCKET) {
+		clientSocket[i] = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
+		if (clientSocket[i] == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
 			WSACleanup();
 			return 1;
 		}
-		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(clientSocket), 0, NULL);//인자가 clientSocket이 아닐 수 있음
-		threadHandles[i].clientSocket = clientSocket;
+		
+		S2CLoadingPacket load1;
+		load1.type = S2CLoading;
+		load1.id = i;
+		
+		
+		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(clientSocket[i]), 0, NULL);//인자가 clientSocket이 아닐 수 있음
+		threadHandles[i].clientSocket = clientSocket[i];
+		
+		
+		
 		if (i == 0) {
-			//sendpakcet(loading);
+			send(clientSocket[i], (char*)&load1, sizeof(S2CLoadingPacket), 0);
 		}
 		if (i == 1) {
-			//sendpakcet(change Stage - Select); // 두 클라이언트 모두에게
+			send(clientSocket[i], (char*)&load1, sizeof(S2CLoadingPacket), 0);
 		}
+		if (i == 2) {
+			
+			S2CChangeStagePacket change1;
+			change1.stageNum = 0;
+			change1.type = S2CChangeStage;
+
+			for(int x=0; x<3; x++)
+				send(clientSocket[i], (char*)&change1, sizeof(S2CChangeStage), 0);
+		}
+		
 	}
 
 	closesocket(listenSocket);
@@ -98,6 +130,9 @@ void Display_Err(int Errcode)
 
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
+	//WaitForSingleObject(loadFlag, INFINITE);
+
+
 	SOCKET socket = *reinterpret_cast<SOCKET*>(arg);
 	while (true) {
 		//recv();
@@ -107,7 +142,9 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 
 void ProcessPacket(char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
 {
+
 	//changePacket() => send S2CChangeRolePacket
 	//selectPacket() => mutex Role container and send S2CSelectPacket
 	//movePacket(); => 여기서 충돌 체크, 보석 체크 => 여기서 보석을 다 먹었다면 두 클라이언트에게 문 여는 패킷 전송, 문 들어가라는 패킷도 전송해야되네
 }
+
