@@ -87,14 +87,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	6. WM_PAINT : 메인 윈도우에 오브젝트 그리기
 
 	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
-*/
+*/ 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hDC;
 	static HDC memdc;
 	static HBITMAP hbitmap;
-	HBRUSH hBrush, oldBrush;
 
 	static HWND start_button, retry_button, end_button, next_button;
 	static BOOL back = FALSE;
@@ -102,10 +101,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	int blue_count = 0;
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
+
+	// 현재 스테이지 획득
 	currentStage = myStageMgr.getStage(stageIndex);
+	
 	switch (uMsg) {
-	case WM_CREATE: {
-		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)IDC_BUTTON1, g_hInst, NULL);
+	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
+		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
 
 		SetTimer(hWnd, 1, 30, NULL);
@@ -117,30 +119,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDC_BUTTON1:
+		case BTN_START:
 			stageIndex = 1;
-			//currentStage = myStageMgr.getStage(stageIndex);
 			SetTimer(hWnd, 5, 1000, NULL);
-			// LoadSound(hWnd);
 			DestroyWindow(start_button);
 			break;
-		case IDC_BUTTON2:	// Restart Game
+		case BTN_RESTART:
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
-			/*switch (currentStage.stage)
-			{
-			case 3:
-				currentStage.Stage_1();
-				break;
-			case 4:
-				currentStage.Stage_2();
-				break;
-			case 5:
-				currentStage.Stage_3();
-				break;
-			}*/
-			//LoadSound(hWnd);
+
+			currentStage = myStageMgr.getStage(stageIndex);
+
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);
 			SetTimer(hWnd, 3, 50, NULL);
@@ -151,7 +141,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(retry_button);
 			DestroyWindow(end_button);
 			break;
-		case IDC_BUTTON3:	// Game Quit
+
+		case BTN_QUIT:
 			back = FALSE;
 			currentStage.time_over = FALSE;
 			DestroyWindow(retry_button);
@@ -160,26 +151,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DeleteObject(hbitmap);
 			DeleteDC(memdc);
 			break;
-		case IDC_BUTTON4:	// Next Stage
+
+		case BTN_NEXT_STAGE:
 			back = FALSE;
 			currentStage.clear = FALSE;
 			fire.on = TRUE;
 			water.on = TRUE;
-			//currentStage.stage += 1;
-			stageIndex += 1;
 			time = 300;
-			/*switch (currentStage.stage)
-			{
-			case 3:
-				currentStage.Stage_1();
-				break;
-			case 4:
-				currentStage.Stage_2();
-				break;
-			case 5:
-				currentStage.Stage_3();
-				break;
-			}*/
+			currentStage = myStageMgr.getStage(++stageIndex);
+			
 			/*for (int i = 0; i < 20; i++)
 			{
 				if (Jwewlry.find(i)->second.On)
@@ -194,6 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}*/
+
 			currentStage.red_total = red_count;
 			currentStage.blue_total = blue_count;
 			currentStage.count = 0;
@@ -202,13 +183,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SetTimer(hWnd, 3, 50, NULL);
 			SetTimer(hWnd, 4, 50, NULL);
 			SetTimer(hWnd, 5, 1000, NULL);
-			LoadSound(hWnd);
 			DestroyWindow(next_button);
 			break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
-	case WM_TIMER:			// m/s Timer Function
+	case WM_TIMER:
 		switch (wParam) {
 		case 1:				// 캐릭터 이동과 충돌체크
 			currentStage.Wid_Move();

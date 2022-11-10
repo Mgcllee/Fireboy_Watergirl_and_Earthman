@@ -4,6 +4,7 @@
 
 // PNG파일 읽어오기
 void ImageMgr::LoadImages() {
+	loading.Load(L"Resource\\로딩중 이미지.png");
 	robby.Load(L"Resource\\로비 이미지 초안 2.png");
 	buttonimg.Load(L"Resource\\플레이 버튼 158.60.png");
 	stage1.Load(L"Resource\\맵 기본.png");
@@ -83,6 +84,7 @@ void ImageMgr::LoadImages() {
 
 }
 
+
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 {
@@ -111,16 +113,26 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	else if (stageNum == 2) {
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
-		me.Draw(*memdc, 100, 100, 150, 150, 0, 0, 403, 317);
-		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 403, 317);
+		//me
+		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
+
+		//if(나의 캐릭터에 따라서)
+		fireStopImage.Draw(*memdc, 170, 200, 100, 200, 0, 0, 215, 411);
+		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
+
+		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
+		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+
+		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
 
-		leftArrow.Draw(*memdc, 50, 300, 70, 70, 0, 0, 300, 300);
-		rightArrow.Draw(*memdc, 300, 300, 70, 70, 0, 0, 300, 300);
+
+
+		//버튼으로 수정 해야됨
 		selectBtn.Draw(*memdc, 500, 450, 150, 150, 0, 0, 484, 393);
-
-
-
+		leftArrow.Draw(*memdc, 50, 280, 70, 70, 0, 0, 300, 300);
+		rightArrow.Draw(*memdc, 330, 280, 70, 70, 0, 0, 300, 300);
+		//select 버튼이나 화살표는 main으로 빼야하는지??
 	}
 	else if (stageNum == 3)
 	{
@@ -164,6 +176,10 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
+	}
+	else
+	{
+		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 	}
 }
 

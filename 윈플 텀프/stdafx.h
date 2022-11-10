@@ -4,14 +4,15 @@
 #include <atlimage.h>
 #include <mmsystem.h>
 #include <unordered_map>
+#include <array>
 
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
 
-#define IDC_BUTTON1 100
-#define IDC_BUTTON2 200
-#define IDC_BUTTON3 300
-#define IDC_BUTTON4 350
+#define BTN_START 100
+#define BTN_RESTART 200
+#define BTN_QUIT 300
+#define BTN_NEXT_STAGE 350
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -103,6 +104,14 @@ public:
 	bool GetVisible() {
 		return On;
 	}
+};
+
+//client Info
+struct clientInfo {
+	int id;// 다른 클라이언트 식별 정보
+	short role; // 어떤 캐릭터 인지
+
+	//좌표가 필요 하겠지?
 };
 
 extern PLAYER water;
