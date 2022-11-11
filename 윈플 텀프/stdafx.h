@@ -13,6 +13,9 @@
 #define BTN_RESTART 200
 #define BTN_QUIT 300
 #define BTN_NEXT_STAGE 350
+#define BTN_LEFT_ARROW 400
+#define BTN_RIGHT_ARROW 450
+#define BTN_SELECT 500
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

@@ -88,6 +88,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
 */
+bool isArrow = true;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
@@ -97,12 +99,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static HWND start_button, retry_button, end_button, next_button;
 	static HWND selectRoleLeftArrow, selectRoleRightArrow;
+	static HWND selectBtn;
 	static BOOL back = FALSE;
 	static int time = 300;
 	int blue_count = 0;
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
-	bool isArrow = true;
 
 	// 현재 스테이지 획득
 	currentStage = myStageMgr.getStage(stageIndex);
@@ -130,10 +132,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
-		case BTN_LEFT_ARROW:						
+		case BTN_LEFT_ARROW:
 			//캐릭터 변경 돼야함
-			break;
-		case BTN_RIGHT_ARROW:						
+		{
+			int a = 10;
+		}
+		break;
+		case BTN_RIGHT_ARROW:
 			//캐릭터 변경 돼야함
 			break;
 
@@ -622,7 +627,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_PAINT: {
-		hDC = BeginPaint(hWnd, &ps);
+		hDC = BeginPaint(hWnd, &ps);				
 		hbitmap = CreateCompatibleBitmap(hDC, 1200, 800);
 		memdc = CreateCompatibleDC(hDC);
 		SelectObject(memdc, hbitmap);
@@ -636,20 +641,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				currneClientNum = 3;
 			}
 		}
-
-		if (currentStage.stage == 2) {
-			if (isArrow) {
-				//selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 70, 70, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
-
-				selectRoleLeftArrow = CreateWindowEx(WS_EX_TRANSPARENT, L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | ~BS_DEFPUSHBUTTON, 20, 50, 75, 25, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
-				DWORD a = GetLastError();
-				SendMessage(selectRoleLeftArrow, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
-
-				selectRoleRightArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 70, 70, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
-				SendMessage(selectRoleRightArrow, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
+		
+		if (currentStage.stage == 2) {		
+			if (isArrow) {			
+				selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);					
+				selectRoleRightArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
+				selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500,620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
+				SendMessage(selectRoleLeftArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
+				SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
+				SendMessage(selectBtn, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.selectBtn));
 				isArrow = false;
 			}
 		}
+
 
 
 		if (currentStage.stage > 2) {
@@ -745,6 +749,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//		}
 		//	}
 		//}
+
 
 		DeleteDC(hDC);
 		DeleteObject(hbitmap);
