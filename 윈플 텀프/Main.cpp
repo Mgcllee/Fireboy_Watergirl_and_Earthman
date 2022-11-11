@@ -55,7 +55,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 		return 1;
-	c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, 0, 0, WSA_FLAG_OVERLAPPED);
+	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
