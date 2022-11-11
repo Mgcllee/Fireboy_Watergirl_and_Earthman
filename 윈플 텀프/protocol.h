@@ -7,7 +7,7 @@
 //RolePacket 구분
 #define C2SSelectRole 3// 케릭터 선택시 클라이언트 => 서버 로 역할 전송
 #define S2CSelectRole 4// 서버 => 클라이언트 한테 역할을 전송
-#define C2SChangRole 5 // 다른 클라이언트가 어떤 역할을 보고 있는지 알려주기 위한 패킷
+#define C2SChangeRole 5 // 다른 클라이언트가 어떤 역할을 보고 있는지 알려주기 위한 패킷
 #define S2CChangeRole 6// 선택이 아닌 케릭터 뭘 보고 있는지 다른 클라이언트도 알아야 하니까 있는 패킷
 //MovePacket 구분
 #define C2SMove 7

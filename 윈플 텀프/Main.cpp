@@ -2,7 +2,7 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-
+#include"protocol.h"
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
@@ -180,13 +180,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case BTN_LEFT_ARROW:
-
+		{
+			C2SRolePacket makePacket;
+			makePacket.type = C2SChangeRole;
+			makePacket.role = 'f'; // 아직 로직 안 짬
+			SendPacket(&makePacket);
+		}
 			break;
 		case BTN_RIGHT_ARROW:
-
+		{
+			C2SRolePacket makePacket;
+			makePacket.type = C2SChangeRole;
+			makePacket.role = 'f'; // 아직 로직 안 짬
+			SendPacket(&makePacket);
+		}
 			break;
 		case BTN_SELECT:
-
+		{
+			C2SRolePacket makePacket;
+			makePacket.type = C2SSelectRole;
+			makePacket.role = 'f'; // 아직 로직 안 짬 수정해야됨
+			SendPacket(&makePacket);
+		}
 			break;
 		case BTN_QUIT:
 			back = FALSE;

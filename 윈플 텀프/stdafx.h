@@ -139,5 +139,5 @@ extern BOOL				keybuffer[256];
 extern int currneClientNum;
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);
-void send_packet(char* buf);
-void ProcessPacket();
+void ProcessPacket(char* buf);
+void SendPacket(void* buf);

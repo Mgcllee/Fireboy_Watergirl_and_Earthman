@@ -32,13 +32,45 @@ bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 	return true;
 }
 
-void send_packet(char* buf)
+void ProcessPacket(char* buf)
 {
 	switch (buf[0]) {
-	case C2SSelectRole:
+	case S2CSelectRole:
 
 		break;
-	case C2SChangRole:
+	case S2CChangeRole:
+
+		break;
+	case S2CMove:
+
+		break;
+	case S2CDoorOpen:
+
+		break;
+	case S2CExitGame:
+
+		break;
+	case S2CJewelryVisibility:
+
+		break;
+	case S2CLoading:
+		break;		
+	}
+}
+
+void SendPacket(void* buf)
+{
+	if (buf == nullptr)
+		return;
+	char* packet = nullptr;
+	int size = 0;
+	switch (reinterpret_cast<char*>(buf)[0]) {
+	case C2SSelectRole:
+		size = sizeof(C2SRolePacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
+		break;
+	case C2SChangeRole:
 
 		break;
 	case C2SMove:
@@ -49,12 +81,11 @@ void send_packet(char* buf)
 		break;
 	case C2SExitGame:
 
-		break;
+		break;		
 	}
-}
 
-void ProcessPacket()
-{
-	// recv packet
-
+	if (packet != nullptr) {
+		send(c_socket, packet, size, NULL);
+		delete[] packet;
+	}
 }
