@@ -16,6 +16,10 @@
 #define BTN_QUIT 300
 #define BTN_NEXT_STAGE 350
 #define EDIT_SERVER_ADDR 400
+#define BTN_LEFT_ARROW 500
+#define BTN_RIGHT_ARROW 550
+#define BTN_SELECT 600
+
 
 
 // Network Module
