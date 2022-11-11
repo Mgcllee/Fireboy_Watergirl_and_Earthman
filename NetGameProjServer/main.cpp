@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define MAX_BUF_SIZE 256
+
 void Display_Err(int Errcode);
 void ConstructPacket(char* recvPacket); // 패킷 재조립
 void ProcessPacket(char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
@@ -18,18 +20,18 @@ void CheckJewelryEat();// 쥬얼리 습득 확인
 void CheckOpenDoor(); // 문 열리는 조건 확인
 
 
-DWORD WINAPI ClientWorkThread(LPVOID arg);
-struct MyThread
-{
-    int iIndex = 0;
-    SOCKET sock = 0;
-};
 
+
+DWORD WINAPI ClientWorkThread(LPVOID arg);
 
 struct threadInfo {
 	HANDLE h = NULL;
 	SOCKET clientSocket;
+	char recvBuf[MAX_BUF_SIZE] = { 0 };
+	int currentSize;
+	int prev_size = 0;
 };
+
 array<threadInfo, 3> threadHandles;
 
 //HANDLE loadFlag; =>웨이트포실긍
@@ -46,7 +48,7 @@ int main(int argv, char** argc)
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
-	
+
 	//loadFlag= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -70,48 +72,39 @@ int main(int argv, char** argc)
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
-	
+
 	array<SOCKET, 3> clientSocket;
 
 	for (int i = 0; i < 3; i++)
 	{
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
-		clientSocket[i] = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
+		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
 		if (clientSocket[i] == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
 			WSACleanup();
 			return 1;
 		}
-		
+
 		S2CLoadingPacket load1;
 		load1.type = S2CLoading;
 		load1.id = i;
-		
-		
-		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(clientSocket[i]), 0, NULL);//인자가 clientSocket이 아닐 수 있음
-		threadHandles[i].clientSocket = clientSocket[i];
-		
-		
-		
-		if (i == 0) {
-			send(clientSocket[i], (char*)&load1, sizeof(S2CLoadingPacket), 0);
-		}
-		if (i == 1) {
-			send(clientSocket[i], (char*)&load1, sizeof(S2CLoadingPacket), 0);
-		}
+
+		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
+
+		send(threadHandles[i].clientSocket, (char*)&load1, sizeof(S2CLoadingPacket), 0);//loading 패킷을 로그인 패킷으로 생각하고
+
 		if (i == 2) {
-			
 			S2CChangeStagePacket change1;
 			change1.stageNum = 0;
 			change1.type = S2CChangeStage;
 
-			for(int x=0; x<3; x++)
+			for (int x = 0; x < 3; x++)
 				send(clientSocket[i], (char*)&change1, sizeof(S2CChangeStage), 0);
 		}
-		
 	}
+
 
 	closesocket(listenSocket);
 	WSACleanup();
@@ -132,10 +125,12 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	//WaitForSingleObject(loadFlag, INFINITE);
 
-
-	SOCKET socket = *reinterpret_cast<SOCKET*>(arg);
+	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
-		//recv();
+		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size, MAX_BUF_SIZE, 0);
+		if (!recvRetVal) {
+			// construct Pakcet - processPacket
+		}
 	}
 	return 0;
 }
