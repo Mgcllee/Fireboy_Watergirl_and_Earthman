@@ -1,4 +1,6 @@
 #pragma once
+
+#include <WinSock2.h>
 #include <windows.h>
 #include <tchar.h>
 #include <atlimage.h>
@@ -13,6 +15,17 @@
 #define BTN_RESTART 200
 #define BTN_QUIT 300
 #define BTN_NEXT_STAGE 350
+#define EDIT_SERVER_ADDR 400
+
+
+// Network Module
+#include <iostream>
+#include <WS2tcpip.h>
+#pragma comment(lib, "ws2_32")
+extern WSADATA WSAData;
+extern SOCKET c_socket;
+//===============
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -120,3 +133,7 @@ extern PLAYER fire;
 extern MCI_PLAY_PARMS	mciPlayParms;
 extern BOOL				keybuffer[256];
 extern int currneClientNum;
+
+bool NetworkInit(HWND& hWnd, std::string input_addr);
+void send_packet(char* buf);
+void ProcessPacket();
