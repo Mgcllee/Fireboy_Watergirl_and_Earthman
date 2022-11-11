@@ -87,7 +87,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	6. WM_PAINT : 메인 윈도우에 오브젝트 그리기
 
 	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
-*/ 
+*/
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
@@ -96,15 +96,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HBITMAP hbitmap;
 
 	static HWND start_button, retry_button, end_button, next_button;
+	static HWND selectRoleLeftArrow, selectRoleRightArrow;
 	static BOOL back = FALSE;
 	static int time = 300;
 	int blue_count = 0;
 	int red_count = 0;
 	static int stair_red_x = 0, stair_blue_x = 0;
+	bool isArrow = true;
 
 	// 현재 스테이지 획득
 	currentStage = myStageMgr.getStage(stageIndex);
-	
+
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
@@ -128,6 +130,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
+		case BTN_LEFT_ARROW:						
+			//캐릭터 변경 돼야함
+			break;
+		case BTN_RIGHT_ARROW:						
+			//캐릭터 변경 돼야함
+			break;
 
 			currentStage = myStageMgr.getStage(stageIndex);
 
@@ -159,7 +167,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			water.on = TRUE;
 			time = 300;
 			currentStage = myStageMgr.getStage(++stageIndex);
-			
+
 			/*for (int i = 0; i < 20; i++)
 			{
 				if (Jwewlry.find(i)->second.On)
@@ -621,13 +629,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
 		//삭제
-		if(stageIndex == 1)
+		if (stageIndex == 1) {
 			currneClientNum += 1;
-		if (currneClientNum == 4) {
-			stageIndex += 1;
-			currneClientNum = 0;
+			if (currneClientNum == 4) {
+				stageIndex += 1;
+				currneClientNum = 3;
+			}
 		}
-		//
+
+		if (currentStage.stage == 2) {
+			if (isArrow) {
+				//selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 70, 70, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
+
+				selectRoleLeftArrow = CreateWindowEx(WS_EX_TRANSPARENT, L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | ~BS_DEFPUSHBUTTON, 20, 50, 75, 25, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
+				DWORD a = GetLastError();
+				SendMessage(selectRoleLeftArrow, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
+
+				selectRoleRightArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 70, 70, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
+				SendMessage(selectRoleRightArrow, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
+				isArrow = false;
+			}
+		}
+
 
 		if (currentStage.stage > 2) {
 			myImageMgr.DrawPlayer(&memdc, 0, &water, currentStage);
