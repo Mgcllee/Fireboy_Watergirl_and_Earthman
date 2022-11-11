@@ -161,6 +161,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Back_Ground.cpp" />
+    <ClCompile Include="NetworkModule.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageMgr.cpp" />
     <ClCompile Include="stdafx.cpp" />

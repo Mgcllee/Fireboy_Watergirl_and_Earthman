@@ -8,6 +8,9 @@ ImageMgr myImageMgr;
 StageMgr myStageMgr;
 Stage currentStage;
 
+WSADATA WSAData;
+SOCKET c_socket;
+
 int stageIndex = 0;
 
 int currneClientNum = 1;
@@ -49,6 +52,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	// 메인 윈도우 Update Data
 	UpdateWindow(hWnd);
+
+	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
+		return 1;
+	c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, 0, 0, WSA_FLAG_OVERLAPPED);
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
@@ -95,7 +102,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HDC memdc;
 	static HBITMAP hbitmap;
 
-	static HWND start_button, retry_button, end_button, next_button;
+	static HWND start_button, retry_button, end_button, next_button, server_addr;
 	static BOOL back = FALSE;
 	static int time = 300;
 	int blue_count = 0;
@@ -110,6 +117,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
 
+		static HFONT s_hFont = (HFONT)NULL;
+		NONCLIENTMETRICS nonClientMetrics;
+		ZeroMemory(&nonClientMetrics, sizeof(nonClientMetrics));
+		nonClientMetrics.cbSize = sizeof(NONCLIENTMETRICS);
+		s_hFont = CreateFontIndirect(&nonClientMetrics.lfCaptionFont);
+
+		server_addr = CreateWindow(L"edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
+		SendMessage(server_addr, WM_SETFONT, (WPARAM)s_hFont, (LPARAM)MAKELONG(TRUE, 0));
+
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
 		SetTimer(hWnd, 3, 50, NULL);
@@ -120,11 +136,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case BTN_START:
-			stageIndex = 1;
-			SetTimer(hWnd, 5, 1000, NULL);
-			DestroyWindow(start_button);
+			wchar_t wc_s_addr[256];
+			char c_s_addr[256];
+			size_t t;
+			GetWindowText(server_addr, wc_s_addr, 256);
+			wcstombs_s(&t, c_s_addr, wc_s_addr, 256);
+
+			if (NetworkInit(hWnd, c_s_addr)) {
+				stageIndex = 1;
+				SetTimer(hWnd, 5, 1000, NULL);
+				DestroyWindow(start_button);
+				DestroyWindow(server_addr);
+			}
+			else {
+				SetWindowText(server_addr, LPCWSTR());
+			}
+			
 			break;
 		case BTN_RESTART:
+
+
 			time = 300;
 			fire.on = TRUE;
 			water.on = TRUE;
