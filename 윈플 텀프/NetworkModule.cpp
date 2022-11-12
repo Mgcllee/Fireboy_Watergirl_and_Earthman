@@ -149,12 +149,9 @@ void Display_Err(HWND hWnd, int Errcode)
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPWSTR)&lpMsgBuf, 0, NULL);
-
-	WCHAR wc_errcode[256];
-	swprintf_s(wc_errcode, L"ErrorCode: %d", Errcode);
-
-	MessageBox(g_hWnd, (WCHAR*)lpMsgBuf, wc_errcode, NULL);
-
+	//std::wcout << "ErrorCode: " << Errcode << " - " << (WCHAR*)lpMsgBuf << std::endl;
+	MessageBox(hWnd, (LPWSTR)lpMsgBuf, _T("서버주소 오류!"), NULL);
+	//이거 윈도우 그걸로 에러 뜨는거 수정 - 명철 부탁
 	LocalFree(lpMsgBuf);
 }
 

@@ -13,10 +13,8 @@ SOCKET c_socket;
 
 int stageIndex = 0;
 int currneClientNum = 1;
-int myId = -1;
 
-char recvBuf[MAX_BUF_SIZE] = { 0 };
-int prevSize = 0;
+char recvBuf[MAX_BUF_SIZE] = {0};
 
 HWND g_hWnd;
 
@@ -118,14 +116,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
+	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
 
 	if (!recvRetVal) {
-		ConstructPacket(recvBuf, recvRetVal);
+
 	}
 	else {
 		WSAGetLastError();
-	}
+	}*/
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
