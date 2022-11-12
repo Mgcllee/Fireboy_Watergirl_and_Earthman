@@ -145,7 +145,14 @@ extern PLAYER players[3];
 extern MCI_PLAY_PARMS	mciPlayParms;
 extern BOOL				keybuffer[256];
 extern int currneClientNum;
+extern char recvBuf[MAX_BUF_SIZE];
+extern int prevSize;
+extern int myId;
+
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);
 void ProcessPacket(char* buf);
 void SendPacket(void* buf);
+void ConstructPacket(void* buf, int ioSize);
+int GetPacketSize(char packetType);
+void Display_Err(HWND hWnd, int Errcode);

@@ -13,8 +13,10 @@ SOCKET c_socket;
 
 int stageIndex = 0;
 int currneClientNum = 1;
+int myId = -1;
 
 char recvBuf[MAX_BUF_SIZE] = {0};
+int prevSize = 0;
 
 
 // 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
@@ -58,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 		return 1;
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	
+
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
 
@@ -116,14 +118,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	// 현재 스테이지 획득
 	currentStage = myStageMgr.getStage(stageIndex);
 
-	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
+	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 
 	if (!recvRetVal) {
-
+		ConstructPacket(recvBuf, recvRetVal);
 	}
 	else {
 		WSAGetLastError();
-	}*/
+	}
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
