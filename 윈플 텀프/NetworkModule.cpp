@@ -3,7 +3,12 @@
 #include "stdafx.h"
 #include "protocol.h"
 
+void Display_Err(int Errcode);
+
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
+	// 오류검출 함수 테스트
+	Display_Err(10049);
+
 	// 클라이언트 작업용 (서버 연결이 필요할 경우 제거)
 	if (SERVER_ADDR.length() == 0) return true;
 
@@ -47,7 +52,7 @@ void ProcessPacket(char* buf)
 		players[move->id].x = move->x;
 		players[move->id].y = move->y;
 	}
-		break;
+	break;
 	case S2CDoorOpen:
 
 		break;
@@ -109,8 +114,11 @@ void Display_Err(int Errcode)
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPWSTR)&lpMsgBuf, 0, NULL);
-	//std::wcout << "ErrorCode: " << Errcode << " - " << (WCHAR*)lpMsgBuf << std::endl;
 
-	//이거 윈도우 그걸로 에러 뜨는거 수정 - 명철 부탁
+	WCHAR wc_errcode[256];
+	swprintf_s(wc_errcode, L"ErrorCode: %d", Errcode);
+
+	MessageBox(g_hWnd, (WCHAR*)lpMsgBuf, wc_errcode, NULL);
+
 	LocalFree(lpMsgBuf);
 }

@@ -128,13 +128,14 @@ public:
 		return On;
 	}
 
-	bool ChangeFrame(int direction) {
-		if (image_x + wid == MaxWid) {
-			image_x = 0;
+	bool ChangeFrame(int direction, bool replay) {
+		if (MaxWid == image_x + imageMoveWid) {
+			if(replay)
+				image_x = 0;
 			return true;
 		}
 		else {
-			image_x += imageMoveWid * direction;
+			image_x += (imageMoveWid * direction);
 			return false;
 		}
 	}
@@ -142,6 +143,7 @@ public:
 
 extern PLAYER players[3];
 
+extern HWND	g_hWnd;
 extern MCI_PLAY_PARMS	mciPlayParms;
 extern BOOL				keybuffer[256];
 extern int currneClientNum;
