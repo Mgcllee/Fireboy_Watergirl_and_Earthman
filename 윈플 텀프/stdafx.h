@@ -11,6 +11,8 @@
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
 
+#define MAX_BUF_SIZE		256
+
 #define BTN_START			100
 #define BTN_RESTART			200
 #define BTN_QUIT			300
@@ -51,6 +53,8 @@ struct FootHold {
 
 class PLAYER {
 public:
+	int id;						// 다른 클라이언트 식별 정보 - -1 // 아직 안쓰는 상황에 -1
+	short role;					// 어떤 캐릭터 인지 - f w e => fire water earth
 	int x, y;					// 우하단 좌표
 	int hei = 100, wid = 60;	// 캐릭터 크기
 	int direction;				// 이동방향 (애니메이션에서 사용)
@@ -71,9 +75,7 @@ public:
 	bool is_Push = FALSE;
 	bool Down = FALSE;
 
-	PLAYER() {
-
-	}
+	PLAYER() : id(-1), role('f') {}
 	~PLAYER() {
 
 	}
@@ -136,14 +138,6 @@ public:
 			return false;
 		}
 	}
-};
-
-//client Info
-struct clientInfo {
-	int id;// 다른 클라이언트 식별 정보
-	short role; // 어떤 캐릭터 인지
-
-	//좌표가 필요 하겠지?
 };
 
 extern PLAYER players[3];

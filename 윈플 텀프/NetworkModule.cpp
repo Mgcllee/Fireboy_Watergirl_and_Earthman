@@ -9,9 +9,6 @@ bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 
 	std::string buf_addr = SERVER_ADDR;
 
-	// 입력받은 문자열에서 모든 온점(.) 제거
-	SERVER_ADDR.erase(remove(SERVER_ADDR.begin(), SERVER_ADDR.end(), '.'), SERVER_ADDR.end());
-
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
@@ -104,4 +101,16 @@ void SendPacket(void* buf)
 		send(c_socket, packet, size, NULL);
 		delete[] packet;
 	}
+}
+
+void Display_Err(int Errcode)
+{
+	LPVOID lpMsgBuf;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPWSTR)&lpMsgBuf, 0, NULL);
+	//std::wcout << "ErrorCode: " << Errcode << " - " << (WCHAR*)lpMsgBuf << std::endl;
+
+	//이거 윈도우 그걸로 에러 뜨는거 수정 - 명철 부탁
+	LocalFree(lpMsgBuf);
 }

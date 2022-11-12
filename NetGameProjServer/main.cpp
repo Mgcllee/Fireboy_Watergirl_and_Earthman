@@ -87,6 +87,8 @@ int main(int argv, char** argc)
 			return 1;
 		}
 
+		cout << "Accept Client[" << i <<"]" << endl;
+
 		S2CLoadingPacket load1;
 		load1.type = S2CLoading;
 		load1.id = i;
@@ -142,4 +144,3 @@ void ProcessPacket(char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러�
 	//selectPacket() => mutex Role container and send S2CSelectPacket
 	//movePacket(); => 여기서 충돌 체크, 보석 체크 => 여기서 보석을 다 먹었다면 두 클라이언트에게 문 여는 패킷 전송, 문 들어가라는 패킷도 전송해야되네
 }
-

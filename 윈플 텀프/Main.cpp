@@ -14,6 +14,9 @@ SOCKET c_socket;
 int stageIndex = 0;
 int currneClientNum = 1;
 
+char recvBuf[MAX_BUF_SIZE] = {0};
+
+
 // 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
@@ -112,6 +115,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	// 현재 스테이지 획득
 	currentStage = myStageMgr.getStage(stageIndex);
+
+	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
+
+	if (!recvRetVal) {
+
+	}
+	else {
+		WSAGetLastError();
+	}*/
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
