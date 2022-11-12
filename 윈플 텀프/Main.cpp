@@ -13,11 +13,10 @@ SOCKET c_socket;
 
 int stageIndex = 0;
 int currneClientNum = 1;
-int myId = -1;
 
 char recvBuf[MAX_BUF_SIZE] = {0};
-int prevSize = 0;
 
+HWND g_hWnd;
 
 // 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
@@ -60,7 +59,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 		return 1;
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
+	
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
 
@@ -106,6 +105,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HDC memdc;
 	static HBITMAP hbitmap;
 
+	g_hWnd = hWnd;
+
 	static HWND start_button, retry_button, end_button, next_button, server_addr;
 	static HWND selectRoleLeftArrow;
 	static HWND selectRoleRightArrow;
@@ -115,17 +116,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	// 현재 스테이지 획득
-	currentStage = myStageMgr.getStage(stageIndex);
-
-	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
+	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
 
 	if (!recvRetVal) {
-		ConstructPacket(recvBuf, recvRetVal);
+
 	}
 	else {
 		WSAGetLastError();
-	}
+	}*/
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -207,10 +205,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.role = 'f'; // 아직 로직 안 짬 수정해야됨
 			SendPacket(&makePacket);
 
-
-
+			// (임시) 서버 연결 후 제거
 			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
-
 		}
 			break;
 		case BTN_QUIT:
@@ -275,20 +271,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		case 3:				// 보석, 함정, 사망, 문 애니메이션 처리와 스테이지 클리어 조건 충족시 후처리(Next 윈도우와 배경처리)
 			for (OBJECT& bj : currentStage.Blue_Jewel)
-				if (bj.GetVisible())
-					bj.ChangeFrame(1);
+				if (bj.GetVisible() && bj.ChangeFrame(1, true))
+					bj.image_x = 0;
+
 			for (OBJECT& rj : currentStage.Red_Jewel)
-				if (rj.GetVisible())
-					rj.ChangeFrame(1);
+				if (rj.GetVisible() && rj.ChangeFrame(1, true))
+					rj.image_x = 0;
 
 			for (OBJECT& t : currentStage.Trap)
 				if (t.GetVisible())
-					t.ChangeFrame(1);
+					t.ChangeFrame(1, true);
 
 			// Fire bot, Water girl 중 1명이라도 사망 && 현재 Stage가 1 이상인 경우 (Stage 0은 Title 화면)
 			if (currentStage.Die.GetVisible() && STAGE_01 <= currentStage.stage)
 			{
-				if (currentStage.Die.ChangeFrame(1))
+				if (currentStage.Die.ChangeFrame(1, false))
 				{
 					back = TRUE;
 					currentStage.Die.SetVisible(FALSE);
@@ -309,40 +306,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// 스테이스 클리어 후 문으로 들어가는 애니메이션
-			if (currentStage.stair)
-			{
-				if (currentStage.red_door.ChangeFrame(1) && currentStage.blue_door.ChangeFrame(1)) {
-					currentStage.stair = FALSE;
-					currentStage.red_door.image_x = 0;
-					currentStage.blue_door.image_x = 0;
-					next_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 400, 200, 100, hWnd, (HMENU)BTN_NEXT_STAGE, g_hInst, NULL);
-					SendMessage(next_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.clear_img));
-				}
-			}
+			// if (currentStage.red_door.Collision(players[1]) && currentStage.blue_door.Collision(players[0]))
+			//{
+			//	// if (currentStage.red_door.ChangeFrame(1) && currentStage.blue_door.ChangeFrame(1)) {
+			//	if (currentStage.blue_door.ChangeFrame(1)) {
+			//		currentStage.stair = FALSE;
+			//		currentStage.red_door.image_x = 0;
+			//		currentStage.blue_door.image_x = 0;
+			//		next_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 400, 200, 100, hWnd, (HMENU)BTN_NEXT_STAGE, g_hInst, NULL);
+			//		SendMessage(next_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.clear_img));
+			//	}
+			//}
 
 			for (PLAYER& pl : players) {
 				for (OBJECT& btn : currentStage.button)
 					if (btn.GetVisible() && btn.Collision(pl))
-						btn.ChangeFrame(1);
+						btn.ChangeFrame(1, false);
 			}
 			break;
 		case 4:
-			if (currentStage.red_door.GetVisible())
+			/*if (currentStage.red_door.GetVisible())
 				currentStage.red_door.ChangeFrame(1);
 			else 
-				currentStage.red_door.ChangeFrame(-1);
+				currentStage.red_door.ChangeFrame(-1);*/
 
-			if (currentStage.blue_door.GetVisible())
-				currentStage.blue_door.ChangeFrame(1);
-			else 
-				currentStage.blue_door.ChangeFrame(-1);
+			if (currentStage.blue_door.Collision(players[1]))
+				currentStage.blue_door.ChangeFrame(1, false);
+			else if (currentStage.blue_door.image_x != 0) {
+
+				if (currentStage.blue_door.image_x + currentStage.blue_door.imageMoveWid == currentStage.blue_door.MaxWid)
+					currentStage.blue_door.image_x -= currentStage.blue_door.imageMoveWid;
+
+				currentStage.blue_door.ChangeFrame(-1, false);
+			}
 
 			// Stage_03() 에서 나오는 X축 이동 바 (block1.PNG 파일 참고)
 			for (OBJECT& block : currentStage.block)
 				if (block.GetVisible())
-					block.ChangeFrame(-1);
+					block.ChangeFrame(-1, false);
 				else
-					block.ChangeFrame(1);
+					block.ChangeFrame(1, false);
 			break;
 
 		case 5:
@@ -388,15 +391,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
 
-		//삭제
-		/*if (stageIndex == 1)
-			currneClientNum += 1;
-		if (currneClientNum == 4) {
-			stageIndex += 1;
-			currneClientNum = 0;
-		}*/
-		//
-
 		if (STAGE_LOBBY == currentStage.stage) {
 			if (isArrow) {
 				selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
@@ -423,8 +417,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					myImageMgr.Jewelry_red.Draw(memdc, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
 			}
 			for (auto& bj : currentStage.Blue_Jewel) {
-				if (bj.GetVisible())
+				if (bj.GetVisible()) {
 					myImageMgr.Jewelry_blue.Draw(memdc, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
+				}
 			}
 
 			// 사망시 연기 Anim

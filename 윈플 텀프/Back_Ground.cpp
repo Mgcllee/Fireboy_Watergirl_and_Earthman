@@ -8,12 +8,21 @@ void Move()
 	move.id = currneClientNum;
 	move.type = C2SMove;
 
-	if (keybuffer[VK_LEFT])
+	if (keybuffer[VK_LEFT]) {
 		move.x = players[currneClientNum].x - 1;
-	if (keybuffer[VK_RIGHT])
+		players[currneClientNum].x -= 10;
+	}
+	if (keybuffer[VK_RIGHT]) {
 		move.x = players[currneClientNum].x + 1;
-	if (keybuffer[VK_UP])
-		move.x = players[currneClientNum].y + 1;
+		players[currneClientNum].x += 10;
+	}
+	if (keybuffer[VK_UP]) {
+		move.y = players[currneClientNum].y - 1;
+		players[currneClientNum].y -= 10;
+	}
+	if (keybuffer[VK_DOWN]) {
+		players[currneClientNum].y += 10;
+	}
 
 	SendPacket(&move);
 }

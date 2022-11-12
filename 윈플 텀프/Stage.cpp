@@ -27,13 +27,11 @@ void Stage::Stage_1() {
 			t = OBJECT{0, 0, 20, 20, 230, 23, FALSE};
 		}
 		
-		if (Blue_Jewel.size() == 0 && Red_Jewel.size() == 0) {
-			Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-			Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
-		}
+		Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+		Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 
-		blue_door = OBJECT{ 480, 300, 0, 0, 0, 0, FALSE };
-		red_door = OBJECT{ 630, 300, 0, 0, 0, 0, FALSE };
+		blue_door= OBJECT{ 480, 300, 60, 100, 1260, 60, TRUE };
+		red_door = OBJECT{ 630, 300, 60, 100, 1260, 60, TRUE };
 
 		Ft[0].x = 100, Ft[0].y = 600;
 		Ft[1].x = 250, Ft[1].y = 500;
