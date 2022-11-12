@@ -89,13 +89,13 @@ int main(int argv, char** argc)
 
 		cout << "Accept Client[" << i <<"]" << endl;
 
-		S2CLoadingPacket load1;
+		S2CPlayerPacket load1;
 		load1.type = S2CLoading;
 		load1.id = i;
 
 		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
 
-		send(threadHandles[i].clientSocket, (char*)&load1, sizeof(S2CLoadingPacket), 0);//loading 패킷을 로그인 패킷으로 생각하고
+		send(threadHandles[i].clientSocket, (char*)&load1, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각하고
 
 		if (i == 2) {
 			S2CChangeStagePacket change1;
@@ -123,15 +123,20 @@ void Display_Err(int Errcode)
 	LocalFree(lpMsgBuf);
 }
 
+void ConstructPacket(char* recvPacket)
+{
+
+}
+
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	//WaitForSingleObject(loadFlag, INFINITE);
 
 	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
-		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size, MAX_BUF_SIZE, 0);
+		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size, MAX_BUF_SIZE - threadHandles[myIndex].prev_size, 0);
 		if (!recvRetVal) {
-			// construct Pakcet - processPacket
+			ConstructPacket(threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size);
 		}
 	}
 	return 0;

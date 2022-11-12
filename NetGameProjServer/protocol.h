@@ -17,13 +17,14 @@
 #define S2CExitGame 10// 서버에서 다른 클라이언트에게 정보 알림
 #define C2SRetry 11// 클라이언트가 서버에게 이번 스테이지 재시도 요청 패킷
 #define S2CDoorOpen 12// 문열리는걸 알리는 패킷
+#define S2CAddPlayer 13// 다른 플레이어 정보 받기
 
 
 #define PORT_NUM 9000
 
 #pragma pack(push, 1)
 
-struct S2CLoadingPacket { // 다른 클라이언트 기다리기위한 패킷
+struct S2CPlayerPacket { // 다른 클라이언트 기다리기위한 패킷
 	//unsigned char size;
 	char type;
 	char id; // 클라이언트 고유 id 전송
