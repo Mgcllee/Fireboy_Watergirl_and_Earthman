@@ -14,7 +14,10 @@ SOCKET c_socket;
 int stageIndex = 0;
 int currneClientNum = 1;
 
-char recvBuf[MAX_BUF_SIZE] = {0};
+int prevSize = 0;
+int myId = -1;
+
+char recvBuf[MAX_BUF_SIZE] = { 0 };
 
 HWND g_hWnd;
 
@@ -59,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 		return 1;
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	
+
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
 
@@ -189,7 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.role = 'f'; // 아직 로직 안 짬
 			SendPacket(&makePacket);
 		}
-			break;
+		break;
 		case BTN_RIGHT_ARROW:
 		{
 			C2SRolePacket makePacket;
@@ -197,7 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.role = 'f'; // 아직 로직 안 짬
 			SendPacket(&makePacket);
 		}
-			break;
+		break;
 		case BTN_SELECT:
 		{
 			C2SRolePacket makePacket;
@@ -208,7 +211,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// (임시) 서버 연결 후 제거
 			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 		}
-			break;
+		break;
 		case BTN_QUIT:
 			back = FALSE;
 			currentStage.time_over = FALSE;
@@ -242,7 +245,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_TIMER:
 		switch (wParam) {
-		case 1:				
+		case 1:
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
@@ -251,7 +254,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
-			
+
 			if (STAGE_01 <= currentStage.stage)
 			{
 				for (PLAYER& pl : players) {
@@ -327,7 +330,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case 4:
 			/*if (currentStage.red_door.GetVisible())
 				currentStage.red_door.ChangeFrame(1);
-			else 
+			else
 				currentStage.red_door.ChangeFrame(-1);*/
 
 			if (currentStage.blue_door.Collision(players[1]))
@@ -350,7 +353,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case 5:
 			//타임아웃시 할 동작
-			
+
 			if (--time == 0)
 			{
 				currentStage.time_over = TRUE;
@@ -362,7 +365,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				KillTimer(hWnd, 5);
 			}
-			
+
 			break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
