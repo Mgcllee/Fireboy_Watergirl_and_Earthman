@@ -4,13 +4,13 @@
 #include "protocol.h"
 
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
+	// 클라이언트 작업용 (서버 연결이 필요할 경우 제거)
+	if (SERVER_ADDR.length() == 0) return true;
+
 	std::string buf_addr = SERVER_ADDR;
 
 	// 입력받은 문자열에서 모든 온점(.) 제거
 	SERVER_ADDR.erase(remove(SERVER_ADDR.begin(), SERVER_ADDR.end(), '.'), SERVER_ADDR.end());
-
-	// 클라이언트 작업용 (서버 연결이 필요할 경우 제거)
-	if (SERVER_ADDR.length() == 0) return true;
 
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -34,7 +34,10 @@ bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 
 void ProcessPacket(char* buf)
 {
-	switch (buf[0]) {
+	if (buf == nullptr)
+		return;
+
+	switch (reinterpret_cast<char*>(buf)[0]) {
 	case S2CSelectRole:
 
 		break;
@@ -42,7 +45,11 @@ void ProcessPacket(char* buf)
 
 		break;
 	case S2CMove:
-
+	{
+		MovePacket* move = reinterpret_cast<MovePacket*>(buf);
+		players[move->id].x = move->x;
+		players[move->id].y = move->y;
+	}
 		break;
 	case S2CDoorOpen:
 
@@ -54,7 +61,11 @@ void ProcessPacket(char* buf)
 
 		break;
 	case S2CLoading:
-		break;		
+
+		break;
+	default:
+		// Packet Error
+		break;
 	}
 }
 
@@ -74,14 +85,19 @@ void SendPacket(void* buf)
 
 		break;
 	case C2SMove:
-
+		size = sizeof(MovePacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
 		break;
 	case C2SRetry:
 
 		break;
 	case C2SExitGame:
 
-		break;		
+		break;
+	default:
+		// Packet Error
+		break;
 	}
 
 	if (packet != nullptr) {

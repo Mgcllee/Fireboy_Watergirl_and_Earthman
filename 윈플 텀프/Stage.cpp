@@ -10,13 +10,10 @@ void Stage::SelectCharacter()
 
 // 스테이지 내부 오브젝트 위치 설정
 void Stage::Stage_1() {
-	water.x = 600;
-	water.y = 730;
-	fire.x = 700;
-	fire.y = 730;
-
-	fire.on = TRUE;
-	water.on = TRUE;
+	players[0].x = 600;
+	players[0].y = 730;
+	players[1].x = 700;
+	players[1].y = 730;
 
 	if(Red_Jewel.empty() && Blue_Jewel.empty())
 	{
@@ -27,16 +24,16 @@ void Stage::Stage_1() {
 		Trap.reserve(3);
 
 		for (auto& t : Trap) {
-			t = OBJECT{0, 0, 20, 20, FALSE};
+			t = OBJECT{0, 0, 20, 20, 230, 23, FALSE};
 		}
 		
 		if (Blue_Jewel.size() == 0 && Red_Jewel.size() == 0) {
-			Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, TRUE });
-			Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, TRUE });
+			Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+			Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 		}
 
-		blue_door = OBJECT{ 480, 300, 0, 0, FALSE };
-		red_door = OBJECT{ 630, 300, 0, 0, FALSE };
+		blue_door = OBJECT{ 480, 300, 0, 0, 0, 0, FALSE };
+		red_door = OBJECT{ 630, 300, 0, 0, 0, 0, FALSE };
 
 		Ft[0].x = 100, Ft[0].y = 600;
 		Ft[1].x = 250, Ft[1].y = 500;
@@ -352,307 +349,308 @@ void Stage::Stage_3() {
 
 // 플레이어 점프 동작시 충돌 체크
 void Stage::Jump() {
-	if (fire.Down) {
-		if (fire.y + (fire.v + fire.g) > fire.ground) {
-			fire.is_Jumping = FALSE;
-			fire.Down = FALSE;
-			fire.v = 50;
-			fire.y = fire.ground;
-		}
-		if (fire.y < fire.ground) {
-			fire.v = fire.v + fire.g;
-			fire.y = fire.y + fire.v;
-		}
-	}
-	if (water.Down) {
-		if (water.y + (water.v + water.g) > water.ground) {
-			water.is_Jumping = FALSE;
-			water.Down = FALSE;
-			water.v = 50;
-			water.y = water.ground;
-		}
-		if (water.y < water.ground) {
-			water.v = water.v + water.g;
-			water.y = water.y + water.v;
-		}
-	}
-	if (water.is_Jumping == TRUE) {
-		if (!water.Down) {
-			if (water.v >= 0) {
-				water.v = water.v - water.g;
-				water.y = water.y - (water.v / 2);
-			}
-			else {
-				water.Down = TRUE;    // 상태 변화
-			}
-		}
-	}
-	if (fire.is_Jumping == TRUE) {
-		if (!fire.Down) {
-			if (fire.v > 0) {
-				fire.v = fire.v - fire.g;
-				fire.y = fire.y - (fire.v / 2);
-			}
-			else {
-				fire.Down = TRUE;    // 상태 변화
-			}
-		}
-	}
+	//if (fire.Down) {
+	//	if (fire.y + (fire.v + fire.g) > fire.ground) {
+	//		fire.is_Jumping = FALSE;
+	//		fire.Down = FALSE;
+	//		fire.v = 50;
+	//		fire.y = fire.ground;
+	//	}
+	//	if (fire.y < fire.ground) {
+	//		fire.v = fire.v + fire.g;
+	//		fire.y = fire.y + fire.v;
+	//	}
+	//}
+	//if (water.Down) {
+	//	if (water.y + (water.v + water.g) > water.ground) {
+	//		water.is_Jumping = FALSE;
+	//		water.Down = FALSE;
+	//		water.v = 50;
+	//		water.y = water.ground;
+	//	}
+	//	if (water.y < water.ground) {
+	//		water.v = water.v + water.g;
+	//		water.y = water.y + water.v;
+	//	}
+	//}
+	//if (water.is_Jumping == TRUE) {
+	//	if (!water.Down) {
+	//		if (water.v >= 0) {
+	//			water.v = water.v - water.g;
+	//			water.y = water.y - (water.v / 2);
+	//		}
+	//		else {
+	//			water.Down = TRUE;    // 상태 변화
+	//		}
+	//	}
+	//}
+	//if (fire.is_Jumping == TRUE) {
+	//	if (!fire.Down) {
+	//		if (fire.v > 0) {
+	//			fire.v = fire.v - fire.g;
+	//			fire.y = fire.y - (fire.v / 2);
+	//		}
+	//		else {
+	//			fire.Down = TRUE;    // 상태 변화
+	//		}
+	//	}
+	//}
 }
 
 // 플레이어 좌우 이동시 충돌 체크
-void Stage::Wid_Move() {
-	if (water.is_Move) {
-		if (water.dic == 1) {
-			if (water.wid_v <= 10) {
-				water.wid_v = water.wid_v + water.wid_a;
-			}
-			water.x = water.x + water.wid_v;
-		}
-		else if (water.dic == -1) {
-			if (water.wid_v <= 10) {
-				water.wid_v = water.wid_v + water.wid_a;
-			}
-			water.x = water.x - water.wid_v;
-		}
-	}
-	if (water.is_Speed_Down) {
-		if (water.dic == 1) {
-			water.wid_a += 1;
-			water.wid_v = water.wid_v - water.wid_a;
-			water.x = water.x + water.wid_v;
-			if (water.wid_v <= 0) {
-				water.wid_v = 0;
-				water.wid_a = 0;
-				water.dic = 0;
-				water.is_Speed_Down = FALSE;
-			}
-		}
-		else if (water.dic == -1) {
-			water.wid_a += 1;
-			water.wid_v = water.wid_v - water.wid_a;
-			water.x = water.x - water.wid_v;
-			if (water.wid_v <= 0) {
-				water.wid_v = 0;
-				water.wid_a = 0;
-				water.dic = 0;
-				water.is_Speed_Down = FALSE;
-			}
-		}
-	}
-	if (fire.is_Move) {
-		if (fire.dic == 1) {
-			if (fire.wid_v <= 10) {
-				fire.wid_v = fire.wid_v + fire.wid_a;
-			}
-			fire.x = fire.x + fire.wid_v;
-		}
-		else if (fire.dic == -1) {
-			if (fire.wid_v <= 10) {
-				fire.wid_v = fire.wid_v + fire.wid_a;
-			}
-			fire.x = fire.x - fire.wid_v;
-		}
-	}
-	if (fire.is_Speed_Down) {
-		if (fire.dic == 1) {
-			fire.wid_a += 1;
-			fire.wid_v = fire.wid_v - fire.wid_a;
-			fire.x = fire.x + fire.wid_v;
-			if (fire.wid_v <= 0) {
-				fire.wid_v = 0;
-				fire.wid_a = 0;
-				fire.dic = 0;
-				fire.is_Speed_Down = FALSE;
-			}
-		}
-		else if (fire.dic == -1) {
-			fire.wid_a += 1;
-			fire.wid_v = fire.wid_v - fire.wid_a;
-			fire.x = fire.x - fire.wid_v;
-			if (fire.wid_v <= 0) {
-				fire.wid_v = 0;
-				fire.wid_a = 0;
-				fire.dic = 0;
-				fire.is_Speed_Down = FALSE;
-			}
-		}
-	}
-}
+//void Stage::Wid_Move() {
+//	if (water.is_Move) {
+//		if (water.dic == 1) {
+//			if (water.wid_v <= 10) {
+//				water.wid_v = water.wid_v + water.
+//					;
+//			}
+//			water.x = water.x + water.wid_v;
+//		}
+//		else if (water.dic == -1) {
+//			if (water.wid_v <= 10) {
+//				water.wid_v = water.wid_v + water.wid_a;
+//			}
+//			water.x = water.x - water.wid_v;
+//		}
+//	}
+//	if (water.is_Speed_Down) {
+//		if (water.dic == 1) {
+//			water.wid_a += 1;
+//			water.wid_v = water.wid_v - water.wid_a;
+//			water.x = water.x + water.wid_v;
+//			if (water.wid_v <= 0) {
+//				water.wid_v = 0;
+//				water.wid_a = 0;
+//				water.dic = 0;
+//				water.is_Speed_Down = FALSE;
+//			}
+//		}
+//		else if (water.dic == -1) {
+//			water.wid_a += 1;
+//			water.wid_v = water.wid_v - water.wid_a;
+//			water.x = water.x - water.wid_v;
+//			if (water.wid_v <= 0) {
+//				water.wid_v = 0;
+//				water.wid_a = 0;
+//				water.dic = 0;
+//				water.is_Speed_Down = FALSE;
+//			}
+//		}
+//	}
+//	if (fire.is_Move) {
+//		if (fire.dic == 1) {
+//			if (fire.wid_v <= 10) {
+//				fire.wid_v = fire.wid_v + fire.wid_a;
+//			}
+//			fire.x = fire.x + fire.wid_v;
+//		}
+//		else if (fire.dic == -1) {
+//			if (fire.wid_v <= 10) {
+//				fire.wid_v = fire.wid_v + fire.wid_a;
+//			}
+//			fire.x = fire.x - fire.wid_v;
+//		}
+//	}
+//	if (fire.is_Speed_Down) {
+//		if (fire.dic == 1) {
+//			fire.wid_a += 1;
+//			fire.wid_v = fire.wid_v - fire.wid_a;
+//			fire.x = fire.x + fire.wid_v;
+//			if (fire.wid_v <= 0) {
+//				fire.wid_v = 0;
+//				fire.wid_a = 0;
+//				fire.dic = 0;
+//				fire.is_Speed_Down = FALSE;
+//			}
+//		}
+//		else if (fire.dic == -1) {
+//			fire.wid_a += 1;
+//			fire.wid_v = fire.wid_v - fire.wid_a;
+//			fire.x = fire.x - fire.wid_v;
+//			if (fire.wid_v <= 0) {
+//				fire.wid_v = 0;
+//				fire.wid_a = 0;
+//				fire.dic = 0;
+//				fire.is_Speed_Down = FALSE;
+//			}
+//		}
+//	}
+//}
 
 // Stage 03에 나오는 박스를 양쪽에서 밀었을 때 처리
 void Stage::Push() {
-	if (water.is_Push == FALSE && fire.is_Push == FALSE) {
-		if (water.y == Rt.y && abs(water.x - Rt.x) <= 60) {			// 불과 접촉
-			water.is_Push = TRUE;
-		}
-		if (fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {		// 물과 접촉
-			fire.is_Push = TRUE;
-		}
-	}
-	// 충돌 체크
-	if (water.is_Push == TRUE && water.y == Rt.y && abs(water.x - Rt.x) <= 60) {
-		if (Rt.dic == 0) {
-			Rt.dic = water.dic;
-		}
+	//if (water.is_Push == FALSE && fire.is_Push == FALSE) {
+	//	if (water.y == Rt.y && abs(water.x - Rt.x) <= 60) {			// 불과 접촉
+	//		water.is_Push = TRUE;
+	//	}
+	//	if (fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {		// 물과 접촉
+	//		fire.is_Push = TRUE;
+	//	}
+	//}
+	//// 충돌 체크
+	//if (water.is_Push == TRUE && water.y == Rt.y && abs(water.x - Rt.x) <= 60) {
+	//	if (Rt.dic == 0) {
+	//		Rt.dic = water.dic;
+	//	}
 
-		if (Rt.dic == water.dic) {
-			if (Rt.dic == 1) {
-				Rt.x = water.x + 60;
-			}
-			else if (Rt.dic == -1) {
-				Rt.x = water.x - 60;
-			}
-		}
-	}
-	else if (water.is_Push == TRUE && Rt.dic != water.dic) {
-		Rt.dic = 0;
-		water.is_Push = FALSE;
-		return;
-	}
+	//	if (Rt.dic == water.dic) {
+	//		if (Rt.dic == 1) {
+	//			Rt.x = water.x + 60;
+	//		}
+	//		else if (Rt.dic == -1) {
+	//			Rt.x = water.x - 60;
+	//		}
+	//	}
+	//}
+	//else if (water.is_Push == TRUE && Rt.dic != water.dic) {
+	//	Rt.dic = 0;
+	//	water.is_Push = FALSE;
+	//	return;
+	//}
 
-	if (fire.is_Push == TRUE && fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {
-		if (Rt.dic == 0) {
-			Rt.dic = fire.dic;
-		}
+	//if (fire.is_Push == TRUE && fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {
+	//	if (Rt.dic == 0) {
+	//		Rt.dic = fire.dic;
+	//	}
 
-		if (Rt.dic == fire.dic) {
-			if (Rt.dic == 1) {
-				Rt.x = fire.x + 60;
-			}
-			else if (Rt.dic == -1) {
-				Rt.x = fire.x - 60;
-			}
-		}
-	}
-	else if (fire.is_Push == TRUE && Rt.dic != fire.dic) {
-		Rt.dic = 0;
-		fire.is_Push = FALSE;
-		return;
-	}
+	//	if (Rt.dic == fire.dic) {
+	//		if (Rt.dic == 1) {
+	//			Rt.x = fire.x + 60;
+	//		}
+	//		else if (Rt.dic == -1) {
+	//			Rt.x = fire.x - 60;
+	//		}
+	//	}
+	//}
+	//else if (fire.is_Push == TRUE && Rt.dic != fire.dic) {
+	//	Rt.dic = 0;
+	//	fire.is_Push = FALSE;
+	//	return;
+	//}
 
-	for (int i = 0; i < 20 && Ft[i].x != NULL; ++i) {
-		if ((Rt.y == Ft[i].y && Ft[i].x > Rt.x - 60) || (Rt.y == Ft[i].y && Ft[i].x + Ft[i].wid < Rt.x)) {
-			Rt.Down = TRUE;
-		}
-	}
-	if (Rt.Down) {
-		if (Rt.y + (Rt.v + Rt.g) >= 730) {
-			Rt.v = 0;
-			Rt.y = 730;
-			Rt.Down = FALSE;
-			return;
-		}
-		if (Rt.y <= 730) {
-			Rt.v = Rt.v + Rt.g;
-			Rt.y = Rt.y + Rt.v;
-			return;
-		}
-	}
+	//for (int i = 0; i < 20 && Ft[i].x != NULL; ++i) {
+	//	if ((Rt.y == Ft[i].y && Ft[i].x > Rt.x - 60) || (Rt.y == Ft[i].y && Ft[i].x + Ft[i].wid < Rt.x)) {
+	//		Rt.Down = TRUE;
+	//	}
+	//}
+	//if (Rt.Down) {
+	//	if (Rt.y + (Rt.v + Rt.g) >= 730) {
+	//		Rt.v = 0;
+	//		Rt.y = 730;
+	//		Rt.Down = FALSE;
+	//		return;
+	//	}
+	//	if (Rt.y <= 730) {
+	//		Rt.v = Rt.v + Rt.g;
+	//		Rt.y = Rt.y + Rt.v;
+	//		return;
+	//	}
+	//}
 }
 
 // 스테이지에 나오는 발판들을 플레이어와 충돌 검사
 void Stage::Foot() {
-	for (int i = 0; i < 20; ++i) {	// 발판의 최대수가 20개이므로 최대치 20
-		if (Ft[i].W_On) {
-			if (Ft[i].x > water.x || (water.x - water.wid) > (Ft[i].x + Ft[i].wid)) {    // 밖으로 나갔을 경우
-				bool signal = FALSE;
-				for (int beam = water.y; beam < 730; ++beam) {            // 빔 쏘기
-					for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
-						if (((Ft[j].y + average) - beam) < 10 && ((Ft[j].y + average) - beam) > -10) {
-							if (Ft[j].x < water.x - 30 && water.x - 30 < Ft[j].x + Ft[j].wid) {            // if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid)
-								water.ground = beam;
-								Ft[j].W_On = FALSE;
-								signal = TRUE;
-							}
-						}
-					}
-				}
-				if (!signal) {
-					water.ground = 730;
-				}
-				if (water.is_Jumping == FALSE) {
-					water.v = 0;
-					water.Down = TRUE;
-				}
-				Ft[i].W_On = FALSE;
-			}
-		}
-		if (Ft[i].F_On) {
-			if (Ft[i].x > fire.x || fire.x - 60 > Ft[i].x + Ft[i].wid) {    // 밖으로 나갔을 경우
-				bool signal = FALSE;
-				for (int beam = fire.y; beam < 730; ++beam) {            // 빔 쏘기
-					for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
-						if ((Ft[j].y + average) - beam < 10 && (Ft[j].y + average) - beam > -10) {
-							if (Ft[j].x < fire.x && fire.x - 60 < Ft[j].x + Ft[j].wid) {
-								fire.ground = beam;
-								Ft[j].W_On = FALSE;
-								signal = TRUE;
-							}
-						}
-					}
-				}
-				if (!signal) {
-					fire.ground = 730;
-				}
-				if (fire.is_Jumping == FALSE) {
-					fire.v = 0;
-					fire.Down = TRUE;
-				}
-				Ft[i].F_On = FALSE;
-			}
-		}
-		if (water.is_Jumping == TRUE) {
-			if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid) {
-				if ((water.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (water.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {    // 머리 부닥치기
-					water.v = 0;
-					water.Down = TRUE;
-				}
-				if (Ft[i].y + average - water.y <= 5 && Ft[i].y + average - water.y > -20) {        // 안착
-					water.is_Jumping = FALSE;
-					water.Down = FALSE;
-					water.v = 50;
-					water.y = Ft[i].y + average;
-					water.ground = Ft[i].y + average;
-					Ft[i].W_On = TRUE;
-				}
-			}
-			if (Ft[i].y + average > water.y - 60 && Ft[i].y + Ft[i].hei + average < water.y) {
-				if (Ft[i].x - 5 - water.x < 20 && Ft[i].x - 5 - water.x > 0) {
-					water.wid_a = 0;
-					water.wid_v = 0;
-				}
-				if ((water.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (water.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
-					water.wid_a = 0;
-					water.wid_v = 0;
-				}
-			}
-		}
-		if (fire.is_Jumping == TRUE) {
-			if (Ft[i].x < fire.x && fire.x - 60 < Ft[i].x + Ft[i].wid) {
-				if ((fire.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (fire.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {
-					fire.v = 0;
-					fire.Down = TRUE;
-				}
-				if (Ft[i].y + average - fire.y <= 5 && Ft[i].y + average - fire.y > -20) {
-					fire.is_Jumping = FALSE;
-					fire.Down = FALSE;
-					fire.v = 50;
-					fire.y = Ft[i].y + average;
-					fire.ground = Ft[i].y + average;
-					Ft[i].F_On = TRUE;
-				}
-			}
-			if (Ft[i].y + average > fire.y - 70 && Ft[i].y + Ft[i].hei + average < fire.y) {
-				if (Ft[i].x - 5 - fire.x < 20 && Ft[i].x - 5 - fire.x > 0) {
-					fire.wid_a = 0;
-					fire.wid_v = 0;
-				}
-				if ((fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
-					fire.wid_a = 0;
-					fire.wid_v = 0;
-				}
-			}
-		}
-	}
+	//for (int i = 0; i < 20; ++i) {	// 발판의 최대수가 20개이므로 최대치 20
+	//	if (Ft[i].W_On) {
+	//		if (Ft[i].x > water.x || (water.x - water.wid) > (Ft[i].x + Ft[i].wid)) {    // 밖으로 나갔을 경우
+	//			bool signal = FALSE;
+	//			for (int beam = water.y; beam < 730; ++beam) {            // 빔 쏘기
+	//				for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
+	//					if (((Ft[j].y + average) - beam) < 10 && ((Ft[j].y + average) - beam) > -10) {
+	//						if (Ft[j].x < water.x - 30 && water.x - 30 < Ft[j].x + Ft[j].wid) {            // if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid)
+	//							water.ground = beam;
+	//							Ft[j].W_On = FALSE;
+	//							signal = TRUE;
+	//						}
+	//					}
+	//				}
+	//			}
+	//			if (!signal) {
+	//				water.ground = 730;
+	//			}
+	//			if (water.is_Jumping == FALSE) {
+	//				water.v = 0;
+	//				water.Down = TRUE;
+	//			}
+	//			Ft[i].W_On = FALSE;
+	//		}
+	//	}
+	//	if (Ft[i].F_On) {
+	//		if (Ft[i].x > fire.x || fire.x - 60 > Ft[i].x + Ft[i].wid) {    // 밖으로 나갔을 경우
+	//			bool signal = FALSE;
+	//			for (int beam = fire.y; beam < 730; ++beam) {            // 빔 쏘기
+	//				for (int j = 0; j < 20; ++j) {    // 블럭 하나씩 검사
+	//					if ((Ft[j].y + average) - beam < 10 && (Ft[j].y + average) - beam > -10) {
+	//						if (Ft[j].x < fire.x && fire.x - 60 < Ft[j].x + Ft[j].wid) {
+	//							fire.ground = beam;
+	//							Ft[j].W_On = FALSE;
+	//							signal = TRUE;
+	//						}
+	//					}
+	//				}
+	//			}
+	//			if (!signal) {
+	//				fire.ground = 730;
+	//			}
+	//			if (fire.is_Jumping == FALSE) {
+	//				fire.v = 0;
+	//				fire.Down = TRUE;
+	//			}
+	//			Ft[i].F_On = FALSE;
+	//		}
+	//	}
+	//	if (water.is_Jumping == TRUE) {
+	//		if (Ft[i].x <= water.x && water.x - 60 <= Ft[i].x + Ft[i].wid) {
+	//			if ((water.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (water.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {    // 머리 부닥치기
+	//				water.v = 0;
+	//				water.Down = TRUE;
+	//			}
+	//			if (Ft[i].y + average - water.y <= 5 && Ft[i].y + average - water.y > -20) {        // 안착
+	//				water.is_Jumping = FALSE;
+	//				water.Down = FALSE;
+	//				water.v = 50;
+	//				water.y = Ft[i].y + average;
+	//				water.ground = Ft[i].y + average;
+	//				Ft[i].W_On = TRUE;
+	//			}
+	//		}
+	//		if (Ft[i].y + average > water.y - 60 && Ft[i].y + Ft[i].hei + average < water.y) {
+	//			if (Ft[i].x - 5 - water.x < 20 && Ft[i].x - 5 - water.x > 0) {
+	//				water.wid_a = 0;
+	//				water.wid_v = 0;
+	//			}
+	//			if ((water.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (water.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
+	//				water.wid_a = 0;
+	//				water.wid_v = 0;
+	//			}
+	//		}
+	//	}
+	//	if (fire.is_Jumping == TRUE) {
+	//		if (Ft[i].x < fire.x && fire.x - 60 < Ft[i].x + Ft[i].wid) {
+	//			if ((fire.y - 70) - (Ft[i].y + Ft[i].hei + average) <= 5 && (fire.y - 70) - (Ft[i].y + Ft[i].hei + average) > Ft[i].hei * -1) {
+	//				fire.v = 0;
+	//				fire.Down = TRUE;
+	//			}
+	//			if (Ft[i].y + average - fire.y <= 5 && Ft[i].y + average - fire.y > -20) {
+	//				fire.is_Jumping = FALSE;
+	//				fire.Down = FALSE;
+	//				fire.v = 50;
+	//				fire.y = Ft[i].y + average;
+	//				fire.ground = Ft[i].y + average;
+	//				Ft[i].F_On = TRUE;
+	//			}
+	//		}
+	//		if (Ft[i].y + average > fire.y - 70 && Ft[i].y + Ft[i].hei + average < fire.y) {
+	//			if (Ft[i].x - 5 - fire.x < 20 && Ft[i].x - 5 - fire.x > 0) {
+	//				fire.wid_a = 0;
+	//				fire.wid_v = 0;
+	//			}
+	//			if ((fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) < 20 && (fire.x - 60) - (Ft[i].x + Ft[i].wid + 5) > 0) {
+	//				fire.wid_a = 0;
+	//				fire.wid_v = 0;
+	//			}
+	//		}
+	//	}
+	//}
 }

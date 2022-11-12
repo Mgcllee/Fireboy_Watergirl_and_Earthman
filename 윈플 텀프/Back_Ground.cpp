@@ -1,75 +1,21 @@
 #pragma once
-#include"stdafx.h"
+#include "stdafx.h"
+#include "protocol.h"
 
-// 윈도우 프로그래밍에서 키 동시 입력을 위한 함수 (제거 예정)
-void Loop(bool keyDown)
-{
-	if (true == keyDown) {
-		//다중키 입력을 위해서 전부 if로 작성했으며 [ ] 안에 원하는 키와 행동을 넣으면 작동한다.
-		if (keybuffer[VK_LEFT])
-		{
-			fire.wid_a += 1;
-			if (fire.wid_a > 5) {
-				fire.wid_a = 10;
-			}
-			fire.dic = -1;
-			fire.is_Move = TRUE;
-		}
-		if (keybuffer[VK_RIGHT])
-		{
-			fire.wid_a += 1;
-			if (fire.wid_a > 5) {
-				fire.wid_a = 10;
-			}
-			fire.dic = 1;
-			fire.is_Move = TRUE;
-		}
-		if (keybuffer[VK_UP])
-		{
-			fire.is_Jumping = TRUE;
-		}
-		if (keybuffer[VK_DOWN])
-		{
-			//	button[0].On = FALSE;
-			//	block[0].On = TRUE;
-		}
-		if (keybuffer['d'] || keybuffer['D'])
-		{
-			water.wid_a += 1;
-			if (water.wid_a > 5) {
-				water.wid_a = 10;
-			}
-			water.dic = 1;
-			water.is_Move = TRUE;
-		}
-		if (keybuffer['a'] || keybuffer['A'])
-		{
-			water.wid_a += 1;
-			if (water.wid_a > 5) {
-				water.wid_a = 10;
-			}
-			water.dic = -1;
-			water.is_Move = TRUE;
-		}
-		if (keybuffer['s'] || keybuffer['S'])
-		{
-			//	button[0].On = TRUE;
-		}
-		if (keybuffer['w'] || keybuffer['W'])
-		{
-			water.is_Jumping = TRUE;
-		}
-	}
-	else if (false == keyDown) {
-		water.is_Move = FALSE;
-		water.wid_a = 0;
-		water.is_Speed_Down = TRUE;
-		fire.is_Move = FALSE;
-		fire.wid_a = 0;
-		water.Frame = 0;
-		fire.Frame = 0;
-		fire.is_Speed_Down = TRUE;
-	}
+void Move()
+{ 
+	MovePacket move;
+	move.id = currneClientNum;
+	move.type = C2SMove;
+
+	if (keybuffer[VK_LEFT])
+		move.x = players[currneClientNum].x - 1;
+	if (keybuffer[VK_RIGHT])
+		move.x = players[currneClientNum].x + 1;
+	if (keybuffer[VK_UP])
+		move.x = players[currneClientNum].y + 1;
+
+	SendPacket(&move);
 }
 
 // WAV형식 음원 분석 함수 (LoadSound()함수에서만 호출)

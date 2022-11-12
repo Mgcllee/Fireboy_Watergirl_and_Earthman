@@ -43,27 +43,27 @@ void ImageMgr::LoadImages() {
 	timeout.Load(L"Resource\\타임아웃.png");
 	fraction.Load(L"Resource\\fraction.png");
 
-	fire.Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
-	fire.Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승
-	fire.Anim[2].Load(L"Resource\\빨강 오른쪽 342.271.png");	 // 우측
-	fire.Anim[3].Load(L"Resource\\빨강 하강 215.411.png");       // 하단
-	fire.Anim[4].Load(L"Resource\\빨강 왼쪽 342.271.png");       // 좌측
-	fire.C_img_X_Size_01 = 215;
-	fire.C_img_Y_Size_01 = 411;
-	fire.C_img_Frame = 342;
-	fire.C_img_X_Size_02 = 342;
-	fire.C_img_Y_Size_02 = 271;
+	players[0].Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
+	players[0].Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승
+	players[0].Anim[2].Load(L"Resource\\빨강 오른쪽 342.271.png");	 // 우측
+	players[0].Anim[3].Load(L"Resource\\빨강 하강 215.411.png");       // 하단
+	players[0].Anim[4].Load(L"Resource\\빨강 왼쪽 342.271.png");       // 좌측
+	players[0].C_img_X_Size_01 = 215;
+	players[0].C_img_Y_Size_01 = 411;
+	players[0].C_img_Frame = 342;
+	players[0].C_img_X_Size_02 = 342;
+	players[0].C_img_Y_Size_02 = 271;
 
-	water.Anim[0].Load(L"Resource\\파랑 정지 207.480.png");      // 정지
-	water.Anim[1].Load(L"Resource\\파랑 정지 207.480.png");      // 상승
-	water.Anim[2].Load(L"Resource\\파랑 오른쪽 376.480.png");    // 우측
-	water.Anim[3].Load(L"Resource\\파랑 하강 207.480.png");      // 하단
-	water.Anim[4].Load(L"Resource\\파랑 왼쪽 376.480.png");      // 좌측
-	water.C_img_X_Size_01 = 207;
-	water.C_img_Y_Size_01 = 480;
-	water.C_img_Frame = 376;
-	water.C_img_X_Size_02 = 376;
-	water.C_img_Y_Size_02 = 480;
+	players[1].Anim[0].Load(L"Resource\\파랑 정지 207.480.png");      // 정지
+	players[1].Anim[1].Load(L"Resource\\파랑 정지 207.480.png");      // 상승
+	players[1].Anim[2].Load(L"Resource\\파랑 오른쪽 376.480.png");    // 우측
+	players[1].Anim[3].Load(L"Resource\\파랑 하강 207.480.png");      // 하단
+	players[1].Anim[4].Load(L"Resource\\파랑 왼쪽 376.480.png");      // 좌측
+	players[1].C_img_X_Size_01 = 207;
+	players[1].C_img_Y_Size_01 = 480;
+	players[1].C_img_Frame = 376;
+	players[1].C_img_X_Size_02 = 376;
+	players[1].C_img_Y_Size_02 = 480;
 
 	block_w.Load(L"Resource\\block1.png");
 	block_h.Load(L"Resource\\block2.png");
@@ -88,54 +88,40 @@ void ImageMgr::LoadImages() {
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 {
-	if (stageNum == 0)//start 버튼
+	switch (stageNum)
 	{
+	case STAGE_TITLE:
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
-
-	}
-	else if (stageNum == 1) {//load Scene
+		break;
+	case STAGE_LOADING:
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		if (currneClientNum == 1) {
 			one.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
-
 		}
 		else if (currneClientNum == 2) {
 			two.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
-
 		}
 		else if (currneClientNum == 3) {
 			three.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
-
 		}
 		fraction.Draw(*memdc, 450, 450, 150, 150, 0, 0, 48, 48);
 		three.Draw(*memdc, 550, 450, 150, 150, 0, 0, 50, 50);
-	}
-	else if (stageNum == 2) {
-		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 
+		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		break;
+	case STAGE_LOBBY:
+		 lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
-
 		//if(나의 캐릭터에 따라서)
 		fireStopImage.Draw(*memdc, 170, 200, 100, 200, 0, 0, 215, 411);
 		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
-
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
-
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
-
-
-
-		//버튼으로 수정 해야됨
-		//selectBtn.Draw(*memdc, 500, 450, 150, 150, 0, 0, 484, 304);
-		//leftArrow.Draw(*memdc, 50, 280, 70, 70, 0, 0, 300, 300);
-		//rightArrow.Draw(*memdc, 330, 280, 70, 70, 0, 0, 300, 300);
-		//select 버튼이나 화살표는 main으로 빼야하는지??
-	}
-	else if (stageNum == 3)
-	{
+	break;
+	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
@@ -145,9 +131,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
-	}
-	else if (stageNum == 4)
-	{
+		break;
+	case STAGE_02:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
@@ -157,9 +142,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
-	}
-	else if (stageNum == 5)
-	{
+		break;
+	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
@@ -169,17 +153,13 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
 
-
 		block_w.Draw(*memdc, stage.block[0].x + stage.block[0].image_x, stage.block[0].y, 100 + stage.block[0].image_x, 30, -stage.block[0].image_x, 0, 83 + stage.block[0].image_x, 25);
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
 		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
-	}
-	else
-	{
-		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		break;
 	}
 }
 
@@ -285,20 +265,22 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 }
 
 // Fire boy와 Water girl의 애니메이션 재생 함수
-void ImageMgr::DrawPlayer(HDC* memdc, short Frame, PLAYER* pl, Stage& stage) {
-	if (pl->on)
-	{
-		if ((pl->Down == TRUE) && pl->dic == 0) {
-			pl->Anim[3].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
-		}
-		else if (pl->dic == 0) {
-			pl->Anim[1].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0, 0, pl->C_img_X_Size_01, pl->C_img_Y_Size_01);
-		}
-		else if (pl->dic == -1) {
-			pl->Anim[4].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
-		}
-		else if (pl->dic == 1) {
-			pl->Anim[2].Draw(*memdc, pl->x - pl->wid, pl->y - pl->hei + stage.average, pl->wid, pl->hei, 0 + pl->C_img_Frame * pl->Frame, 0, pl->C_img_X_Size_02, pl->C_img_Y_Size_02);
+void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
+	for (PLAYER& pl : players) {
+		if (pl.on)
+		{
+			if ((pl.Down == TRUE) && pl.direction == 0) {
+				pl.Anim[3].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
+			}
+			else if (pl.direction == 0) {
+				pl.Anim[1].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
+			}
+			else if (pl.direction == -1) {
+				pl.Anim[4].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
+			}
+			else if (pl.direction == 1) {
+				pl.Anim[2].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
+			}
 		}
 	}
 }

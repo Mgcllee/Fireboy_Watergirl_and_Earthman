@@ -23,5 +23,5 @@ public:
 	void LoadImages();
 	void DrawMap(HDC* memdc, short stageNum, Stage& stage);
 	void DrawTimer(HDC* memdc, short time);
-	void DrawPlayer(HDC* memdc, short Frame, PLAYER* pl, Stage& stage);
+	void DrawPlayers(HDC* memdc, Stage& stage);
 };
