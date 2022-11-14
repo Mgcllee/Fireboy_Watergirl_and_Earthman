@@ -119,14 +119,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
+	int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
 
-	if (!recvRetVal) {
-
+	if (recvRetVal != 0) {
+		ConstructPacket(recvBuf + prevSize, recvRetVal);
 	}
 	else {
 		WSAGetLastError();
-	}*/
+	}
+	currentStage = myStageMgr.getStage(stageIndex);
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -161,7 +162,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (NetworkInit(hWnd, c_s_addr)) {
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
-				currentStage = myStageMgr.getStage(stageIndex = STAGE_LOBBY);
+				stageIndex = STAGE_LOADING;
+				currentStage = myStageMgr.getStage(stageIndex);
 			}
 			else {
 				SetWindowText(server_addr, LPCWSTR());
@@ -172,7 +174,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			for (PLAYER& pl : players)
 				pl.on = true;
 
-			currentStage = myStageMgr.getStage(stageIndex);
 
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);

@@ -84,6 +84,12 @@ void ProcessPacket(char* buf)
 	case S2CJewelryVisibility:
 
 		break;
+	case S2CChangeStage:
+	{
+		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
+		stageIndex =  packet->stageNum;
+	}
+		break;
 	default:
 		// Packet Error
 		break;
@@ -116,6 +122,7 @@ void SendPacket(void* buf)
 	case C2SExitGame:
 
 		break;
+	
 	default:
 		// Packet Error
 		break;
@@ -133,8 +140,10 @@ void ConstructPacket(void* buf, int ioSize)
 	int needSize = 0;
 	while (restSize != 0) {
 		needSize = GetPacketSize(reinterpret_cast<char*>(buf)[0]);
-		if (restSize < needSize)
+		if (restSize < needSize) {
+			prevSize = restSize;
 			return;
+		}
 		else {
 			ProcessPacket(reinterpret_cast<char*>(buf));
 			memcpy(buf, reinterpret_cast<char*>(buf) + needSize, restSize - needSize);

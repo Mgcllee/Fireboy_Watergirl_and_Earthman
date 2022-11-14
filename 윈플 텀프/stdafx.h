@@ -150,6 +150,7 @@ extern int currneClientNum;
 extern char recvBuf[MAX_BUF_SIZE];
 extern int prevSize;
 extern int myId;
+extern int stageIndex;
 
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);

@@ -94,20 +94,20 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		break;
 	case STAGE_LOADING:
-		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		//lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		if (currneClientNum == 1) {
-			one.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			one.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
 		else if (currneClientNum == 2) {
-			two.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			two.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
 		else if (currneClientNum == 3) {
-			three.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			three.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
-		fraction.Draw(*memdc, 450, 450, 150, 150, 0, 0, 48, 48);
-		three.Draw(*memdc, 550, 450, 150, 150, 0, 0, 50, 50);
+		fraction.Draw(*memdc, 450, 550, 150, 150, 0, 0, 48, 48);
+		three.Draw(*memdc, 550, 550, 150, 150, 0, 0, 50, 50);
 
-		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		break;
 	case STAGE_LOBBY:
 		 lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
