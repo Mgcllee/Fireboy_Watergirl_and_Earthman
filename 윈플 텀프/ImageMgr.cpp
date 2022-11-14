@@ -109,7 +109,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		three.Draw(*memdc, 550, 550, 150, 150, 0, 0, 50, 50);
 
 		break;
-	case STAGE_LOBBY:
+	case STAGE_ROLE:
 		 lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);

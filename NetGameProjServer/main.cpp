@@ -12,7 +12,7 @@ using namespace std;
 
 #define STAGE_TITLE			0
 #define STAGE_LOADING		1
-#define STAGE_LOBBY			2
+#define STAGE_ROLE			2
 #define STAGE_01			3
 #define STAGE_02			4
 #define STAGE_03			5
@@ -93,7 +93,7 @@ int main(int argv, char** argc)
 			return 1;
 		}
 
-		cout << "Accept Client[" << i <<"]" << endl;
+		cout << "Accept Client[" << i << "]" << endl;
 
 		S2CPlayerPacket loadPacket;
 		loadPacket.type = S2CLoading;
@@ -117,13 +117,14 @@ int main(int argv, char** argc)
 			}
 		}
 
-		if (i == 2) {
+		if (i == 2) {		
 			S2CChangeStagePacket changePacket;
-			changePacket.stageNum = STAGE_LOBBY;
+			changePacket.stageNum = STAGE_ROLE;
 			changePacket.type = S2CChangeStage;
 
-			for (int x = 0; x < 3; x++)
-				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStage), 0);
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+			}			
 		}
 	}
 

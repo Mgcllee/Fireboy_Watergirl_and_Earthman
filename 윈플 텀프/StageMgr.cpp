@@ -10,7 +10,7 @@ StageMgr::StageMgr()
 	myStage[1].stage = STAGE_LOADING;
 
 	myStage[2].lobby();		// lobby 스테이지 (=캐릭터 선택 스테이지)
-	myStage[2].stage = STAGE_LOBBY;
+	myStage[2].stage = STAGE_ROLE;
 
 	myStage[3].Stage_1();
 	myStage[3].stage = STAGE_01;
@@ -24,7 +24,7 @@ StageMgr::StageMgr()
 	// 아직 구현된 부분만 true
 	isUse[STAGE_TITLE]	= true;
 	isUse[STAGE_LOADING]= true;
-	isUse[STAGE_LOBBY]	= true;
+	isUse[STAGE_ROLE]	= true;
 	isUse[STAGE_01]		= true;
 	isUse[STAGE_02]		= false;
 	isUse[STAGE_03]		= false;

@@ -119,10 +119,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
+	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 
-	if (recvRetVal != 0) {
-		ConstructPacket(recvBuf + prevSize, recvRetVal);
+	if (recvRetVal != 0 && recvRetVal != -1) {
+		ConstructPacket(recvBuf, recvRetVal);
 	}
 	else {
 		WSAGetLastError();
@@ -162,7 +162,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (NetworkInit(hWnd, c_s_addr)) {
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
-				stageIndex = STAGE_LOADING;
+				if(stageIndex < STAGE_ROLE)
+					stageIndex = STAGE_LOADING;
 				currentStage = myStageMgr.getStage(stageIndex);
 			}
 			else {
@@ -395,7 +396,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
 
-		if (STAGE_LOBBY == currentStage.stage) {
+		if (STAGE_ROLE == currentStage.stage) {
 			if (isArrow) {
 				selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
 				selectRoleRightArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
@@ -406,7 +407,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				isArrow = false;
 			}
 		}
-		else if (STAGE_LOBBY < currentStage.stage) {
+		else if (STAGE_ROLE < currentStage.stage) {
 			if (selectRoleLeftArrow != nullptr) {
 				DestroyWindow(selectRoleLeftArrow);
 				DestroyWindow(selectRoleRightArrow);

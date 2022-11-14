@@ -43,7 +43,7 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-
+	char aa = reinterpret_cast<char*>(buf)[0];
 	switch (reinterpret_cast<char*>(buf)[0]) {
 	case S2CLoading:
 	{
@@ -55,10 +55,12 @@ void ProcessPacket(char* buf)
 	case S2CAddPlayer:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
-		myId = packet->id;
+		int diffId = packet->id;
 		for (int i = 1; i < 3; i++)
-			if (players[i].id == -1)
-				players[i].id = myId;
+			if (players[i].id == -1) {
+				players[i].id = diffId;
+				break;
+			}
 		currneClientNum++;
 	}
 	break;

@@ -24,7 +24,7 @@
 
 #define STAGE_TITLE			0
 #define STAGE_LOADING		1
-#define STAGE_LOBBY			2
+#define STAGE_ROLE			2
 #define STAGE_01			3
 #define STAGE_02			4
 #define STAGE_03			5
