@@ -12,8 +12,12 @@ void Stage::SelectCharacter()
 void Stage::Stage_1() {
 	players[0].x = 600;
 	players[0].y = 730;
+	
 	players[1].x = 700;
 	players[1].y = 730;
+	
+	players[2].x = 500;
+	players[2].y = 730;
 
 	if(Red_Jewel.empty() && Blue_Jewel.empty())
 	{
