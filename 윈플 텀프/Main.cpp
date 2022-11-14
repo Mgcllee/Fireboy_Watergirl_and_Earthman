@@ -119,14 +119,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	/*int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
+	int recvRetVal = recv(c_socket, recvBuf, MAX_BUF_SIZE, 0);
 
 	if (!recvRetVal) {
 
 	}
 	else {
 		WSAGetLastError();
-	}*/
+	}
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -207,7 +207,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.type = C2SSelectRole;
 			makePacket.role = 'f'; // 아직 로직 안 짬 수정해야됨
 			SendPacket(&makePacket);
-
+			
 			// (임시) 서버 연결 후 제거
 			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 		}

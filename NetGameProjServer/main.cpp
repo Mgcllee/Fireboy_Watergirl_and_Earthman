@@ -96,7 +96,8 @@ int main(int argv, char** argc)
 		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
 
 		send(threadHandles[i].clientSocket, (char*)&load1, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각하고
-
+		
+		
 		if (i == 2) {
 			S2CChangeStagePacket change1;
 			change1.stageNum = 0;
