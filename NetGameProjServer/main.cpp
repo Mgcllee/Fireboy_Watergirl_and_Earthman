@@ -10,6 +10,13 @@ using namespace std;
 
 #define MAX_BUF_SIZE 256
 
+#define STAGE_TITLE			0
+#define STAGE_LOADING		1
+#define STAGE_ROLE			2
+#define STAGE_01			3
+#define STAGE_02			4
+#define STAGE_03			5
+
 void Display_Err(int Errcode);
 void ConstructPacket(char* recvPacket); // 패킷 재조립
 void ProcessPacket(char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
@@ -25,7 +32,7 @@ void CheckOpenDoor(); // 문 열리는 조건 확인
 DWORD WINAPI ClientWorkThread(LPVOID arg);
 
 struct threadInfo {
-	HANDLE h = NULL;
+	HANDLE threadHandle = NULL;
 	SOCKET clientSocket;
 	char recvBuf[MAX_BUF_SIZE] = { 0 };
 	int currentSize;
@@ -33,6 +40,7 @@ struct threadInfo {
 };
 
 array<threadInfo, 3> threadHandles;
+HANDLE multiEvenTthreadHadle[3];
 
 //HANDLE loadFlag; =>웨이트포실긍
 
@@ -73,40 +81,57 @@ int main(int argv, char** argc)
 		return 1;
 	}
 
-	array<SOCKET, 3> clientSocket;
-
 	for (int i = 0; i < 3; i++)
 	{
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
 		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
-		if (clientSocket[i] == INVALID_SOCKET) {
+		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
 			WSACleanup();
 			return 1;
 		}
 
-		cout << "Accept Client[" << i <<"]" << endl;
+		cout << "Accept Client[" << i << "]" << endl;
 
-		S2CPlayerPacket load1;
-		load1.type = S2CLoading;
-		load1.id = i;
+		S2CPlayerPacket loadPacket;
+		loadPacket.type = S2CLoading;
+		loadPacket.id = i;
 
-		threadHandles[i].h = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
+		threadHandles[i].threadHandle = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
+		multiEvenTthreadHadle[i] = threadHandles[i].threadHandle;
+		send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각
 
-		send(threadHandles[i].clientSocket, (char*)&load1, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각하고
+		loadPacket.type = S2CAddPlayer;
+		for (int j = 0; j < 3; j++) {
+			if (i != j) {
+				if (threadHandles[j].threadHandle != NULL) {
+					send(threadHandles[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//다른 Player 정보 패킷으로 생각 // j들한테 i의 정보를
 
-		if (i == 2) {
-			S2CChangeStagePacket change1;
-			change1.stageNum = 0;
-			change1.type = S2CChangeStage;
+					S2CPlayerPacket addPlayerPacket;
+					loadPacket.type = S2CAddPlayer;
+					loadPacket.id = j;
+					send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//다른 Player 정보 패킷으로 생각 // i한테 j의 정보를
+				}
+			}
+		}
 
-			for (int x = 0; x < 3; x++)
-				send(clientSocket[i], (char*)&change1, sizeof(S2CChangeStage), 0);
+		if (i == 2) {		
+			S2CChangeStagePacket changePacket;
+			changePacket.stageNum = STAGE_ROLE;
+			changePacket.type = S2CChangeStage;
+
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+			}			
 		}
 	}
 
+	while (WSA_WAIT_EVENT_0 + 2 != WSAWaitForMultipleEvents(3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)) {}
+	for (int j = 0; j < 3; j++) {
+		CloseHandle(threadHandles[j].threadHandle);
+	}
 
 	closesocket(listenSocket);
 	WSACleanup();

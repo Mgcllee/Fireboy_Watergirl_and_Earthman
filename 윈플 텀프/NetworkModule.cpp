@@ -43,7 +43,7 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-
+	char aa = reinterpret_cast<char*>(buf)[0];
 	switch (reinterpret_cast<char*>(buf)[0]) {
 	case S2CLoading:
 	{
@@ -55,10 +55,12 @@ void ProcessPacket(char* buf)
 	case S2CAddPlayer:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
-		myId = packet->id;
+		int diffId = packet->id;
 		for (int i = 1; i < 3; i++)
-			if (players[i].id == -1)
-				players[i].id = myId;
+			if (players[i].id == -1) {
+				players[i].id = diffId;
+				break;
+			}
 		currneClientNum++;
 	}
 	break;
@@ -83,6 +85,12 @@ void ProcessPacket(char* buf)
 		break;
 	case S2CJewelryVisibility:
 
+		break;
+	case S2CChangeStage:
+	{
+		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
+		stageIndex =  packet->stageNum;
+	}
 		break;
 	default:
 		// Packet Error
@@ -116,6 +124,7 @@ void SendPacket(void* buf)
 	case C2SExitGame:
 
 		break;
+	
 	default:
 		// Packet Error
 		break;
@@ -133,8 +142,10 @@ void ConstructPacket(void* buf, int ioSize)
 	int needSize = 0;
 	while (restSize != 0) {
 		needSize = GetPacketSize(reinterpret_cast<char*>(buf)[0]);
-		if (restSize < needSize)
+		if (restSize < needSize) {
+			prevSize = restSize;
 			return;
+		}
 		else {
 			ProcessPacket(reinterpret_cast<char*>(buf));
 			memcpy(buf, reinterpret_cast<char*>(buf) + needSize, restSize - needSize);

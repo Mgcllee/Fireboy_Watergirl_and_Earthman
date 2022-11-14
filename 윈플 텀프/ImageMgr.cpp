@@ -65,6 +65,17 @@ void ImageMgr::LoadImages() {
 	players[1].C_img_X_Size_02 = 376;
 	players[1].C_img_Y_Size_02 = 480;
 
+	players[2].Anim[0].Load(L"Resource\\흙_정지_215.411.png");       // 정지
+	players[2].Anim[1].Load(L"Resource\\흙_정지_215.411.png");       // 상승
+	players[2].Anim[2].Load(L"Resource\\흙_오른쪽_342.271.png");	 // 우측
+	players[2].Anim[3].Load(L"Resource\\흙_하강_215.411.png");       // 하단
+	players[2].Anim[4].Load(L"Resource\\흙_왼쪽_342.271.png");       // 좌측
+	players[2].C_img_X_Size_01 = 215;
+	players[2].C_img_Y_Size_01 = 411;
+	players[2].C_img_Frame = 342;
+	players[2].C_img_X_Size_02 = 342;
+	players[2].C_img_Y_Size_02 = 271;
+
 	block_w.Load(L"Resource\\block1.png");
 	block_h.Load(L"Resource\\block2.png");
 	foot_block.Load(L"Resource\\발판.png");
@@ -74,12 +85,14 @@ void ImageMgr::LoadImages() {
 	lobby.Load(L"Resource\\로비 이미지 초안.png");
 	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
 	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
+	earthStopImage.Load(L"Resource\\흙_정지_ 215.411.png");
 	
 	leftArrow.Load(L"Resource\\left_arrow.png");
 	rightArrow.Load(L"Resource\\right_arrow.png");
 	me.Load(L"Resource\\me.png");
 	player1.Load(L"Resource\\player1.png");
 	player2.Load(L"Resource\\player2.png");
+	
 	selectBtn.Load(L"Resource\\select_btn.png");
 
 }
@@ -94,22 +107,22 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		break;
 	case STAGE_LOADING:
-		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		//lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		if (currneClientNum == 1) {
-			one.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			one.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
 		else if (currneClientNum == 2) {
-			two.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			two.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
 		else if (currneClientNum == 3) {
-			three.Draw(*memdc, 350, 450, 150, 150, 0, 0, 50, 50);
+			three.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
 		}
-		fraction.Draw(*memdc, 450, 450, 150, 150, 0, 0, 48, 48);
-		three.Draw(*memdc, 550, 450, 150, 150, 0, 0, 50, 50);
+		fraction.Draw(*memdc, 450, 550, 150, 150, 0, 0, 48, 48);
+		three.Draw(*memdc, 550, 550, 150, 150, 0, 0, 50, 50);
 
-		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		break;
-	case STAGE_LOBBY:
+	case STAGE_ROLE:
 		 lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
@@ -120,6 +133,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
+		
 	break;
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);

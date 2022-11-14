@@ -15,6 +15,7 @@ public:
 
 	CImage fireStopImage;
 	CImage waterStopImage;
+	CImage earthStopImage;
 
 	CImage leftArrow, rightArrow;
 	CImage me, player1, player2;
