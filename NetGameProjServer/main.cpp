@@ -2,6 +2,7 @@
 #include<WS2tcpip.h>
 #include<array>
 #include<mutex>
+#include<math.h>
 #include"protocol.h"
 
 #pragma comment(lib, "ws2_32")
@@ -17,6 +18,17 @@ using namespace std;
 #define STAGE_02			4
 #define STAGE_03			5
 
+enum PLAYER_STATUS {
+	IDLE,
+	LEFT,
+	RIGHT,
+	JUMP,
+	LEFT_JUMP,
+	RIGHT_JUMP,
+	LEFT_DOWN,
+	RIGHT_DOWN
+};
+
 struct threadInfo {
 	HANDLE threadHandle = NULL;
 	SOCKET clientSocket;
@@ -25,6 +37,8 @@ struct threadInfo {
 	int prevSize = 0;
 	char clientId = -1;
 	short x, y;
+	PLAYER_STATUS status = IDLE;
+
 };
 
 void Display_Err(int Errcode);
@@ -37,22 +51,25 @@ void SelectRole(); // mutex ÇÊ¿ä => µÎ Å¬¶óÀÌ¾ðÆ®°¡ µ¿½Ã¿¡ °°Àº ÄÉ¸¯ÅÍ ¼±ÅÃÀ» ÇØ
 //void MovePacket(); // ¿òÁ÷ÀÏ ¶§ ¸¶´Ù, Àü¼Û
 void CheckJewelryEat();// Áê¾ó¸® ½Àµæ È®ÀÎ
 void CheckOpenDoor(); // ¹® ¿­¸®´Â Á¶°Ç È®ÀÎ
+void PlayerMove(char playerId, short x);
 
 
 DWORD WINAPI ClientWorkThread(LPVOID arg);
 DWORD WINAPI ServerWorkThread(LPVOID arg);
 
-array<threadInfo, 3> threadHandles;
+array<threadInfo, 3> threadInfos;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
-array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
+array<char, 3> selectPlayerRole = { 'f', 'f', 'f' };
 
 
 HANDLE multiEvenTthreadHadle[3];
+HANDLE playerJumpHandle[3] = { NULL }; // JUMP¿¡ ´ëÇÑ ÇÚµé°ª
+
 
 int stageIndex = -1;
 
-//HANDLE loadFlag; =>¿þÀÌÆ®Æ÷½Ç±à
+//HANDLE loadFlag; =>¿þÀÌÆ®Æ÷½Ç
 
 int main(int argv, char** argc)
 {
@@ -93,8 +110,8 @@ int main(int argv, char** argc)
 	{
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
-		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
-		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
+		threadInfos[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
+		if (threadInfos[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
 			WSACleanup();
@@ -106,42 +123,51 @@ int main(int argv, char** argc)
 		S2CPlayerPacket loadPacket;
 		loadPacket.type = S2CLoading;
 		loadPacket.id = i;
-		threadHandles[i].clientId = i;
-		threadHandles[i].threadHandle = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
-		multiEvenTthreadHadle[i] = threadHandles[i].threadHandle;
-		send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//loading ÆÐÅ¶À» ·Î±×ÀÎ ÆÐÅ¶À¸·Î »ý°¢
+		threadInfos[i].clientId = i;
+		threadInfos[i].threadHandle = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
+		multiEvenTthreadHadle[i] = threadInfos[i].threadHandle;
+		send(threadInfos[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//loading ÆÐÅ¶À» ·Î±×ÀÎ ÆÐÅ¶À¸·Î »ý°¢
 
 		loadPacket.type = S2CAddPlayer;
 		for (int j = 0; j < 3; j++) {
 			if (i != j) {
-				if (threadHandles[j].threadHandle != NULL) {
-					send(threadHandles[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // jµéÇÑÅ× iÀÇ Á¤º¸¸¦
+				if (threadInfos[j].threadHandle != NULL) {
+					send(threadInfos[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // jµéÇÑÅ× iÀÇ Á¤º¸¸¦
 
 					S2CPlayerPacket addPlayerPacket;
 					loadPacket.type = S2CAddPlayer;
 					loadPacket.id = j;
-					send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // iÇÑÅ× jÀÇ Á¤º¸¸¦
+					send(threadInfos[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // iÇÑÅ× jÀÇ Á¤º¸¸¦
 				}
 			}
 		}
 
 		if (i == 2) {
 			S2CChangeStagePacket changePacket;
-			changePacket.stageNum = STAGE_ROLE;
+
+			//¹«ºê¸¦ À§ÇÑ ½ºÅ×ÀÌÁö º¯°æ
+			changePacket.stageNum = STAGE_01;
+			//changePacket.stageNum = STAGE_ROLE;
 			changePacket.type = S2CChangeStage;
 
 			for (int x = 0; x < 3; x++) {
-				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+				send(threadInfos[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 			}
 			stageIndex = STAGE_ROLE;
 		}
+	}
+
+	for (int i = 0; i < 3; i++) {
+		playerJumpHandle[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
+		ResetEvent(playerJumpHandle[i]);
 	}
 
 	HANDLE serverThread = CreateThread(NULL, 0, ServerWorkThread, reinterpret_cast<LPVOID>(1), 0, NULL);
 
 	while (WSA_WAIT_EVENT_0 + 2 != WSAWaitForMultipleEvents(3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)) {}
 	for (int j = 0; j < 3; j++) {
-		CloseHandle(threadHandles[j].threadHandle);
+		CloseHandle(threadInfos[j].threadHandle);
+		CloseHandle(playerJumpHandle[j]);
 	}
 	CloseHandle(serverThread);
 
@@ -180,15 +206,29 @@ void ConstructPacket(threadInfo& clientInfo, int ioSize)
 	}
 }
 
+void PlayerMove(char playerId, short x)
+{
+	//Ãæµ¹ Ã¼Å© ÇØº¸°í
+	//¶³¾îÁø´Ù¸é
+	if (threadInfos[playerId].status == RIGHT) {
+		threadInfos[playerId].status = RIGHT_DOWN;
+		SetEvent(playerJumpHandle[playerId]);
+	}
+	else if (threadInfos[playerId].status == LEFT) {
+		threadInfos[playerId].status = LEFT_DOWN;
+		SetEvent(playerJumpHandle[playerId]);
+	}
+}
+
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	//WaitForSingleObject(loadFlag, INFINITE);
 
 	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
-		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
+		int recvRetVal = recv(threadInfos[myIndex].clientSocket, threadInfos[myIndex].recvBuf + threadInfos[myIndex].prevSize, MAX_BUF_SIZE - threadInfos[myIndex].prevSize, 0);
 		if (recvRetVal != 0) {
-			ConstructPacket(threadHandles[myIndex], recvRetVal);
+			ConstructPacket(threadInfos[myIndex], recvRetVal);
 		}
 	}
 	return 0;
@@ -196,27 +236,39 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 
 DWORD WINAPI ServerWorkThread(LPVOID arg)
 {
+	//while (true) {
+	//	if (stageIndex == STAGE_ROLE) {
+	//		bool isFinish = true;
+	//		for (int i = 0; i < 3; i++) {
+	//			if (selectPlayerRole[i] == 'n') {
+	//				isFinish = false;
+	//				break;
+	//			}
+	//		}
+	//		if (isFinish) {
+	//			//Send All Cleint Next Stage == Stage01
+	//			S2CChangeStagePacket changePacket;
+	//			changePacket.stageNum = STAGE_01;
+	//			changePacket.type = S2CChangeStage;
+	//			for (int x = 0; x < 3; x++) {
+	//				send(threadInfos[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+	//			}
+	//			stageIndex = STAGE_01;
+	//		}
+	//	}
+	//}
 	while (true) {
-		if (stageIndex == STAGE_ROLE) {
-			bool isFinish = true;
-			for (int i = 0; i < 3; i++) {
-				if (selectPlayerRole[i] == 'n') {
-					isFinish = false;
-					break;
-				}
-			}
-			if (isFinish) {
-				//Send All Cleint Next Stage == Stage01
-				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = STAGE_01;
-				changePacket.type = S2CChangeStage;
-				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-				}
-				stageIndex = STAGE_01;
+		for (int i = 0; i < 3; i++) {
+			DWORD ret = WaitForSingleObject(playerJumpHandle[i], 0);
+			if (ret == WAIT_OBJECT_0) {
+				//¸¸¾à¿¡ Ãæµ¹ÇÑ´Ù¸é -> ¶¥À§·Î °¡°Ô À§Ä¡ recv ÈÄ ResetEvent();
+				//JUMP ¸ð¼Ç send
+				//JUMP¶ó¸é LEFT RIGHT È®ÀÎÇÏ°í À§Ä¡ º¯°æ
+				//DOWNÀÌ¶ó¸é ¤·¤·¤·
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -252,7 +304,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			sendPacket.role = packet->role;
 			sendPacket.type = S2CSelectRole;
 			for (int i = 0; i < 3; i++) {
-				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+				send(threadInfos[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
 			}
 		}
 	}
@@ -267,13 +319,28 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		sendPacket.role = packet->role;
 		sendPacket.type = S2CChangeRole;
 		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+			send(threadInfos[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
 		}
 	}
 	break;
 	case C2SMove:
 	{
-
+		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);		
+		if (packet->y == SHRT_MAX) {
+			SetEvent(playerJumpHandle[packet->id]);
+		}
+		else {
+			DWORD ret = WaitForSingleObject(playerJumpHandle[packet->id], 0);
+			if (ret == WAIT_OBJECT_0) {
+				if (packet->x - threadInfos[packet->id].x > 0) {
+					threadInfos[packet->id].status = RIGHT;
+				}
+				else {
+					threadInfos[packet->id].status = RIGHT;
+				}
+				//move();
+			}
+		}
 	}
 	break;
 	case C2SExitGame:
