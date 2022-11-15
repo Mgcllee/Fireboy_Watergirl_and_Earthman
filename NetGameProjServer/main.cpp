@@ -208,6 +208,7 @@ void ConstructPacket(threadInfo& clientInfo, int ioSize)
 
 void PlayerMove(char playerId, short x)
 {
+	
 	//Ãæµ¹ Ã¼Å© ÇØº¸°í
 	//¶³¾îÁø´Ù¸é
 	if (threadInfos[playerId].status == RIGHT) {
@@ -331,12 +332,12 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		}
 		else {
 			DWORD ret = WaitForSingleObject(playerJumpHandle[packet->id], 0);
-			if (ret == WAIT_OBJECT_0) {
+			if (ret == WAIT_FAILED) {
 				if (packet->x - threadInfos[packet->id].x > 0) {
 					threadInfos[packet->id].status = RIGHT;
 				}
 				else {
-					threadInfos[packet->id].status = RIGHT;
+					threadInfos[packet->id].status = LEFT;
 				}
 				//move();
 			}
