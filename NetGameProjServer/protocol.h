@@ -60,7 +60,7 @@ struct MovePacket { // 움직임 동작 패킷
 	//unsigned char size;
 	char type;
 	char id; // 클라이언트 구분 패킷
-	float x, y; // 현재 위치
+	short x, y; // 현재 위치
 };
 
 struct typePacket {

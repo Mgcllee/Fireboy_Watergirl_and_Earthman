@@ -24,6 +24,7 @@ struct threadInfo {
 	int currentSize;
 	int prevSize = 0;
 	char clientId = -1;
+	short x, y;
 };
 
 void Display_Err(int Errcode);
@@ -45,6 +46,7 @@ array<threadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
+
 
 HANDLE multiEvenTthreadHadle[3];
 
