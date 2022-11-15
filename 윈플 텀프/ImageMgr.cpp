@@ -54,13 +54,13 @@ void ImageMgr::LoadImages() {
 	players[0].C_img_X_Size_02 = 342;
 	players[0].C_img_Y_Size_02 = 271;
 
-	players[1].Anim[0].Load(L"Resource\\ÆÄ¶û Á¤Áö 207.480.png");      // Á¤Áö
-	players[1].Anim[1].Load(L"Resource\\ÆÄ¶û Á¤Áö 207.480.png");      // »ó½Â
+	players[1].Anim[0].Load(L"Resource\\ÆÄ¶û Á¤Áö 215.411.png");      // Á¤Áö
+	players[1].Anim[1].Load(L"Resource\\ÆÄ¶û Á¤Áö 215.411.png");      // »ó½Â
 	players[1].Anim[2].Load(L"Resource\\ÆÄ¶û ¿À¸¥ÂÊ 376.480.png");    // ¿ìÃø
 	players[1].Anim[3].Load(L"Resource\\ÆÄ¶û ÇÏ°­ 207.480.png");      // ÇÏ´Ü
 	players[1].Anim[4].Load(L"Resource\\ÆÄ¶û ¿ŞÂÊ 376.480.png");      // ÁÂÃø
-	players[1].C_img_X_Size_01 = 207;
-	players[1].C_img_Y_Size_01 = 480;
+	players[1].C_img_X_Size_01 = 215;
+	players[1].C_img_Y_Size_01 = 411;
 	players[1].C_img_Frame = 376;
 	players[1].C_img_X_Size_02 = 376;
 	players[1].C_img_Y_Size_02 = 480;

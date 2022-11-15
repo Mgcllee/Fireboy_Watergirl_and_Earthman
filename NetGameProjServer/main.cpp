@@ -17,34 +17,42 @@ using namespace std;
 #define STAGE_02			4
 #define STAGE_03			5
 
-void Display_Err(int Errcode);
-void ConstructPacket(char* recvPacket); // 패킷 재조립
-void ProcessPacket(char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
-void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
-void SelectRole(); // mutex 필요 => 두 클라이언트가 동시에 같은 케릭터 선택을 해버리면 안됨
-void MovePacket(); // 움직일 때 마다, 전송
-void CheckJewelryEat();// 쥬얼리 습득 확인
-void CheckOpenDoor(); // 문 열리는 조건 확인
-
-
-
-
-DWORD WINAPI ClientWorkThread(LPVOID arg);
-
 struct threadInfo {
 	HANDLE threadHandle = NULL;
 	SOCKET clientSocket;
 	char recvBuf[MAX_BUF_SIZE] = { 0 };
 	int currentSize;
-	int prev_size = 0;
+	int prevSize = 0;
+	char clientId = -1;
+	short x, y;
 };
 
+void Display_Err(int Errcode);
+void ConstructPacket(threadInfo& clientInfo, int ioSize); // 패킷 재조립
+void ProcessPacket(threadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
+int GetPacketSize(char packetType);
+
+void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
+void SelectRole(); // mutex 필요 => 두 클라이언트가 동시에 같은 케릭터 선택을 해버리면 안됨
+//void MovePacket(); // 움직일 때 마다, 전송
+void CheckJewelryEat();// 쥬얼리 습득 확인
+void CheckOpenDoor(); // 문 열리는 조건 확인
+
+
+DWORD WINAPI ClientWorkThread(LPVOID arg);
+DWORD WINAPI ServerWorkThread(LPVOID arg);
+
 array<threadInfo, 3> threadHandles;
+array<char, 3> playerRole = { 'f', 'f', 'f' };
+mutex selectMutex;
+array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
+
+
 HANDLE multiEvenTthreadHadle[3];
 
-//HANDLE loadFlag; =>웨이트포실긍
+int stageIndex = -1;
 
-//map<socket, Role> 하는게 나을듯?
+//HANDLE loadFlag; =>웨이트포실긍
 
 int main(int argv, char** argc)
 {
@@ -98,7 +106,7 @@ int main(int argv, char** argc)
 		S2CPlayerPacket loadPacket;
 		loadPacket.type = S2CLoading;
 		loadPacket.id = i;
-
+		threadHandles[i].clientId = i;
 		threadHandles[i].threadHandle = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
 		multiEvenTthreadHadle[i] = threadHandles[i].threadHandle;
 		send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각
@@ -117,21 +125,26 @@ int main(int argv, char** argc)
 			}
 		}
 
-		if (i == 2) {		
+		if (i == 2) {
 			S2CChangeStagePacket changePacket;
 			changePacket.stageNum = STAGE_ROLE;
 			changePacket.type = S2CChangeStage;
 
 			for (int x = 0; x < 3; x++) {
 				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-			}			
+			}
+			stageIndex = STAGE_ROLE;
 		}
 	}
+
+	HANDLE serverThread = CreateThread(NULL, 0, ServerWorkThread, reinterpret_cast<LPVOID>(1), 0, NULL);
 
 	while (WSA_WAIT_EVENT_0 + 2 != WSAWaitForMultipleEvents(3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)) {}
 	for (int j = 0; j < 3; j++) {
 		CloseHandle(threadHandles[j].threadHandle);
 	}
+	CloseHandle(serverThread);
+
 
 	closesocket(listenSocket);
 	WSACleanup();
@@ -148,9 +161,23 @@ void Display_Err(int Errcode)
 	LocalFree(lpMsgBuf);
 }
 
-void ConstructPacket(char* recvPacket)
+void ConstructPacket(threadInfo& clientInfo, int ioSize)
 {
-
+	int restSize = ioSize + clientInfo.prevSize;
+	int needSize = 0;
+	char* buf = clientInfo.recvBuf;
+	while (restSize != 0) {
+		needSize = GetPacketSize(reinterpret_cast<char*>(buf)[0]);
+		if (restSize < needSize) {
+			clientInfo.prevSize = restSize;
+			return;
+		}
+		else {
+			ProcessPacket(clientInfo, reinterpret_cast<char*>(buf));
+			memcpy(buf, reinterpret_cast<char*>(buf) + needSize, restSize - needSize);
+			restSize -= needSize;
+		}
+	}
 }
 
 DWORD WINAPI ClientWorkThread(LPVOID arg)
@@ -159,18 +186,140 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 
 	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
-		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size, MAX_BUF_SIZE - threadHandles[myIndex].prev_size, 0);
-		if (!recvRetVal) {
-			ConstructPacket(threadHandles[myIndex].recvBuf + threadHandles[myIndex].prev_size);
+		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
+		if (recvRetVal != 0) {
+			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
 	}
 	return 0;
 }
 
-void ProcessPacket(char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
+DWORD WINAPI ServerWorkThread(LPVOID arg)
+{
+	while (true) {
+		if (stageIndex == STAGE_ROLE) {
+			bool isFinish = true;
+			for (int i = 0; i < 3; i++) {
+				if (selectPlayerRole[i] == 'n') {
+					isFinish = false;
+					break;
+				}
+			}
+			if (isFinish) {
+				//Send All Cleint Next Stage == Stage01
+				S2CChangeStagePacket changePacket;
+				changePacket.stageNum = STAGE_01;
+				changePacket.type = S2CChangeStage;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+				}
+				stageIndex = STAGE_01;
+			}
+		}
+	}
+	return 0;
+}
+
+void ProcessPacket(threadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
 {
 
 	//changePacket() => send S2CChangeRolePacket
 	//selectPacket() => mutex Role container and send S2CSelectPacket
 	//movePacket(); => 여기서 충돌 체크, 보석 체크 => 여기서 보석을 다 먹었다면 두 클라이언트에게 문 여는 패킷 전송, 문 들어가라는 패킷도 전송해야되네
+	if (packetStart == nullptr)
+		return;
+	switch (reinterpret_cast<char*>(packetStart)[0]) {
+	case C2SSelectRole:
+	{
+		C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
+		bool change = true;
+		//already Exist Role Check
+
+		//non exist Role
+		selectMutex.lock();
+		for (int i = 0; i < 3; i++) { // 성능이 구릴려나? 상관 없나?
+			if (selectPlayerRole[i] == packet->role) {
+				change = false;
+				break;
+			}
+		}
+		selectPlayerRole[clientInfo.clientId] = packet->role;
+		selectMutex.unlock();
+		if (change) {
+			//send SelectPacket for all Client
+			S2CRolePacket sendPacket;
+			sendPacket.id = clientInfo.clientId;
+			sendPacket.role = packet->role;
+			sendPacket.type = S2CSelectRole;
+			for (int i = 0; i < 3; i++) {
+				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+			}
+		}
+	}
+	break;
+	case C2SChangRole:
+	{
+		C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
+		playerRole[clientInfo.clientId] = packet->role; // 캐릭터 둘러보는 것 정도는 상호배제 필요 없다고 생각됨
+		//send changePacekt for all Client
+		S2CRolePacket sendPacket;
+		sendPacket.id = clientInfo.clientId;
+		sendPacket.role = packet->role;
+		sendPacket.type = S2CChangeRole;
+		for (int i = 0; i < 3; i++) {
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+		}
+	}
+	break;
+	case C2SMove:
+	{
+
+	}
+	break;
+	case C2SExitGame:
+	{
+
+	}
+	break;
+	case C2SRetry:
+	{
+
+	}
+	break;
+	default:
+		// Packet Error
+		break;
+	}
+}
+
+int GetPacketSize(char packetType)
+{
+	int retVal = -1;
+	switch (packetType)
+	{
+	case S2CLoading:
+	case S2CAddPlayer:
+		retVal = sizeof(S2CPlayerPacket);
+		break;
+	case S2CChangeRole:
+	case S2CSelectRole:
+		retVal = sizeof(S2CRolePacket);
+		break;
+	case S2CChangeStage:
+		retVal = sizeof(S2CChangeStagePacket);
+		break;
+	case S2CMove:
+		retVal = sizeof(MovePacket);
+		break;
+	case S2CExitGame:
+	case S2CDoorOpen:
+		retVal = sizeof(typePacket);
+		break;
+	case S2CJewelryVisibility:
+		retVal = sizeof(S2CJewelryVisibilityPacket);
+		break;
+	default:
+		break;
+	}
+	return retVal;
 }
