@@ -326,13 +326,13 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SMove:
 	{
-		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);		
+		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		if (packet->y == SHRT_MAX) {
 			SetEvent(playerJumpHandle[packet->id]);
 		}
-		else {
+		else {			
 			DWORD ret = WaitForSingleObject(playerJumpHandle[packet->id], 0);
-			if (ret == WAIT_FAILED) {
+			if (ret == WAIT_TIMEOUT || ret == WAIT_FAILED) {
 				if (packet->x - threadInfos[packet->id].x > 0) {
 					threadInfos[packet->id].status = RIGHT;
 				}
@@ -364,27 +364,17 @@ int GetPacketSize(char packetType)
 {
 	int retVal = -1;
 	switch (packetType)
-	{
-	case S2CLoading:
-	case S2CAddPlayer:
-		retVal = sizeof(S2CPlayerPacket);
-		break;
-	case S2CChangeRole:
-	case S2CSelectRole:
+	{	
+	case C2SChangRole:
+	case C2SSelectRole:
 		retVal = sizeof(S2CRolePacket);
-		break;
-	case S2CChangeStage:
-		retVal = sizeof(S2CChangeStagePacket);
-		break;
-	case S2CMove:
+		break;	
+	case C2SMove:
 		retVal = sizeof(MovePacket);
 		break;
-	case S2CExitGame:
-	case S2CDoorOpen:
+	case C2SRetry:
+	case C2SExitGame:
 		retVal = sizeof(typePacket);
-		break;
-	case S2CJewelryVisibility:
-		retVal = sizeof(S2CJewelryVisibilityPacket);
 		break;
 	default:
 		break;
