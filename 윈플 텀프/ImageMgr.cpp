@@ -49,6 +49,11 @@ void ImageMgr::LoadImages() {
 	fireStop.Load(L"Resource\\빨강 정지 215.411.png");
 	earthStop.Load(L"Resource\\흙_정지_215.411.png");
 
+	lobby.Load(L"Resource\\로비 이미지 초안.png");
+	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
+	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
+	earthStopImage.Load(L"Resource\\흙_정지_215.411.png");
+
 	players[0].Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
 	players[0].Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승
 	players[0].Anim[2].Load(L"Resource\\빨강 오른쪽 342.271.png");	 // 우측
@@ -88,10 +93,7 @@ void ImageMgr::LoadImages() {
 	rect.Load(L"Resource\\상자 40.40.png");
 
 
-	lobby.Load(L"Resource\\로비 이미지 초안.png");
-	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
-	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
-	earthStopImage.Load(L"Resource\\흙_정지_ 215.411.png");
+	
 	
 	leftArrow.Load(L"Resource\\left_arrow.png");
 	rightArrow.Load(L"Resource\\right_arrow.png");
@@ -111,6 +113,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	{
 	case STAGE_TITLE:
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		
 		break;
 	case STAGE_LOADING:
 		//lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
@@ -136,27 +139,17 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		
 		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
-
-
-		if (players[1].role == 'f') {
-			fireStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		if (players[0].role == 'f') {
+			fireStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
 		}
-		else if (players[1].role == 'w') {
-			waterStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		else if (players[0].role == 'w') {
+			waterStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
 		}
-		else if (players[1].role == 'e') {
-			earthStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		else if (players[0].role == 'e') {
+			earthStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
 		}
 
-		if (players[2].role == 'f') {
-			fireStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
-		}
-		else if (players[2].role == 'w') {
-			waterStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
-		}
-		else if (players[2].role == 'e') {
-			earthStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
-		}
+		
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		//player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
 		
