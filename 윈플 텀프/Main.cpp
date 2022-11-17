@@ -20,6 +20,8 @@ int myId = -1;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 
 HWND g_hWnd;
+DWORD WINAPI ClientrecvThread (LPVOID arg);
+
 
 // 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
@@ -62,6 +64,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 		return 1;
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	HANDLE chandle;
+	chandle = CreateThread(NULL, 0, ClientrecvThread, reinterpret_cast<LPVOID>(c_socket), 0,NULL);
+	
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
@@ -119,14 +125,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static int time = 300;
 
-	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
-
-	if (recvRetVal != 0 && recvRetVal != -1) {
-		ConstructPacket(recvBuf, recvRetVal);
-	}
-	else {
-		WSAGetLastError();
-	}
+	
 	currentStage = myStageMgr.getStage(stageIndex);
 
 	switch (uMsg) {
@@ -188,7 +187,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case BTN_LEFT_ARROW:
-		{
+		{	
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
 			makePacket.role = 'f'; // 아직 로직 안 짬
@@ -210,7 +209,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.role = 'f'; // 아직 로직 안 짬 수정해야됨
 			SendPacket(&makePacket);
 
-			// (임시) 서버 연결 후 제거
+			
 			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 		}
 		break;
@@ -514,4 +513,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+DWORD WINAPI ClientrecvThread(LPVOID arg)
+{
+	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
+
+	if (recvRetVal != 0 && recvRetVal != -1) {
+		ConstructPacket(recvBuf, recvRetVal);
+	}
+	else {
+		WSAGetLastError();
+	}
+	return 0;
 }
