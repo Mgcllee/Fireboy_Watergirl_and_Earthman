@@ -191,6 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
 			makePacket.role = 'f'; // 아직 로직 안 짬
+			players[0].role = 'e';
 			SendPacket(&makePacket);
 		}
 		break;
@@ -198,7 +199,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f'; // 아직 로직 안 짬
+			makePacket.role = 'f'; 
+			players[0].role = 'w';// 아직 로직 안 짬
 			SendPacket(&makePacket);
 		}
 		break;
