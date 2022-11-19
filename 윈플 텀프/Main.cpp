@@ -2,11 +2,10 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include"protocol.h"
+#include "protocol.h"
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
-Stage currentStage;
 
 WSADATA WSAData;
 SOCKET c_socket;
@@ -53,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	myImageMgr.LoadImages();
 
 	// 메인 윈도우 생성
-	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, WINDOW_WID, WINDOW_HEI, NULL, (HMENU)NULL, hInstance, NULL);
 
 	// 메인 윈도우 Set Visible
 	ShowWindow(hWnd, nCmdShow);
@@ -81,38 +80,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	return Message.wParam;
 }
 
-/*
-	[메인 윈도우 작업 함수]
-	1. WM_CREATE : 최초 초기화
-
-	2. WM_COMMAND : 키 입력
-					(IDC_BUTTON1 : Title 화면 시작 버튼,
-					 IDC_BUTTON2 : Game Over 화면에서 재시작 버튼)
-					 IDC_BUTTON3 : Game Over 화면에서 프로그램 종료 버튼,
-					 IDC_BUTTON4 : Stage Clear 성공시 다음 스테이지로 이동)
-
-	3. WM_TIMER : 타이머 호출시 실행, 내부 switch문에서 timer의 ID를 사용해 해당 작업을 수행
-					(Timer ID : case WM_CREATE 에 있는 SetTimer 함수의 2번째 파라미터)
-					(Timer ID 1 : User 입력에 따른 캐릭터 이동과 충돌체크,
-					 Timer ID 2 : 캐릭터(Fire boy, Water girl)의 애니메이션 프레임 (총 8개)
-					 Timer ID 3 : 오브젝트 애니메이션 전용
-					 Timer ID 4 : 캐릭터 출구, Stage_03의 이동 발판 애니메이션 (Timer ID 3 와 호출 시간이 다름)
-					 Timer ID 5 : 제한 시간 (time변수) 초과할 경우 화면 갱신 ()
-
-	4. WM_KEYDOWN : 키가 눌렸을 때 동작
-
-	5. WM_KEYUP : 키가 (눌렸다가) 올라갈 때 동작
-
-	6. WM_PAINT : 메인 윈도우에 오브젝트 그리기
-
-	6. WM_DESTROY : 메인 윈도우 종료 (== 프로그램 종료)
-*/
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hDC;
-	static HDC memdc;
-	static HBITMAP hbitmap;
+	static PAINTSTRUCT ps;
+	static HDC hDC;
+	static HDC memdc, backMemDC, memDC;
+	static HBITMAP hBitmap, oldBitmap;
 
 	g_hWnd = hWnd;
 
@@ -124,9 +97,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static BOOL isArrow = true;
 
 	static int time = 300;
-
-	
-	currentStage = myStageMgr.getStage(stageIndex);
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -144,9 +114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
-		SetTimer(hWnd, 3, 50, NULL);
-		SetTimer(hWnd, 4, 50, NULL);
-		SetTimer(hWnd, 5, 1000, NULL);
+		SetTimer(hWnd, 3, 1000, NULL);
 		break;
 	}
 	case WM_COMMAND:
@@ -161,9 +129,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (NetworkInit(hWnd, c_s_addr)) {
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
-				if(stageIndex < STAGE_ROLE)
+
+				currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
+
+				/*if(stageIndex < STAGE_ROLE)
 					stageIndex = STAGE_LOADING;
-				currentStage = myStageMgr.getStage(stageIndex);
+				currentStage = myStageMgr.getStage(stageIndex);*/
 			}
 			else {
 				SetWindowText(server_addr, LPCWSTR());
@@ -173,13 +144,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			time = 300;
 			for (PLAYER& pl : players)
 				pl.on = true;
-
-
-			SetTimer(hWnd, 1, 30, NULL);
-			SetTimer(hWnd, 2, 100, NULL);
-			SetTimer(hWnd, 3, 50, NULL);
-			SetTimer(hWnd, 4, 50, NULL);
-			SetTimer(hWnd, 5, 1000, NULL);
+			SetTimer(hWnd, 3, 1000, NULL);
 			back = FALSE;
 			currentStage.time_over = FALSE;
 			DestroyWindow(retry_button);
@@ -221,8 +186,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(retry_button);
 			DestroyWindow(end_button);
 			PostQuitMessage(0);
-			DeleteObject(hbitmap);
-			DeleteDC(memdc);
 			break;
 
 		case BTN_NEXT_STAGE:
@@ -238,13 +201,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.count = 0;
 			SetTimer(hWnd, 1, 30, NULL);
 			SetTimer(hWnd, 2, 100, NULL);
-			SetTimer(hWnd, 3, 50, NULL);
-			SetTimer(hWnd, 4, 50, NULL);
-			SetTimer(hWnd, 5, 1000, NULL);
+			SetTimer(hWnd, 3, 1000, NULL);
 			DestroyWindow(next_button);
 			break;
 		}
-		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_TIMER:
 		switch (wParam) {
@@ -271,11 +231,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
-			break;
-		case 2:				// 캐릭터 프레임
-			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
-			break;
-		case 3:				// 보석, 함정, 사망, 문 애니메이션 처리와 스테이지 클리어 조건 충족시 후처리(Next 윈도우와 배경처리)
+
 			for (OBJECT& bj : currentStage.Blue_Jewel)
 				if (bj.GetVisible() && bj.ChangeFrame(1, true))
 					bj.image_x = 0;
@@ -300,8 +256,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					KillTimer(hWnd, 1);
 					KillTimer(hWnd, 2);
 					KillTimer(hWnd, 3);
-					KillTimer(hWnd, 4);
-					KillTimer(hWnd, 5);
 
 					retry_button = CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 300, 500, 200, 100, hWnd, (HMENU)BTN_RESTART, g_hInst, NULL);
 					SendMessage(retry_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.retryimg));
@@ -329,12 +283,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (btn.GetVisible() && btn.Collision(pl))
 						btn.ChangeFrame(1, false);
 			}
-			break;
-		case 4:
-			/*if (currentStage.red_door.GetVisible())
-				currentStage.red_door.ChangeFrame(1);
-			else
-				currentStage.red_door.ChangeFrame(-1);*/
 
 			if (currentStage.blue_door.Collision(players[1]))
 				currentStage.blue_door.ChangeFrame(1, false);
@@ -346,16 +294,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				currentStage.blue_door.ChangeFrame(-1, false);
 			}
 
-			// Stage_03() 에서 나오는 X축 이동 바 (block1.PNG 파일 참고)
 			for (OBJECT& block : currentStage.block)
 				if (block.GetVisible())
 					block.ChangeFrame(-1, false);
 				else
 					block.ChangeFrame(1, false);
 			break;
+		case 2:				// 캐릭터 프레임
+			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
+			InvalidateRect(hWnd, NULL, FALSE);
+			break;
+		case 4:
 
-		case 5:
-			//타임아웃시 할 동작
+			if(players[currneClientNum].wid_a > 0)
+				players[currneClientNum].wid_a -= 1;
+	
+			if (players[currneClientNum].wid_v - players[currneClientNum].wid_a > 0)
+				players[currneClientNum].wid_v -= players[currneClientNum].wid_a;
 
 			if (--time == 0)
 			{
@@ -368,7 +323,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				KillTimer(hWnd, 5);
 			}
-
 			break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
@@ -384,18 +338,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
-		Move();
+
+		players[currneClientNum].direction = 0;
+		players[currneClientNum].Down = FALSE;
+		
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
 
 	case WM_PAINT: {
-		hDC = BeginPaint(hWnd, &ps);
-		hbitmap = CreateCompatibleBitmap(hDC, 1200, 800);
-		memdc = CreateCompatibleDC(hDC);
-		SelectObject(memdc, hbitmap);
+		hDC			= BeginPaint(hWnd, &ps);
+		backMemDC	= CreateCompatibleDC(hDC);
+		memDC		= CreateCompatibleDC(hDC);
+		hBitmap		= CreateCompatibleBitmap(hDC, WINDOW_WID, WINDOW_HEI);
+		oldBitmap	= (HBITMAP)SelectObject(backMemDC, hBitmap);
+		PatBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, WHITENESS);
 
-		myImageMgr.DrawMap(&memdc, currentStage.stage, currentStage);
+		myImageMgr.DrawMap(&backMemDC, currentStage.stage, currentStage);
 
 		if (STAGE_ROLE == currentStage.stage) {
 			if (isArrow) {
@@ -415,103 +374,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(selectBtn);
 			}
 
-			myImageMgr.DrawPlayers(&memdc, currentStage);
-			myImageMgr.DrawTimer(&memdc, time);
+			myImageMgr.DrawPlayers(&backMemDC, currentStage);
+			myImageMgr.DrawTimer(&backMemDC, time);
 
-			for (auto& rj : currentStage.Red_Jewel) {
-				if (rj.GetVisible())
-					myImageMgr.Jewelry_red.Draw(memdc, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
+			for (OBJECT& rj : currentStage.Red_Jewel) {
+				if (rj.GetVisible()) {
+					rj.ChangeFrame(1, true);
+					myImageMgr.Jewelry_red.Draw(backMemDC, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
+				}
 			}
-			for (auto& bj : currentStage.Blue_Jewel) {
+			for (OBJECT& bj : currentStage.Blue_Jewel) {
 				if (bj.GetVisible()) {
-					myImageMgr.Jewelry_blue.Draw(memdc, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
+					myImageMgr.Jewelry_blue.Draw(backMemDC, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
 				}
 			}
 
 			// 사망시 연기 Anim
-			if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(memdc, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
+			if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(backMemDC, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
 			if (currentStage.clear)	back = TRUE;
-			if (currentStage.time_over) myImageMgr.timeout.Draw(memdc, 400, 200, 400, 250, 0, 0, 486, 286);
+			if (currentStage.time_over) myImageMgr.timeout.Draw(backMemDC, 400, 200, 400, 250, 0, 0, 486, 286);
 			if (currentStage.stair)
 			{
-				myImageMgr.red_stair.Draw(memdc, currentStage.red_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 50, 73);
-				myImageMgr.blue_stair.Draw(memdc, currentStage.blue_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 54, 77);
+				myImageMgr.red_stair.Draw(backMemDC, currentStage.red_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 50, 73);
+				myImageMgr.blue_stair.Draw(backMemDC, currentStage.blue_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 54, 77);
 				for (PLAYER& pl : players)
 					pl.on = false;
 			}
 			if (back)
 			{
-				myImageMgr.backimg.Draw(memdc, 0, 0, 1200, 800, 0, 0, 1200, 800);
+				myImageMgr.backimg.Draw(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, 0, 0, WINDOW_WID, WINDOW_HEI);
 				KillTimer(hWnd, 1);
 				KillTimer(hWnd, 2);
 				KillTimer(hWnd, 3);
-				KillTimer(hWnd, 4);
-				KillTimer(hWnd, 5);
 				currentStage.clear = FALSE;
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 			}
 		}
 
-		//if (currentStage.clear == FALSE && back == FALSE)
-		//{
-		//	for (int i = 0; i < 90; i++) // 0~19까지 파랑 가운데 물 20~29까지 파랑 왼.오 |||| 30~49까지 빨강 가운데 물 50~59까지 빨강물 왼.오 60~79 초록 가운데 80~89 초록왼.오
-		//	{
-		//		if (currentStage.Trap[i].GetVisible())
-		//		{
-		//			
-		//			if (i < 20)
-		//			{
-		//				myImageMgr.blue_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
-		//			}
-		//			if (i >= 20 && i < 25)
-		//			{
-		//				myImageMgr.blue_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
-		//			}
-		//			if (i >= 25 && i < 30)
-		//			{
-		//				myImageMgr.blue_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 23);
-		//			}
-		//			
-		//			if (i >= 30 && i < 50)
-		//			{
-		//				myImageMgr.red_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 21, 14);
-		//			}
-		//			if (i >= 50 && i < 55)
-		//			{
-		//				myImageMgr.red_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-		//			}
-		//			if (i >= 55 && i < 60)
-		//			{
-		//				myImageMgr.red_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-		//			}
-		//			
-		//			if (i >= 60 && i < 80)
-		//			{
-		//				myImageMgr.green_water_center.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 23, 14);
-		//			}
-		//			if (i >= 80 && i < 85)
-		//			{
-		//				myImageMgr.green_water_left.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-		//			}
-		//			if (i >= 85 && i < 90)
-		//			{
-		//				myImageMgr.green_water_right.Draw(hDC, currentStage.Trap[i].x, currentStage.Trap[i].y, 25, 25, currentStage.Trap[i].image_x, currentStage.Trap[i].image_y, 24, 25);
-		//			}
-		//		}
-		//	}
-		//}
-
-		BitBlt(hDC, 0, 0, 1200, 800, memdc, 0, 0, SRCCOPY);
-		DeleteObject(hbitmap);
-		DeleteDC(memdc);
-		DeleteDC(hDC);
+		BitBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, memDC, 0, 0, SRCCOPY);
+		BitBlt(hDC, 0, 0, WINDOW_WID, WINDOW_HEI, backMemDC, 0, 0, SRCCOPY);
+		DeleteObject(SelectObject(backMemDC, oldBitmap));
+		DeleteObject(hBitmap);
+		DeleteDC(backMemDC);
+		DeleteDC(memDC);
 		EndPaint(hWnd, &ps);
 		break;
 	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		DeleteObject(hbitmap);
-		DeleteDC(memdc);
 		break;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);

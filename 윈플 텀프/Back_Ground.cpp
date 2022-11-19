@@ -1,27 +1,75 @@
 #pragma once
 #include "stdafx.h"
 #include "protocol.h"
+#include "Stage.h"
 
 void Move()
 { 
+	if (players[currneClientNum].wid_a <= 10)
+		players[currneClientNum].wid_a += 1;
+
+	if (players[currneClientNum].wid_v <= 10)
+		players[currneClientNum].wid_v += players[currneClientNum].wid_a;
+
 	MovePacket move;
 	move.id = currneClientNum;
 	move.type = C2SMove;
 
+	players[currneClientNum].direction = 0;
+	players[currneClientNum].Down = FALSE;
+
 	if (keybuffer[VK_LEFT]) {
+		players[currneClientNum].direction = -1;
 		move.x = players[currneClientNum].x - 1;
-		players[currneClientNum].x -= 10;
+
+		players[currneClientNum].x -= players[currneClientNum].wid_v;
+
+		for (OBJECT& ft : currentStage.Ft) {
+			if (ft.Ft_Collision(players[currneClientNum])) {
+				players[currneClientNum].x += players[currneClientNum].wid_v;
+				break;
+			}
+		}
 	}
 	if (keybuffer[VK_RIGHT]) {
+		players[currneClientNum].direction = 1;
 		move.x = players[currneClientNum].x + 1;
-		players[currneClientNum].x += 10;
+
+		players[currneClientNum].x += players[currneClientNum].wid_v;
+
+		for (OBJECT& ft : currentStage.Ft) {
+			if (ft.Ft_Collision(players[currneClientNum])) {
+				players[currneClientNum].x -= players[currneClientNum].wid_v;
+				break;
+			}
+		}
 	}
 	if (keybuffer[VK_UP]) {
+		players[currneClientNum].direction = 0;
 		move.y = players[currneClientNum].y - 1;
-		players[currneClientNum].y -= 10;
+
+		players[currneClientNum].y -= players[currneClientNum].wid_v;
+
+		for (OBJECT& ft : currentStage.Ft) {
+			if (ft.Ft_Collision(players[currneClientNum])) {
+				players[currneClientNum].y += players[currneClientNum].wid_v;
+				break;
+			}
+		}
 	}
 	if (keybuffer[VK_DOWN]) {
-		players[currneClientNum].y += 10;
+		players[currneClientNum].Down = TRUE;
+		players[currneClientNum].direction = 0;
+
+		if (players[currneClientNum].y + players[currneClientNum].wid_v < currentStage.Ground.y)
+			players[currneClientNum].y += players[currneClientNum].wid_v;
+
+		for (OBJECT& ft : currentStage.Ft) {
+			if (ft.Ft_Collision(players[currneClientNum])) {
+				players[currneClientNum].y -= players[currneClientNum].wid_v;
+				break;
+			}
+		}
 	}
 
 	SendPacket(&move);
