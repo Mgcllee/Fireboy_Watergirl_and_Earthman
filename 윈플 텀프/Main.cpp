@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	HANDLE chandle;
-	chandle = CreateThread(NULL, 0, ClientrecvThread, reinterpret_cast<LPVOID>(c_socket), 0,NULL);
+	chandle = CreateThread(NULL, 0, ClientrecvThread, NULL, 0,NULL);
 	
 
 	// 스테이지 열기
@@ -97,6 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static BOOL isArrow = true;
 
 	static int time = 300;
+	currentStage = myStageMgr.getStage(stageIndex);
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -130,11 +131,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
 
-				currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
+				//currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 
-				/*if(stageIndex < STAGE_ROLE)
+				if (stageIndex < STAGE_ROLE) {
 					stageIndex = STAGE_LOADING;
-				currentStage = myStageMgr.getStage(stageIndex);*/
+					//currentStage = myStageMgr.getStage(stageIndex);
+				}
 			}
 			else {
 				SetWindowText(server_addr, LPCWSTR());
@@ -177,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendPacket(&makePacket);
 
 			
-			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
+			//currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 		}
 		break;
 		case BTN_QUIT:
