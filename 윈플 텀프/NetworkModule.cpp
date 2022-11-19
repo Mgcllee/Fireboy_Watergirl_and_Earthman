@@ -65,11 +65,16 @@ void ProcessPacket(char* buf)
 	}
 	break;
 	case S2CSelectRole:
-
-		break;
+	
 	case S2CChangeRole:
+	{
+		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
+		myId = packet->id;
+		players[myId].role = packet->role;
 
 		break;
+	}
+		
 	case S2CMove:
 	{
 		MovePacket* move = reinterpret_cast<MovePacket*>(buf);
@@ -111,6 +116,9 @@ void SendPacket(void* buf)
 		memcpy(packet, buf, size);
 		break;
 	case C2SChangeRole:
+		size = sizeof(C2SRolePacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
 
 		break;
 	case C2SMove:

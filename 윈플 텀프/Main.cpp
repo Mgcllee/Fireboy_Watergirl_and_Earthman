@@ -157,17 +157,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{	
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f'; // 아직 로직 안 짬
-			players[0].role = 'e';
+			//f w e
+			makePacket.role = 'f'; 
+			if (players[0].role == 'e') {
+				players[0].role = 'w';
+				makePacket.role = 'w';
+			}
+			else if (players[0].role== 'w') {
+				players[0].role = 'f';
+				makePacket.role = 'f';
+			}
+			else if (players[0].role == 'f') {
+				players[0].role = 'e';
+				makePacket.role = 'e';
+			}
 			SendPacket(&makePacket);
 		}
 		break;
 		case BTN_RIGHT_ARROW:
 		{
+			//fwe
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
 			makePacket.role = 'f'; 
-			players[0].role = 'w';// 아직 로직 안 짬
+			if (players[0].role == 'e') {
+				players[0].role = 'f';
+				makePacket.role = 'f';
+			}
+			else if (players[0].role == 'w') {
+				players[0].role = 'e';
+				makePacket.role = 'e';
+			}
+			else if (players[0].role == 'f') {
+				players[0].role = 'w';
+				makePacket.role = 'w';
+			}
 			SendPacket(&makePacket);
 		}
 		break;

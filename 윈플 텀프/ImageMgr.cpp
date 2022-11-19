@@ -149,6 +149,26 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			earthStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
 		}
 
+		if (players[1].role == 'f') {
+			fireStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+		}
+		else if (players[1].role == 'w') {
+			waterStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+		}
+		else if (players[1].role == 'e') {
+			earthStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+		}
+		
+		if (players[2].role == 'f') {
+			fireStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+		}
+		else if (players[2].role == 'w') {
+			waterStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+		}
+		else if (players[2].role == 'e') {
+			earthStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+		}
+
 		
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		//player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
