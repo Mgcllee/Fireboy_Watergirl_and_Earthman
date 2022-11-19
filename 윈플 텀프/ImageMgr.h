@@ -17,6 +17,10 @@ public:
 	CImage waterStopImage;
 	CImage earthStopImage;
 
+	CImage waterStop;
+	CImage fireStop;
+	CImage earthStop;
+
 	CImage leftArrow, rightArrow;
 	CImage me, player1, player2;
 	CImage selectBtn;
