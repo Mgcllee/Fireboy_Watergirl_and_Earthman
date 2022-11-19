@@ -2,11 +2,10 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include"protocol.h"
+#include "protocol.h"
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
-Stage currentStage;
 
 WSADATA WSAData;
 SOCKET c_socket;
@@ -53,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	myImageMgr.LoadImages();
 
 	// 메인 윈도우 생성
-	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(IpszClass, IpszWindowName, WS_OVERLAPPEDWINDOW, 0, 0, WINDOW_WID, WINDOW_HEI, NULL, (HMENU)NULL, hInstance, NULL);
 
 	// 메인 윈도우 Set Visible
 	ShowWindow(hWnd, nCmdShow);
@@ -304,6 +303,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case 4:
+
+			if(players[currneClientNum].wid_a > 0)
+				players[currneClientNum].wid_a -= 1;
+	
+			if (players[currneClientNum].wid_v - players[currneClientNum].wid_a > 0)
+				players[currneClientNum].wid_v -= players[currneClientNum].wid_a;
+
 			if (--time == 0)
 			{
 				currentStage.time_over = TRUE;
@@ -330,18 +336,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
-		Move();
+
+		players[currneClientNum].direction = 0;
+		players[currneClientNum].Down = FALSE;
+		
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
 
 	case WM_PAINT: {
-		hDC = BeginPaint(hWnd, &ps);
-		backMemDC = CreateCompatibleDC(hDC);
-		memDC = CreateCompatibleDC(hDC);
-		hBitmap = CreateCompatibleBitmap(hDC, 1200, 800);
-		oldBitmap = (HBITMAP)SelectObject(backMemDC, hBitmap);
-		PatBlt(backMemDC, 0, 0, 1200, 800, WHITENESS);
+		hDC			= BeginPaint(hWnd, &ps);
+		backMemDC	= CreateCompatibleDC(hDC);
+		memDC		= CreateCompatibleDC(hDC);
+		hBitmap		= CreateCompatibleBitmap(hDC, WINDOW_WID, WINDOW_HEI);
+		oldBitmap	= (HBITMAP)SelectObject(backMemDC, hBitmap);
+		PatBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, WHITENESS);
 
 		myImageMgr.DrawMap(&backMemDC, currentStage.stage, currentStage);
 
@@ -391,7 +400,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			if (back)
 			{
-				myImageMgr.backimg.Draw(backMemDC, 0, 0, 1200, 800, 0, 0, 1200, 800);
+				myImageMgr.backimg.Draw(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, 0, 0, WINDOW_WID, WINDOW_HEI);
 				KillTimer(hWnd, 1);
 				KillTimer(hWnd, 2);
 				KillTimer(hWnd, 3);
@@ -400,8 +409,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		BitBlt(backMemDC, 0, 0, 1200, 800, memDC, 0, 0, SRCCOPY);
-		BitBlt(hDC, 0, 0, 1200, 800, backMemDC, 0, 0, SRCCOPY);
+		BitBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, memDC, 0, 0, SRCCOPY);
+		BitBlt(hDC, 0, 0, WINDOW_WID, WINDOW_HEI, backMemDC, 0, 0, SRCCOPY);
 		DeleteObject(SelectObject(backMemDC, oldBitmap));
 		DeleteObject(hBitmap);
 		DeleteDC(backMemDC);

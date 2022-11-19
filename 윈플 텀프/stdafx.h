@@ -29,6 +29,9 @@
 #define STAGE_02			4
 #define STAGE_03			5
 
+#define WINDOW_WID			1200
+#define WINDOW_HEI			800
+#define GROUND_POS_Y		730
 
 // Network Module
 #include <iostream>
@@ -45,12 +48,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
 void LoadSound(HWND hWnd);
 
-struct FootHold {
-	int x = 0, y = 0;
-	int wid = 111, hei = 23;
-	bool W_On = FALSE, F_On = FALSE;
-};
-
 class PLAYER {
 public:
 	int id;						// 다른 클라이언트 식별 정보 - -1 // 아직 안쓰는 상황에 -1
@@ -58,6 +55,9 @@ public:
 	int x, y;					// 우하단 좌표
 	int hei = 100, wid = 60;	// 캐릭터 크기
 	int direction;				// 이동방향 (애니메이션에서 사용)
+
+	int wid_v{};
+	int wid_a{};
 
 	int ground = 730;		// Stage의 바닥 높이 (상단이 y = 0, 내려갈수록 +)
 	float g = 4;			// 중력 조절로 점프 높이 조정
@@ -106,6 +106,17 @@ public:
 
 	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
 	bool Collision(PLAYER& pl) {
+		if (
+			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
+			&&
+			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) <= (hei + pl.hei) / 2)
+			) {
+			return true;
+		}
+		else return false;
+	}
+
+	bool Ft_Collision(PLAYER& pl) {
 		if (
 			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
 			&&

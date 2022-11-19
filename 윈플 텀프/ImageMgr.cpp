@@ -164,9 +164,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for(OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x - ft.wid, ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, stage.red_door.wid, stage.red_door.hei, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
@@ -175,9 +175,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_02:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
@@ -186,9 +186,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);

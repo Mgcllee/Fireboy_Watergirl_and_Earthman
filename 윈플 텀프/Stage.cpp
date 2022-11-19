@@ -1,4 +1,5 @@
 #include "Stage.h"
+Stage currentStage;
 
 void Stage::Loading()
 {
@@ -31,19 +32,17 @@ void Stage::Stage_1() {
 			t = OBJECT{0, 0, 20, 20, 230, 23, FALSE};
 		}
 		
-		Blue_Jewel.push_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-		Red_Jewel.push_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
+		Blue_Jewel.emplace_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+		Red_Jewel.emplace_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 
 		blue_door= OBJECT{ 480, 300, 60, 100, 1260, 60, TRUE };
 		red_door = OBJECT{ 630, 300, 60, 100, 1260, 60, TRUE };
 
-		Ft[0].x = 100, Ft[0].y = 600;
-		Ft[1].x = 250, Ft[1].y = 500;
-
-		Ft[2].x = 410, Ft[2].y = 400, Ft[2].wid = 380;
-
-		Ft[3].x = 850, Ft[3].y = 500;
-		Ft[4].x = 1000, Ft[4].y = 600;
+		Ft.emplace_back(OBJECT{ 100, 600, 111, 23, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 250, 500, 111, 23, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 410, 400, 111, 23, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 850, 500, 111, 23, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 1000, 600, 111, 23, 0, 0, TRUE });
 	}
 }
 void Stage::Stage_2() {
