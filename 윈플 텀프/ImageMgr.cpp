@@ -59,11 +59,11 @@ void ImageMgr::LoadImages() {
 	players[0].C_img_Frame = 342;
 	players[0].C_img_X_Size_02 = 342;
 	players[0].C_img_Y_Size_02 = 271;
-
+ 
 	players[1].Anim[0].Load(L"Resource\\파랑 정지 215.411.png");      // 정지
 	players[1].Anim[1].Load(L"Resource\\파랑 정지 215.411.png");      // 상승
 	players[1].Anim[2].Load(L"Resource\\파랑 오른쪽 376.480.png");    // 우측
-	players[1].Anim[3].Load(L"Resource\\파랑 하강 207.480.png");      // 하단
+	players[1].Anim[3].Load(L"Resource\\파랑 하강 215.411.png");      // 하단
 	players[1].Anim[4].Load(L"Resource\\파랑 왼쪽 376.480.png");      // 좌측
 	players[1].C_img_X_Size_01 = 215;
 	players[1].C_img_Y_Size_01 = 411;
@@ -102,7 +102,6 @@ void ImageMgr::LoadImages() {
 	selectBtn.Load(L"Resource\\select_btn.png");
 
 }
-
 
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
 void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
@@ -310,16 +309,16 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 		if (pl.on)
 		{
 			if ((pl.Down == TRUE) && pl.direction == 0) {
-				pl.Anim[3].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
+				pl.Anim[3].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
 			}
 			else if (pl.direction == 0) {
-				pl.Anim[1].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
+				pl.Anim[1].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
 			}
 			else if (pl.direction == -1) {
-				pl.Anim[4].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
+				pl.Anim[4].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
 			}
 			else if (pl.direction == 1) {
-				pl.Anim[2].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei + stage.average, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
+				pl.Anim[2].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
 			}
 		}
 	}

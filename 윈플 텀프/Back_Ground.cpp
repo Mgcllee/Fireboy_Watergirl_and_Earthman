@@ -5,10 +5,10 @@
 
 void Move()
 { 
-	if (players[currneClientNum].wid_a <= 10)
-		players[currneClientNum].wid_a += 1;
+	if (players[currneClientNum].wid_a <= 10.f)
+		players[currneClientNum].wid_a += 0.1f;
 
-	if (players[currneClientNum].wid_v <= 10)
+	if (players[currneClientNum].wid_v <= 10.f)
 		players[currneClientNum].wid_v += players[currneClientNum].wid_a;
 
 	MovePacket move;
@@ -44,19 +44,23 @@ void Move()
 			}
 		}
 	}
+
+
 	if (keybuffer[VK_UP]) {
 		players[currneClientNum].direction = 0;
 		move.y = players[currneClientNum].y - 1;
 
-		players[currneClientNum].y -= players[currneClientNum].wid_v;
-
+		/*players[currneClientNum].y -= players[currneClientNum].wid_v;
 		for (OBJECT& ft : currentStage.Ft) {
 			if (ft.Ft_Collision(players[currneClientNum])) {
 				players[currneClientNum].y += players[currneClientNum].wid_v;
 				break;
 			}
-		}
+		}*/
 	}
+
+
+	// 임시 이동키
 	if (keybuffer[VK_DOWN]) {
 		players[currneClientNum].Down = TRUE;
 		players[currneClientNum].direction = 0;

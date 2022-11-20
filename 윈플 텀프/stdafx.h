@@ -56,12 +56,12 @@ public:
 	int hei = 100, wid = 60;	// 캐릭터 크기
 	int direction;				// 이동방향 (애니메이션에서 사용)
 
-	int wid_v{};
-	int wid_a{};
+	float wid_v{};
+	float wid_a{};
 
 	int ground = 730;		// Stage의 바닥 높이 (상단이 y = 0, 내려갈수록 +)
-	float g = 4;			// 중력 조절로 점프 높이 조정
-	float v = 50;			// 속도
+	float g = 3.f;			// 중력 조절로 점프 높이 조정
+	float v = 0;			// 속도
 	short Frame = 0;		// 애니메이션 프레임
 
 	CImage Anim[5]{};
@@ -118,9 +118,9 @@ public:
 
 	bool Ft_Collision(PLAYER& pl) {
 		if (
-			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
+			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) < (wid + pl.wid) / 2)
 			&&
-			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) <= (hei + pl.hei) / 2)
+			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) < (hei + pl.hei) / 2)
 			) {
 			return true;
 		}

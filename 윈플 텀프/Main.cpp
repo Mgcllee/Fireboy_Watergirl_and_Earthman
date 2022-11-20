@@ -21,8 +21,6 @@ char recvBuf[MAX_BUF_SIZE] = { 0 };
 HWND g_hWnd;
 DWORD WINAPI ClientrecvThread (LPVOID arg);
 
-
-// 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
 	HWND hWnd;
@@ -208,6 +206,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case 1:
 			// 캐릭터 이동과 충돌체크
+
+			// 중복 체크는 아직 불가능
+			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y -= players[currneClientNum].v;
+
+					for (OBJECT& ft : currentStage.Ft) {
+						if (ft.Ft_Collision(players[currneClientNum])) {
+							players[currneClientNum].v = 0;
+							players[currneClientNum].Down = TRUE;
+							break;
+						}
+					}
+				}
+				else {
+					players[currneClientNum].v = 0;
+					players[currneClientNum].Down = TRUE;
+				}
+			}
+			else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y += players[currneClientNum].v;
+				}
+				else {
+					players[currneClientNum].Down = FALSE;
+					players[currneClientNum].v = 0.f;
+					keybuffer[VK_UP] = FALSE;
+
+					players[currneClientNum].y = players[currneClientNum].ground;
+				}
+			}
+
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
 					if (bj.Collision(pl)) {
@@ -299,10 +333,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					block.ChangeFrame(1, false);
 			break;
 		case 2:				// 캐릭터 프레임
-			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
+			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 8;
 			InvalidateRect(hWnd, NULL, FALSE);
 			break;
-		case 4:
+		case 3:
 
 			if(players[currneClientNum].wid_a > 0)
 				players[currneClientNum].wid_a -= 1;
@@ -335,9 +369,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
-		keybuffer[wParam] = FALSE;
+		
+		if(keybuffer[VK_UP] == FALSE && keybuffer[wParam] == TRUE)
+			keybuffer[wParam] = FALSE;
 
 		players[currneClientNum].direction = 0;
+		players[currneClientNum].wid_a = 0;
+		players[currneClientNum].wid_v = 0;
 		players[currneClientNum].Down = FALSE;
 		
 		InvalidateRect(hWnd, NULL, FALSE);
