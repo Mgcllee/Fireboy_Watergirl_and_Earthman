@@ -43,6 +43,12 @@ void ImageMgr::LoadImages() {
 	timeout.Load(L"Resource\\타임아웃.png");
 	fraction.Load(L"Resource\\fraction.png");
 
+
+	//캐릭터 고르기
+	waterStop.Load(L"Resource\\파랑 정지 207.480.png");
+	fireStop.Load(L"Resource\\빨강 정지 215.411.png");
+	earthStop.Load(L"Resource\\흙_정지_215.411.png");
+
 	players[0].Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
 	players[0].Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승
 	players[0].Anim[2].Load(L"Resource\\빨강 오른쪽 342.271.png");	 // 우측
@@ -123,24 +129,44 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		break;
 	case STAGE_ROLE:
-		 lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
+		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
 		//if(나의 캐릭터에 따라서)
-		fireStopImage.Draw(*memdc, 170, 200, 100, 200, 0, 0, 215, 411);
+		
 		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
-		player1.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+
+
+		if (players[1].role == 'f') {
+			fireStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		}
+		else if (players[1].role == 'w') {
+			waterStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		}
+		else if (players[1].role == 'e') {
+			earthStop.Draw(*memdc, 500, 100, 150, 150, 0, 0, 403, 317);
+		}
+
+		if (players[2].role == 'f') {
+			fireStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
+		}
+		else if (players[2].role == 'w') {
+			waterStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
+		}
+		else if (players[2].role == 'e') {
+			earthStop.Draw(*memdc, 700, 100, 150, 150, 0, 0, 403, 317);
+		}
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
-		player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
+		//player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
 		
 	break;
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for(OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x - ft.wid, ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, stage.red_door.wid, stage.red_door.hei, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
@@ -149,9 +175,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_02:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
@@ -160,9 +186,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for (int i = 0; i < 20 && stage.Ft[i].x != NULL; ++i)
+		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, stage.Ft[i].x, stage.Ft[i].y, stage.Ft[i].wid, stage.Ft[i].hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
