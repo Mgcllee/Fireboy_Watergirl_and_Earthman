@@ -5,75 +5,39 @@
 
 void Move()
 { 
-	if (players[currneClientNum].wid_a <= 10.f)
+	/*if (players[currneClientNum].wid_a <= 10.f)
 		players[currneClientNum].wid_a += 0.1f;
-
 	if (players[currneClientNum].wid_v <= 10.f)
-		players[currneClientNum].wid_v += players[currneClientNum].wid_a;
+		players[currneClientNum].wid_v += players[currneClientNum].wid_a;*/
 
 	MovePacket move;
 	move.id = currneClientNum;
 	move.type = C2SMove;
 
-	players[currneClientNum].direction = 0;
-	players[currneClientNum].Down = FALSE;
-
 	if (keybuffer[VK_LEFT]) {
-		players[currneClientNum].direction = -1;
-		move.x = players[currneClientNum].x - 1;
-
-		players[currneClientNum].x -= players[currneClientNum].wid_v;
-
-		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].x += players[currneClientNum].wid_v;
-				break;
-			}
-		}
+		move.x = -1;
+		//players[currneClientNum].direction = -1;
+		//players[currneClientNum].x -= players[currneClientNum].wid_v;
+		//for (OBJECT& ft : currentStage.Ft) {
+		//	if (ft.Ft_Collision(players[currneClientNum])) {
+		//		players[currneClientNum].x += players[currneClientNum].wid_v;
+		//		break;
+		//	}
+		//}
 	}
 	if (keybuffer[VK_RIGHT]) {
-		players[currneClientNum].direction = 1;
-		move.x = players[currneClientNum].x + 1;
-
-		players[currneClientNum].x += players[currneClientNum].wid_v;
-
-		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].x -= players[currneClientNum].wid_v;
-				break;
-			}
-		}
+		move.x = +1;
+		//players[currneClientNum].direction = 1;
+		//players[currneClientNum].x += players[currneClientNum].wid_v;
+		//for (OBJECT& ft : currentStage.Ft) {
+		//	if (ft.Ft_Collision(players[currneClientNum])) {
+		//		players[currneClientNum].x -= players[currneClientNum].wid_v;
+		//		break;
+		//	}
+		//}
 	}
-
-
 	if (keybuffer[VK_UP]) {
-		players[currneClientNum].direction = 0;
-		move.y = players[currneClientNum].y - 1;
-
-		/*players[currneClientNum].y -= players[currneClientNum].wid_v;
-		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].y += players[currneClientNum].wid_v;
-				break;
-			}
-		}*/
-	}
-
-
-	// 임시 이동키
-	if (keybuffer[VK_DOWN]) {
-		players[currneClientNum].Down = TRUE;
-		players[currneClientNum].direction = 0;
-
-		if (players[currneClientNum].y + players[currneClientNum].wid_v < currentStage.Ground.y)
-			players[currneClientNum].y += players[currneClientNum].wid_v;
-
-		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].y -= players[currneClientNum].wid_v;
-				break;
-			}
-		}
+		move.y = SHRT_MAX;
 	}
 
 	SendPacket(&move);

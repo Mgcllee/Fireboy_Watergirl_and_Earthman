@@ -207,12 +207,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case 1:
 			// 캐릭터 이동과 충돌체크
 
-			// 중복 체크는 아직 불가능
+			// 일부 제외 전부 서버에서 실행
+			/*
 			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
 			{
 				if (players[currneClientNum].v < 30.f) {
 					players[currneClientNum].v += players[currneClientNum].g;
+
+					// ========== S2C Move Packet 내용 =========
 					players[currneClientNum].y -= players[currneClientNum].v;
+					// =========================================
 
 					for (OBJECT& ft : currentStage.Ft) {
 						if (ft.Ft_Collision(players[currneClientNum])) {
@@ -241,6 +245,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					players[currneClientNum].y = players[currneClientNum].ground;
 				}
 			}
+			*/
+			//===================================================
 
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
@@ -370,13 +376,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		
-		if(keybuffer[VK_UP] == FALSE && keybuffer[wParam] == TRUE)
-			keybuffer[wParam] = FALSE;
+		/*if(keybuffer[VK_UP] == FALSE && keybuffer[wParam] == TRUE)
+			keybuffer[wParam] = FALSE;*/
+		keybuffer[wParam] = FALSE;
 
-		players[currneClientNum].direction = 0;
+		/*players[currneClientNum].direction = 0;
 		players[currneClientNum].wid_a = 0;
 		players[currneClientNum].wid_v = 0;
-		players[currneClientNum].Down = FALSE;
+		players[currneClientNum].Down = FALSE;*/
 		
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
