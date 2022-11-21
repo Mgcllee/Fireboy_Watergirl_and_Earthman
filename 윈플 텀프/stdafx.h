@@ -19,7 +19,7 @@
 #define BTN_NEXT_STAGE		400
 #define EDIT_SERVER_ADDR	500
 #define BTN_LEFT_ARROW		600
-#define BTN_RIGHT_ARROW		700
+#define BTN_RIGHT_ARROW		701
 #define BTN_SELECT			800
 
 #define STAGE_TITLE			0
@@ -160,6 +160,7 @@ extern int myId;
 extern int stageIndex;
 
 extern HANDLE selectMyCharacter;
+extern HANDLE changeStageEvent;
 
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);

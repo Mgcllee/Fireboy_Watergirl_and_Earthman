@@ -49,6 +49,7 @@ void ProcessPacket(char* buf)
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		myId = packet->id;
 		players[0].id = myId;
+		SetEvent(changeStageEvent);
 	}
 	break;
 	case S2CAddPlayer:
@@ -106,6 +107,7 @@ void ProcessPacket(char* buf)
 	{
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
 		stageIndex = packet->stageNum;
+		SetEvent(changeStageEvent);
 	}
 	break;
 	default:
