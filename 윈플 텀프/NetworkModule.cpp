@@ -43,13 +43,13 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-	char aa = reinterpret_cast<char*>(buf)[0];
 	switch (reinterpret_cast<char*>(buf)[0]) {
 	case S2CLoading:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		myId = packet->id;
 		players[0].id = myId;
+		SetEvent(changeStageEvent);
 	}
 	break;
 	case S2CAddPlayer:
@@ -65,11 +65,28 @@ void ProcessPacket(char* buf)
 	}
 	break;
 	case S2CSelectRole:
-
-		break;
+	{
+		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
+		for (int i = 0; i < 3; i++)
+			if (players[i].id == packet->id) {
+				if (packet->id == myId)
+					SetEvent(selectMyCharacter);
+				players[i].role = packet->role;
+				break;
+			}
+	}
+	break;
 	case S2CChangeRole:
+	{
+		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
+		for (int i = 0; i < 3; i++)
+			if (players[i].id == packet->id) {
+				players[i].role = packet->role;
+				break;
+			}
+	}
+	break;
 
-		break;
 	case S2CMove:
 	{
 		MovePacket* move = reinterpret_cast<MovePacket*>(buf);
@@ -89,9 +106,10 @@ void ProcessPacket(char* buf)
 	case S2CChangeStage:
 	{
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
-		stageIndex =  packet->stageNum;
+		stageIndex = packet->stageNum;
+		SetEvent(changeStageEvent);
 	}
-		break;
+	break;
 	default:
 		// Packet Error
 		break;
@@ -111,6 +129,9 @@ void SendPacket(void* buf)
 		memcpy(packet, buf, size);
 		break;
 	case C2SChangeRole:
+		size = sizeof(C2SRolePacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
 
 		break;
 	case C2SMove:
@@ -124,7 +145,7 @@ void SendPacket(void* buf)
 	case C2SExitGame:
 
 		break;
-	
+
 	default:
 		// Packet Error
 		break;

@@ -17,10 +17,15 @@ int prevSize = 0;
 int myId = -1;
 
 char recvBuf[MAX_BUF_SIZE] = { 0 };
+static BOOL isArrow = true;
 
+HANDLE selectMyCharacter = NULL;
+HANDLE changeStageEvent = NULL;
 HWND g_hWnd;
-DWORD WINAPI ClientrecvThread (LPVOID arg);
+DWORD WINAPI ClientrecvThread(LPVOID arg);
 
+
+// 프로그램 최초 실행시 변수 초기화 및 윈도우 생성
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam, int nCmdShow)
 {
 	HWND hWnd;
@@ -63,8 +68,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	HANDLE chandle;
-	chandle = CreateThread(NULL, 0, ClientrecvThread, reinterpret_cast<LPVOID>(c_socket), 0,NULL);
-	
+	chandle = CreateThread(NULL, 0, ClientrecvThread, NULL, 0, NULL);
+
+	selectMyCharacter = CreateEvent(NULL, TRUE, FALSE, NULL);
+	changeStageEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ResetEvent(selectMyCharacter);
+	ResetEvent(changeStageEvent);
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
@@ -78,6 +87,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	return Message.wParam;
 }
 
+HWND start_button, retry_button, end_button, next_button, server_addr;
+HWND selectRoleLeftArrow;
+HWND selectBtn;
+HWND selectRoleRightArrow;
+BOOL back = FALSE;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static PAINTSTRUCT ps;
@@ -86,13 +101,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HBITMAP hBitmap, oldBitmap;
 
 	g_hWnd = hWnd;
-
-	static HWND start_button, retry_button, end_button, next_button, server_addr;
-	static HWND selectRoleLeftArrow;
-	static HWND selectRoleRightArrow;
-	static HWND selectBtn;
-	static BOOL back = FALSE;
-	static BOOL isArrow = true;
 
 	static int time = 300;
 
@@ -110,9 +118,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		server_addr = CreateWindow(L"edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
 		SendMessage(server_addr, WM_SETFONT, (WPARAM)s_hFont, (LPARAM)MAKELONG(TRUE, 0));
 
+		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
+		selectRoleLeftArrow = CreateWindow(L"button", L"Left", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
+		selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 500, 620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
+		SendMessage(selectRoleLeftArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
+		SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
+		SendMessage(selectBtn, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.selectBtn));
+
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
 		SetTimer(hWnd, 3, 1000, NULL);
+		SetTimer(hWnd, 5, 1, NULL);
 		break;
 	}
 	case WM_COMMAND:
@@ -128,11 +144,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
 
-				currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
+				//currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 
-				/*if(stageIndex < STAGE_ROLE)
+				if (stageIndex < STAGE_ROLE) {
 					stageIndex = STAGE_LOADING;
-				currentStage = myStageMgr.getStage(stageIndex);*/
+					SetEvent(changeStageEvent);
+					//currentStage = myStageMgr.getStage(stageIndex);
+				}
 			}
 			else {
 				SetWindowText(server_addr, LPCWSTR());
@@ -150,18 +168,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case BTN_LEFT_ARROW:
-		{	
+		{
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f'; // 아직 로직 안 짬
+			//f w e
+			makePacket.role = 'f';
+			if (players[0].role == 'e') {
+				players[0].role = 'w';
+				makePacket.role = 'w';
+			}
+			else if (players[0].role == 'w') {
+				players[0].role = 'f';
+				makePacket.role = 'f';
+			}
+			else if (players[0].role == 'f') {
+				players[0].role = 'e';
+				makePacket.role = 'e';
+			}
 			SendPacket(&makePacket);
 		}
 		break;
 		case BTN_RIGHT_ARROW:
 		{
+			//fwe
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f'; // 아직 로직 안 짬
+			makePacket.role = 'f';
+			if (players[0].role == 'e') {
+				players[0].role = 'f';
+				makePacket.role = 'f';
+			}
+			else if (players[0].role == 'w') {
+				players[0].role = 'e';
+				makePacket.role = 'e';
+			}
+			else if (players[0].role == 'f') {
+				players[0].role = 'w';
+				makePacket.role = 'w';
+			}
 			SendPacket(&makePacket);
 		}
 		break;
@@ -169,11 +213,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			C2SRolePacket makePacket;
 			makePacket.type = C2SSelectRole;
-			makePacket.role = 'f'; // 아직 로직 안 짬 수정해야됨
+			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
-
-			
-			currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
 		}
 		break;
 		case BTN_QUIT:
@@ -206,48 +247,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case 1:
 			// 캐릭터 이동과 충돌체크
-
-			// 일부 제외 전부 서버에서 실행
-			/*
-			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
-			{
-				if (players[currneClientNum].v < 30.f) {
-					players[currneClientNum].v += players[currneClientNum].g;
-
-					// ========== S2C Move Packet 내용 =========
-					players[currneClientNum].y -= players[currneClientNum].v;
-					// =========================================
-
-					for (OBJECT& ft : currentStage.Ft) {
-						if (ft.Ft_Collision(players[currneClientNum])) {
-							players[currneClientNum].v = 0;
-							players[currneClientNum].Down = TRUE;
-							break;
-						}
-					}
-				}
-				else {
-					players[currneClientNum].v = 0;
-					players[currneClientNum].Down = TRUE;
-				}
-			}
-			else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
-			{
-				if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
-					players[currneClientNum].v += players[currneClientNum].g;
-					players[currneClientNum].y += players[currneClientNum].v;
-				}
-				else {
-					players[currneClientNum].Down = FALSE;
-					players[currneClientNum].v = 0.f;
-					keybuffer[VK_UP] = FALSE;
-
-					players[currneClientNum].y = players[currneClientNum].ground;
-				}
-			}
-			*/
-			//===================================================
-
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
 					if (bj.Collision(pl)) {
@@ -271,11 +270,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			for (OBJECT& bj : currentStage.Blue_Jewel)
-				if (bj.GetVisible() && bj.ChangeFrame(1, true))
+				if (bj.GetVisible() && bj.ChangeFrame(1, false))
 					bj.image_x = 0;
 
 			for (OBJECT& rj : currentStage.Red_Jewel)
-				if (rj.GetVisible() && rj.ChangeFrame(1, true))
+				if (rj.GetVisible() && rj.ChangeFrame(1, false))
 					rj.image_x = 0;
 
 			for (OBJECT& t : currentStage.Trap)
@@ -339,14 +338,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					block.ChangeFrame(1, false);
 			break;
 		case 2:				// 캐릭터 프레임
-			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 8;
+			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
 			InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case 3:
 
-			if(players[currneClientNum].wid_a > 0)
+			if (players[currneClientNum].wid_a > 0)
 				players[currneClientNum].wid_a -= 1;
-	
+
 			if (players[currneClientNum].wid_v - players[currneClientNum].wid_a > 0)
 				players[currneClientNum].wid_v -= players[currneClientNum].wid_a;
 
@@ -361,7 +360,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				KillTimer(hWnd, 5);
 			}
+
 			break;
+		case 4:
+		{
+			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
+			if (retVal == WAIT_OBJECT_0) {
+				ResetEvent(selectMyCharacter);
+				ShowWindow(selectRoleLeftArrow, SW_HIDE);
+				ShowWindow(selectRoleRightArrow, SW_HIDE);
+				ShowWindow(selectBtn, SW_HIDE);
+				KillTimer(hWnd, 4);
+			}
+		}
+		break;
+		case 5:
+		{
+			DWORD retVal = WaitForSingleObject(changeStageEvent, 0);
+			if (retVal == WAIT_OBJECT_0) {
+				currentStage = myStageMgr.getStage(stageIndex);
+				ResetEvent(changeStageEvent);
+			}
+		}
+		break;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
@@ -375,48 +396,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
-		
-		/*if(keybuffer[VK_UP] == FALSE && keybuffer[wParam] == TRUE)
-			keybuffer[wParam] = FALSE;*/
 		keybuffer[wParam] = FALSE;
 
-		/*players[currneClientNum].direction = 0;
-		players[currneClientNum].wid_a = 0;
-		players[currneClientNum].wid_v = 0;
-		players[currneClientNum].Down = FALSE;*/
-		
+		players[currneClientNum].direction = 0;
+		players[currneClientNum].Down = FALSE;
+
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
 
 	case WM_PAINT: {
-		hDC			= BeginPaint(hWnd, &ps);
-		backMemDC	= CreateCompatibleDC(hDC);
-		memDC		= CreateCompatibleDC(hDC);
-		hBitmap		= CreateCompatibleBitmap(hDC, WINDOW_WID, WINDOW_HEI);
-		oldBitmap	= (HBITMAP)SelectObject(backMemDC, hBitmap);
+		hDC = BeginPaint(hWnd, &ps);
+		backMemDC = CreateCompatibleDC(hDC);
+		memDC = CreateCompatibleDC(hDC);
+		hBitmap = CreateCompatibleBitmap(hDC, WINDOW_WID, WINDOW_HEI);
+		oldBitmap = (HBITMAP)SelectObject(backMemDC, hBitmap);
 		PatBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, WHITENESS);
 
 		myImageMgr.DrawMap(&backMemDC, currentStage.stage, currentStage);
 
 		if (STAGE_ROLE == currentStage.stage) {
 			if (isArrow) {
-				selectRoleLeftArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
-				selectRoleRightArrow = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
-				selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
-				SendMessage(selectRoleLeftArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
-				SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
-				SendMessage(selectBtn, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.selectBtn));
+				ShowWindow(selectRoleLeftArrow, SW_SHOW);
+				ShowWindow(selectRoleRightArrow, SW_SHOW);
+				ShowWindow(selectBtn, SW_SHOW);
+				SetTimer(hWnd, 4, 10, NULL);
 				isArrow = false;
 			}
 		}
 		else if (STAGE_ROLE < currentStage.stage) {
-			if (selectRoleLeftArrow != nullptr) {
-				DestroyWindow(selectRoleLeftArrow);
+			/*	DestroyWindow(selectRoleLeftArrow);
 				DestroyWindow(selectRoleRightArrow);
-				DestroyWindow(selectBtn);
-			}
-
+				DestroyWindow(selectBtn);*/
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, time);
 
@@ -472,13 +483,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
-	int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 
-	if (recvRetVal != 0 && recvRetVal != -1) {
-		ConstructPacket(recvBuf, recvRetVal);
-	}
-	else {
-		WSAGetLastError();
+	while (true) {
+		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
+		if (recvRetVal != 0 && recvRetVal != -1) {
+			ConstructPacket(recvBuf, recvRetVal);
+		}
+		else {
+			WSAGetLastError();
+		}
 	}
 	return 0;
 }
