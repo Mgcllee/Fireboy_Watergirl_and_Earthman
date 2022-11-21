@@ -43,7 +43,6 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-	char aa = reinterpret_cast<char*>(buf)[0];
 	switch (reinterpret_cast<char*>(buf)[0]) {
 	case S2CLoading:
 	{
@@ -65,16 +64,28 @@ void ProcessPacket(char* buf)
 	}
 	break;
 	case S2CSelectRole:
-	
+	{
+		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
+		for (int i = 0; i < 3; i++)
+			if (players[i].id == packet->id) {
+				if (packet->id == myId)
+					SetEvent(selectMyCharacter);
+				players[i].role = packet->role;
+				break;
+			}
+	}
+	break;
 	case S2CChangeRole:
 	{
 		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
-		myId = packet->id;
-		players[myId].role = packet->role;
-
-		break;
+		for (int i = 0; i < 3; i++)
+			if (players[i].id == packet->id) {
+				players[i].role = packet->role;
+				break;
+			}
 	}
-		
+	break;
+
 	case S2CMove:
 	{
 		MovePacket* move = reinterpret_cast<MovePacket*>(buf);
@@ -94,9 +105,9 @@ void ProcessPacket(char* buf)
 	case S2CChangeStage:
 	{
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
-		stageIndex =  packet->stageNum;
+		stageIndex = packet->stageNum;
 	}
-		break;
+	break;
 	default:
 		// Packet Error
 		break;
@@ -132,7 +143,7 @@ void SendPacket(void* buf)
 	case C2SExitGame:
 
 		break;
-	
+
 	default:
 		// Packet Error
 		break;

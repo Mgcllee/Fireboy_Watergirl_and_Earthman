@@ -5,68 +5,68 @@
 
 void Move()
 { 
-	if (players[currneClientNum].wid_a <= 10)
-		players[currneClientNum].wid_a += 1;
+	if (players[myId].wid_a <= 10)
+		players[myId].wid_a += 1;
 
-	if (players[currneClientNum].wid_v <= 10)
-		players[currneClientNum].wid_v += players[currneClientNum].wid_a;
+	if (players[myId].wid_v <= 10)
+		players[myId].wid_v += players[myId].wid_a;
 
 	MovePacket move;
-	move.id = currneClientNum;
+	move.id = myId;
 	move.type = C2SMove;
 
-	players[currneClientNum].direction = 0;
-	players[currneClientNum].Down = FALSE;
+	players[myId].direction = 0;
+	players[myId].Down = FALSE;
 
 	if (keybuffer[VK_LEFT]) {
-		players[currneClientNum].direction = -1;
-		move.x = players[currneClientNum].x - 1;
+		players[myId].direction = -1;
+		move.x = players[myId].x - 1;
 
-		players[currneClientNum].x -= players[currneClientNum].wid_v;
+		players[myId].x -= players[myId].wid_v;
 
 		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].x += players[currneClientNum].wid_v;
+			if (ft.Ft_Collision(players[myId])) {
+				players[myId].x += players[myId].wid_v;
 				break;
 			}
 		}
 	}
 	if (keybuffer[VK_RIGHT]) {
-		players[currneClientNum].direction = 1;
-		move.x = players[currneClientNum].x + 1;
+		players[myId].direction = 1;
+		move.x = players[myId].x + 1;
 
-		players[currneClientNum].x += players[currneClientNum].wid_v;
+		players[myId].x += players[myId].wid_v;
 
 		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].x -= players[currneClientNum].wid_v;
+			if (ft.Ft_Collision(players[myId])) {
+				players[myId].x -= players[myId].wid_v;
 				break;
 			}
 		}
 	}
 	if (keybuffer[VK_UP]) {
-		players[currneClientNum].direction = 0;
-		move.y = players[currneClientNum].y - 1;
+		players[myId].direction = 0;
+		move.y = players[myId].y - 1;
 
-		players[currneClientNum].y -= players[currneClientNum].wid_v;
+		players[myId].y -= players[myId].wid_v;
 
 		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].y += players[currneClientNum].wid_v;
+			if (ft.Ft_Collision(players[myId])) {
+				players[myId].y += players[myId].wid_v;
 				break;
 			}
 		}
 	}
 	if (keybuffer[VK_DOWN]) {
-		players[currneClientNum].Down = TRUE;
-		players[currneClientNum].direction = 0;
+		players[myId].Down = TRUE;
+		players[myId].direction = 0;
 
-		if (players[currneClientNum].y + players[currneClientNum].wid_v < currentStage.Ground.y)
-			players[currneClientNum].y += players[currneClientNum].wid_v;
+		if (players[myId].y + players[myId].wid_v < currentStage.Ground.y)
+			players[myId].y += players[myId].wid_v;
 
 		for (OBJECT& ft : currentStage.Ft) {
-			if (ft.Ft_Collision(players[currneClientNum])) {
-				players[currneClientNum].y -= players[currneClientNum].wid_v;
+			if (ft.Ft_Collision(players[myId])) {
+				players[myId].y -= players[myId].wid_v;
 				break;
 			}
 		}

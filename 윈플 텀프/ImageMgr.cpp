@@ -137,41 +137,41 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
 		//if(나의 캐릭터에 따라서)
 		
-		//waterStopImage.Draw(*memdc, 330, 250, 70, 70, 0, 0, 300, 300);
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		if (players[0].role == 'f') {
-			fireStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
+			fireStopImage.Draw(*memdc, 150, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[0].role == 'w') {
-			waterStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
+			waterStopImage.Draw(*memdc, 150, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[0].role == 'e') {
-			earthStopImage.Draw(*memdc, 150, 200, 215, 411, 0, 0, 215, 411);
+			earthStopImage.Draw(*memdc, 150, 200, 100, 205, 0, 0, 215, 411);
 		}
 
+		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 403, 317);
 		if (players[1].role == 'f') {
-			fireStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+			fireStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[1].role == 'w') {
-			waterStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+			waterStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[1].role == 'e') {
-			earthStopImage.Draw(*memdc, 500, 200, 215, 411, 0, 0, 215, 411);
+			earthStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
 		
+		player2.Draw(*memdc, 800, 100, 150, 150, 0, 0, 403, 317);
 		if (players[2].role == 'f') {
-			fireStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+			fireStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[2].role == 'w') {
-			waterStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+			waterStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
 		}
 		else if (players[2].role == 'e') {
-			earthStopImage.Draw(*memdc, 700, 200, 215, 411, 0, 0, 215, 411);
+			earthStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
 		}
 
 		
-		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
-		//player2.Draw(*memdc, 900, 100, 150, 150, 0, 0, 403, 317);
+		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게		
 		
 	break;
 	case STAGE_01:

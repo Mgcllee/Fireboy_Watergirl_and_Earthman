@@ -159,6 +159,8 @@ extern int prevSize;
 extern int myId;
 extern int stageIndex;
 
+extern HANDLE selectMyCharacter;
+
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);
 void ProcessPacket(char* buf);

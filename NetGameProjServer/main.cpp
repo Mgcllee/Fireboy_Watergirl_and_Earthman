@@ -118,9 +118,9 @@ int main(int argv, char** argc)
 					send(threadHandles[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // jµéÇÑÅ× iÀÇ Á¤º¸¸¦
 
 					S2CPlayerPacket addPlayerPacket;
-					loadPacket.type = S2CAddPlayer;
-					loadPacket.id = j;
-					send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // iÇÑÅ× jÀÇ Á¤º¸¸¦
+					addPlayerPacket.type = S2CAddPlayer;
+					addPlayerPacket.id = j;
+					send(threadHandles[i].clientSocket, (char*)&addPlayerPacket, sizeof(S2CPlayerPacket), 0);//´Ù¸¥ Player Á¤º¸ ÆÐÅ¶À¸·Î »ý°¢ // iÇÑÅ× jÀÇ Á¤º¸¸¦
 				}
 			}
 		}
@@ -243,7 +243,8 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				break;
 			}
 		}
-		selectPlayerRole[clientInfo.clientId] = packet->role;
+		if(change)
+			selectPlayerRole[clientInfo.clientId] = packet->role;
 		selectMutex.unlock();
 		if (change) {
 			//send SelectPacket for all Client
