@@ -87,6 +87,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	return Message.wParam;
 }
 
+HWND start_button, retry_button, end_button, next_button, server_addr;
+HWND selectRoleLeftArrow;
+HWND selectBtn;
+HWND selectRoleRightArrow;
+BOOL back = FALSE;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static PAINTSTRUCT ps;
@@ -96,28 +102,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	g_hWnd = hWnd;
 
-	static HWND start_button, retry_button, end_button, next_button, server_addr;
-	static HWND selectRoleRightArrow;
-	static HWND selectRoleLeftArrow;
-	static HWND selectBtn;
-	static BOOL back = FALSE;
-
-
 	static int time = 300;
-
-	DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
-	if (retVal == WAIT_OBJECT_0) {
-		ResetEvent(selectMyCharacter);
-		DestroyWindow(selectRoleLeftArrow);
-		DestroyWindow(selectRoleRightArrow);
-		DestroyWindow(selectBtn);
-	/*	SendMessage(selectRoleRightArrow, WM_CLOSE, 0, 0);
-		SendMessage(selectRoleLeftArrow, WM_CLOSE, 0, 0);
-		SendMessage(selectBtn, WM_CLOSE, 0, 0);
-		ShowWindow(selectRoleLeftArrow, SW_HIDE);
-		ShowWindow(selectRoleRightArrow, SW_HIDE);
-		ShowWindow(selectBtn, SW_HIDE);	*/
-	}
 
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
@@ -143,7 +128,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
 		SetTimer(hWnd, 3, 1000, NULL);
-		SetTimer(hWnd, 4, 10, NULL);
 		SetTimer(hWnd, 5, 1, NULL);
 		break;
 	}
@@ -376,10 +360,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				KillTimer(hWnd, 5);
 			}
+
 			break;
 		case 4:
 		{
-			
+			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
+			if (retVal == WAIT_OBJECT_0) {
+				ResetEvent(selectMyCharacter);
+				ShowWindow(selectRoleLeftArrow, SW_HIDE);
+				ShowWindow(selectRoleRightArrow, SW_HIDE);
+				ShowWindow(selectBtn, SW_HIDE);
+				KillTimer(hWnd, 4);
+			}
 		}
 		break;
 		case 5:
@@ -428,6 +420,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(selectRoleLeftArrow, SW_SHOW);
 				ShowWindow(selectRoleRightArrow, SW_SHOW);
 				ShowWindow(selectBtn, SW_SHOW);
+				SetTimer(hWnd, 4, 10, NULL);
 				isArrow = false;
 			}
 		}
