@@ -86,12 +86,15 @@ void ProcessPacket(char* buf)
 			}
 	}
 	break;
-
 	case S2CMove:
 	{
-		MovePacket* move = reinterpret_cast<MovePacket*>(buf);
-		players[move->id].x = move->x;
-		players[move->id].y = move->y;
+		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
+		for (int i = 0; i < 3; ++i) {
+			if (players[i].id == packet->id) {
+				players[i].x = packet->x;
+				players[i].y = packet->y;
+			}
+		}
 	}
 	break;
 	case S2CDoorOpen:
@@ -180,10 +183,8 @@ void Display_Err(HWND hWnd, int Errcode)
 	LPVOID lpMsgBuf;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPWSTR)&lpMsgBuf, 0, NULL);
-	//std::wcout << "ErrorCode: " << Errcode << " - " << (WCHAR*)lpMsgBuf << std::endl;
+		(LPWSTR)&lpMsgBuf, 0, NULL);	
 	MessageBox(hWnd, (LPWSTR)lpMsgBuf, _T("서버주소 오류!"), NULL);
-	//이거 윈도우 그걸로 에러 뜨는거 수정 - 명철 부탁
 	LocalFree(lpMsgBuf);
 }
 

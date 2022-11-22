@@ -4,15 +4,13 @@
 #include "Stage.h"
 
 void Move()
-{ 
+{
 	/*if (players[currneClientNum].wid_a <= 10.f)
 		players[currneClientNum].wid_a += 0.1f;
 	if (players[currneClientNum].wid_v <= 10.f)
 		players[currneClientNum].wid_v += players[currneClientNum].wid_a;*/
 
 	MovePacket move;
-	move.id = currneClientNum;
-	move.type = C2SMove;
 
 	if (keybuffer[VK_LEFT]) {
 		move.x = -1;
@@ -26,7 +24,7 @@ void Move()
 		//}
 	}
 	if (keybuffer[VK_RIGHT]) {
-		move.x = +1;
+		move.x = 1;
 		//players[currneClientNum].direction = 1;
 		//players[currneClientNum].x += players[currneClientNum].wid_v;
 		//for (OBJECT& ft : currentStage.Ft) {
@@ -40,6 +38,8 @@ void Move()
 		move.y = SHRT_MAX;
 	}
 
+	move.type = C2SMove;
+	move.id = myId;
 	SendPacket(&move);
 }
 

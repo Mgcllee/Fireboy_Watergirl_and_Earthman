@@ -222,6 +222,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
 {
+	cout << "ID: " << (int)(clientInfo.clientId) << " Packet Type: " << reinterpret_cast<char*>(packetStart) << endl;
 
 	//changePacket() => send S2CChangeRolePacket
 	//selectPacket() => mutex Role container and send S2CSelectPacket
@@ -274,7 +275,35 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SMove:
 	{
+		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
+		
+		cout << "ID: " << (int)(clientInfo.clientId) << " (" << packet->x << ", " << packet->y << ")" << endl;
 
+		/*
+		packet->id = clientInfo.clientId;
+		packet->type = C2SMove;
+
+		if (packet->x == 1)
+		{
+			threadHandles[clientInfo.clientId].x += 10;
+			exit(true);
+		}
+		
+		if (packet->x == -1)
+		{
+			threadHandles[clientInfo.clientId].x -= 10;
+		}
+		
+		if (packet->y == SHRT_MAX)
+		{
+			threadHandles[clientInfo.clientId].y -= 10;
+		}
+
+		cout << clientInfo.clientId << endl;
+
+		for (int i = 0; i < 3; i++) {
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&packet), sizeof(MovePacket), 0);
+		}*/
 	}
 	break;
 	case C2SExitGame:

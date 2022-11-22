@@ -115,7 +115,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		nonClientMetrics.cbSize = sizeof(NONCLIENTMETRICS);
 		s_hFont = CreateFontIndirect(&nonClientMetrics.lfCaptionFont);
 
-		server_addr = CreateWindow(L"edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
+		server_addr = CreateWindow(L"edit", L"127.0.0.1", WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
 		SendMessage(server_addr, WM_SETFONT, (WPARAM)s_hFont, (LPARAM)MAKELONG(TRUE, 0));
 
 		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
@@ -144,12 +144,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
 
-				//currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
-
 				if (stageIndex < STAGE_ROLE) {
 					stageIndex = STAGE_LOADING;
 					SetEvent(changeStageEvent);
-					//currentStage = myStageMgr.getStage(stageIndex);
 				}
 			}
 			else {
@@ -366,6 +363,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
 			if (retVal == WAIT_OBJECT_0) {
+				
+				char buf[10] = { myId + '0' };
+				SetWindowTextA(hWnd, buf);
+				
 				ResetEvent(selectMyCharacter);
 				ShowWindow(selectRoleLeftArrow, SW_HIDE);
 				ShowWindow(selectRoleRightArrow, SW_HIDE);
@@ -397,10 +398,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
-
-		players[currneClientNum].direction = 0;
-		players[currneClientNum].Down = FALSE;
-
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
