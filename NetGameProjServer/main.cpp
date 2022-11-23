@@ -283,7 +283,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		if (clientInfo.wid_a <= 10.f)
 			clientInfo.wid_a += 0.1f;
 		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += threadHandles[clientInfo.clientId].wid_a;
+			clientInfo.wid_v += clientInfo.wid_a;
 
 		if (packet->x == 1) {
 			clientInfo.x += clientInfo.wid_v;
@@ -294,7 +294,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		packet->x = clientInfo.x;
 
 		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&packet), sizeof(MovePacket), 0);
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(packet), sizeof(MovePacket), 0);
 		}
 	}
 	break;
