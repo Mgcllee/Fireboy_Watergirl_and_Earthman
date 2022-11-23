@@ -3,7 +3,7 @@
 #include<array>
 #include<mutex>
 #include"protocol.h"
-
+#include<time.h>
 #pragma comment(lib, "ws2_32")
 
 using namespace std;
@@ -213,6 +213,14 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 				}
+				//clock_t start, finish;
+				//double duration;
+				//start = clock();
+				//finish = clock();
+				//duration = (double)(finish - start) / CLOCKS_PER_SEC;
+				//printf("%f초", duration);
+				//팀원과 상의 필요
+				
 				stageIndex = STAGE_01;
 			}
 		}
