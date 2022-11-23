@@ -38,9 +38,11 @@ void Move()
 		move.y = SHRT_MAX;
 	}
 
-	move.type = C2SMove;
-	move.id = myId;
-	SendPacket(&move);
+	if (keybuffer[VK_LEFT] || keybuffer[VK_RIGHT] || keybuffer[VK_UP]) {
+		move.type = C2SMove;
+		move.id = myId;
+		SendPacket(&move);
+	}
 }
 
 // WAV형식 음원 분석 함수 (LoadSound()함수에서만 호출)

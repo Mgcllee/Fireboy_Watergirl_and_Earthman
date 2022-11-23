@@ -243,6 +243,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch (wParam) {
 		case 1:
+			/*
+			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y -= players[currneClientNum].v;
+
+					for (OBJECT& ft : currentStage.Ft) {
+						if (ft.Ft_Collision(players[currneClientNum])) {
+							players[currneClientNum].v = 0;
+							players[currneClientNum].Down = TRUE;
+							break;
+						}
+					}
+				}
+				else {
+					players[currneClientNum].v = 0;
+					players[currneClientNum].Down = TRUE;
+				}
+			}
+			else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y += players[currneClientNum].v;
+				}
+				else {
+					players[currneClientNum].Down = FALSE;
+					players[currneClientNum].v = 0.f;
+					keybuffer[VK_UP] = FALSE;
+
+					players[currneClientNum].y = players[currneClientNum].ground;
+				}
+			}
+			*/
+
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {

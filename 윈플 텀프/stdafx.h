@@ -54,8 +54,8 @@ public:
 	short role;					// 어떤 캐릭터 인지 - f w e => fire water earth
 	int x, y;					// 우하단 좌표
 	int hei = 100, wid = 60;	// 캐릭터 크기
-	int direction;				// 이동방향 (애니메이션에서 사용)
 
+	int direction;				// 이동방향 (애니메이션에서 사용)
 	float wid_v{};
 	float wid_a{};
 

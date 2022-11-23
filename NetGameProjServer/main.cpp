@@ -25,6 +25,10 @@ struct threadInfo {
 	int prevSize = 0;
 	char clientId = -1;
 	short x, y;
+
+	int direction;
+	float wid_v{};
+	float wid_a{};
 };
 
 void Display_Err(int Errcode);
@@ -222,8 +226,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
 {
-	cout << "ID: " << (int)(clientInfo.clientId) << " Packet Type: " << reinterpret_cast<char*>(packetStart) << endl;
-
 	//changePacket() => send S2CChangeRolePacket
 	//selectPacket() => mutex Role container and send S2CSelectPacket
 	//movePacket(); => ¿©±â¼­ Ãæµ¹ Ã¼Å©, º¸¼® Ã¼Å© => ¿©±â¼­ º¸¼®À» ´Ù ¸Ô¾ú´Ù¸é µÎ Å¬¶óÀÌ¾ðÆ®¿¡°Ô ¹® ¿©´Â ÆÐÅ¶ Àü¼Û, ¹® µé¾î°¡¶ó´Â ÆÐÅ¶µµ Àü¼ÛÇØ¾ßµÇ³×
@@ -276,34 +278,24 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	case C2SMove:
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
+		packet->type = S2CMove;
+		
+		if (clientInfo.wid_a <= 10.f)
+			clientInfo.wid_a += 0.1f;
+		if (clientInfo.wid_v <= 10.f)
+			clientInfo.wid_v += threadHandles[clientInfo.clientId].wid_a;
 
-		cout << "ID: " << (int)(clientInfo.clientId) << " (" << packet->x << ", " << packet->y << ")" << endl;
-
-		/*
-		packet->id = clientInfo.clientId;
-		packet->type = C2SMove;
-
-		if (packet->x == 1)
-		{
-			threadHandles[clientInfo.clientId].x += 10;
-			exit(true);
+		if (packet->x == 1) {
+			clientInfo.x += clientInfo.wid_v;
 		}
-
-		if (packet->x == -1)
-		{
-			threadHandles[clientInfo.clientId].x -= 10;
+		if (packet->x == -1) {
+			clientInfo.x -= clientInfo.wid_v;
 		}
-
-		if (packet->y == SHRT_MAX)
-		{
-			threadHandles[clientInfo.clientId].y -= 10;
-		}
-
-		cout << clientInfo.clientId << endl;
+		packet->x = clientInfo.x;
 
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&packet), sizeof(MovePacket), 0);
-		}*/
+		}
 	}
 	break;
 	case C2SExitGame:

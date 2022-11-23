@@ -88,11 +88,13 @@ void ProcessPacket(char* buf)
 	break;
 	case S2CMove:
 	{
+		exit(true);
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
 			if (players[i].id == packet->id) {
 				players[i].x = packet->x;
 				players[i].y = packet->y;
+				break;
 			}
 		}
 	}
@@ -166,6 +168,8 @@ void ConstructPacket(void* buf, int ioSize)
 	int needSize = 0;
 	while (restSize != 0) {
 		needSize = GetPacketSize(reinterpret_cast<char*>(buf)[0]);
+		if (needSize < 0)
+			return;
 		if (restSize < needSize) {
 			prevSize = restSize;
 			return;
