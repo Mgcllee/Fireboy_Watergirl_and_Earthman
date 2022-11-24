@@ -1,62 +1,19 @@
-#include<iostream>
-#include<WS2tcpip.h>
-#include<array>
-#include<mutex>
-#include"protocol.h"
-
-#pragma comment(lib, "ws2_32")
-
-using namespace std;
-
-#define MAX_BUF_SIZE 256
-
-#define STAGE_TITLE			0
-#define STAGE_LOADING		1
-#define STAGE_ROLE			2
-#define STAGE_01			3
-#define STAGE_02			4
-#define STAGE_03			5
-
-struct threadInfo {
-	HANDLE threadHandle = NULL;
-	SOCKET clientSocket;
-	char recvBuf[MAX_BUF_SIZE] = { 0 };
-	int currentSize;
-	int prevSize = 0;
-	char clientId = -1;
-	short x, y;
-
-	int direction;
-	float wid_v{};
-	float wid_a{};
-};
-
-void Display_Err(int Errcode);
-void ConstructPacket(threadInfo& clientInfo, int ioSize); // ÆÐÅ¶ ÀçÁ¶¸³
-void ProcessPacket(threadInfo& clientInfo, char* packetStart); // ÆÐÅ¶ ÀçÁ¶¸³ ÈÄ, ¸í·É ÇØ¼® ÈÄ Çàµ¿
-int GetPacketSize(char packetType);
-
-void ChangeRole(); // mutex ÇÊ¿ä ¾øÀ»µí? => change´Â µüÈ÷ ¹®Á¦ ¾ø´Ù°í »ý°¢ÇÔ
-void SelectRole(); // mutex ÇÊ¿ä => µÎ Å¬¶óÀÌ¾ðÆ®°¡ µ¿½Ã¿¡ °°Àº ÄÉ¸¯ÅÍ ¼±ÅÃÀ» ÇØ¹ö¸®¸é ¾ÈµÊ
-//void MovePacket(); // ¿òÁ÷ÀÏ ¶§ ¸¶´Ù, Àü¼Û
-void CheckJewelryEat();// Áê¾ó¸® ½Àµæ È®ÀÎ
-void CheckOpenDoor(); // ¹® ¿­¸®´Â Á¶°Ç È®ÀÎ
-
-
-DWORD WINAPI ClientWorkThread(LPVOID arg);
-DWORD WINAPI ServerWorkThread(LPVOID arg);
+#pragma once
+#include "stdafx.h"
+#include "Stage.h"
 
 array<threadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
-
-
 HANDLE multiEvenTthreadHadle[3];
 
 int stageIndex = -1;
 
-//HANDLE loadFlag; =>¿þÀÌÆ®Æ÷½Ç±à
+Stage StageMgr;
+
+DWORD WINAPI ClientWorkThread(LPVOID arg);
+DWORD WINAPI ServerWorkThread(LPVOID arg);
 
 int main(int argv, char** argc)
 {
@@ -211,6 +168,21 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 			if (isFinish) {
 				//Send All Cleint Next Stage == Stage01
+
+				// Stage 1 ÀÇ Á¤º¸ È¹µæ
+				StageMgr.Stage_1();
+				// ÃÖÃÊ À§Ä¡ ¼³Á¤
+				MovePacket setPosition;
+				setPosition.type = S2CMove;
+				for (int i = 0; i < 3; ++i) {
+					setPosition.id = i;
+					setPosition.x = threadHandles[i].x;
+					setPosition.y = threadHandles[i].y;
+					for (int j = 0; j < 3; ++j) {
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
+					}
+				}
+
 				S2CChangeStagePacket changePacket;
 				changePacket.stageNum = STAGE_01;
 				changePacket.type = S2CChangeStage;
@@ -280,16 +252,16 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		packet->type = S2CMove;
 		
-		if (clientInfo.wid_a <= 10.f)
+		/*if (clientInfo.wid_a <= 10.f)
 			clientInfo.wid_a += 0.1f;
 		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += clientInfo.wid_a;
+			clientInfo.wid_v += clientInfo.wid_a;*/
 
 		if (packet->x == 1) {
-			clientInfo.x += clientInfo.wid_v;
+			clientInfo.x += 5;
 		}
 		if (packet->x == -1) {
-			clientInfo.x -= clientInfo.wid_v;
+			clientInfo.x -= 5;
 		}
 		packet->x = clientInfo.x;
 

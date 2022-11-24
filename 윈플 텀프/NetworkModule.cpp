@@ -88,7 +88,6 @@ void ProcessPacket(char* buf)
 	break;
 	case S2CMove:
 	{
-//		exit(true);
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
 			if (players[i].id == packet->id) {

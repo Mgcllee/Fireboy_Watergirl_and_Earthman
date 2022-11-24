@@ -3,6 +3,7 @@
 #include "ImageMgr.h"
 #include "StageMgr.h"
 #include "protocol.h"
+#include <string>
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
@@ -243,6 +244,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch (wParam) {
 		case 1:
+		{
+			std::wstring buf = std::to_wstring(players[myId].x) + L", " + std::to_wstring(players[myId].y);
+			SetWindowText(hWnd, buf.c_str());
+
 			/*
 			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
 			{
@@ -369,6 +374,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					block.ChangeFrame(-1, false);
 				else
 					block.ChangeFrame(1, false);
+		}
 			break;
 		case 2:				// 캐릭터 프레임
 			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
