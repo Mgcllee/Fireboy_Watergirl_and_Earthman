@@ -55,10 +55,9 @@ void ProcessPacket(char* buf)
 	case S2CAddPlayer:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
-		int diffId = packet->id;
 		for (int i = 1; i < 3; i++)
 			if (players[i].id == -1) {
-				players[i].id = diffId;
+				players[i].id = packet->id;
 				break;
 			}
 		currneClientNum++;
@@ -72,6 +71,43 @@ void ProcessPacket(char* buf)
 				if (packet->id == myId)
 					SetEvent(selectMyCharacter);
 				players[i].role = packet->role;
+				if (players[i].role == 'f') {
+					players[i].Anim[0].Load(L"Resource\\»¡°­ Á¤Áö 215.411.png");
+					players[i].Anim[1].Load(L"Resource\\»¡°­ Á¤Áö 215.411.png");
+					players[i].Anim[2].Load(L"Resource\\»¡°­ ¿À¸¥ÂÊ 342.271.png");
+					players[i].Anim[3].Load(L"Resource\\»¡°­ ÇÏ°­ 215.411.png");
+					players[i].Anim[4].Load(L"Resource\\»¡°­ ¿ÞÂÊ 342.271.png");
+
+					players[i].C_img_X_Size_01 = 215;
+					players[i].C_img_Y_Size_01 = 411;
+					players[i].C_img_Frame = 342;
+					players[i].C_img_X_Size_02 = 342;
+					players[i].C_img_Y_Size_02 = 271;
+				}
+				else if (players[i].role == 'w') {
+					players[i].Anim[0].Load(L"Resource\\ÆÄ¶û Á¤Áö 215.411.png");
+					players[i].Anim[1].Load(L"Resource\\ÆÄ¶û Á¤Áö 215.411.png");
+					players[i].Anim[2].Load(L"Resource\\ÆÄ¶û ¿À¸¥ÂÊ 376.480.png");
+					players[i].Anim[3].Load(L"Resource\\ÆÄ¶û ÇÏ°­ 215.411.png");
+					players[i].Anim[4].Load(L"Resource\\ÆÄ¶û ¿ÞÂÊ 376.480.png");
+					players[i].C_img_X_Size_01 = 215;
+					players[i].C_img_Y_Size_01 = 411;
+					players[i].C_img_Frame = 376;
+					players[i].C_img_X_Size_02 = 376;
+					players[i].C_img_Y_Size_02 = 480;
+				}
+				else if (players[i].role == 'e') {
+					players[i].Anim[0].Load(L"Resource\\Èë_Á¤Áö_215.411.png");
+					players[i].Anim[1].Load(L"Resource\\Èë_Á¤Áö_215.411.png");
+					players[i].Anim[2].Load(L"Resource\\Èë_¿À¸¥ÂÊ_342.271.png");
+					players[i].Anim[3].Load(L"Resource\\Èë_ÇÏ°­_215.411.png");
+					players[i].Anim[4].Load(L"Resource\\Èë_¿ÞÂÊ_342.271.png");
+					players[i].C_img_X_Size_01 = 215;
+					players[i].C_img_Y_Size_01 = 411;
+					players[i].C_img_Frame = 342;
+					players[i].C_img_X_Size_02 = 342;
+					players[i].C_img_Y_Size_02 = 271;
+				}
 				break;
 			}
 	}
@@ -186,7 +222,7 @@ void Display_Err(HWND hWnd, int Errcode)
 	LPVOID lpMsgBuf;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, Errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPWSTR)&lpMsgBuf, 0, NULL);	
+		(LPWSTR)&lpMsgBuf, 0, NULL);
 	MessageBox(hWnd, (LPWSTR)lpMsgBuf, _T("¼­¹öÁÖ¼Ò ¿À·ù!"), NULL);
 	LocalFree(lpMsgBuf);
 }

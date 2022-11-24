@@ -170,19 +170,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
 			//f w e
-			makePacket.role = 'f';
 			if (players[0].role == 'e') {
 				players[0].role = 'w';
-				makePacket.role = 'w';
 			}
 			else if (players[0].role == 'w') {
 				players[0].role = 'f';
-				makePacket.role = 'f';
 			}
 			else if (players[0].role == 'f') {
 				players[0].role = 'e';
-				makePacket.role = 'e';
 			}
+			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
 		}
 		break;
@@ -190,20 +187,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//fwe
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f';
+			makePacket.type = C2SChangeRole;			
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
-				makePacket.role = 'f';
 			}
 			else if (players[0].role == 'w') {
 				players[0].role = 'e';
-				makePacket.role = 'e';
 			}
 			else if (players[0].role == 'f') {
 				players[0].role = 'w';
-				makePacket.role = 'w';
 			}
+			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
 		}
 		break;

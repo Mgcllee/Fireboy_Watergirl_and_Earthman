@@ -44,48 +44,13 @@ void ImageMgr::LoadImages() {
 	fraction.Load(L"Resource\\fraction.png");
 
 
-	//캐릭터 고르기
-	waterStop.Load(L"Resource\\파랑 정지 207.480.png");
-	fireStop.Load(L"Resource\\빨강 정지 215.411.png");
-	earthStop.Load(L"Resource\\흙_정지_215.411.png");
-
 	lobby.Load(L"Resource\\로비 이미지 초안.png");
+
 	fireStopImage.Load(L"Resource\\빨강 정지 215.411.png");
+
 	waterStopImage.Load(L"Resource\\파랑 정지 215.411.png");
+
 	earthStopImage.Load(L"Resource\\흙_정지_215.411.png");
-
-	players[0].Anim[0].Load(L"Resource\\빨강 정지 215.411.png");       // 정지
-	players[0].Anim[1].Load(L"Resource\\빨강 정지 215.411.png");       // 상승
-	players[0].Anim[2].Load(L"Resource\\빨강 오른쪽 342.271.png");	 // 우측
-	players[0].Anim[3].Load(L"Resource\\빨강 하강 215.411.png");       // 하단
-	players[0].Anim[4].Load(L"Resource\\빨강 왼쪽 342.271.png");       // 좌측
-	players[0].C_img_X_Size_01 = 215;
-	players[0].C_img_Y_Size_01 = 411;
-	players[0].C_img_Frame = 342;
-	players[0].C_img_X_Size_02 = 342;
-	players[0].C_img_Y_Size_02 = 271;
- 
-	players[1].Anim[0].Load(L"Resource\\파랑 정지 215.411.png");      // 정지
-	players[1].Anim[1].Load(L"Resource\\파랑 정지 215.411.png");      // 상승
-	players[1].Anim[2].Load(L"Resource\\파랑 오른쪽 376.480.png");    // 우측
-	players[1].Anim[3].Load(L"Resource\\파랑 하강 215.411.png");      // 하단
-	players[1].Anim[4].Load(L"Resource\\파랑 왼쪽 376.480.png");      // 좌측
-	players[1].C_img_X_Size_01 = 215;
-	players[1].C_img_Y_Size_01 = 411;
-	players[1].C_img_Frame = 376;
-	players[1].C_img_X_Size_02 = 376;
-	players[1].C_img_Y_Size_02 = 480;
-
-	players[2].Anim[0].Load(L"Resource\\흙_정지_215.411.png");       // 정지
-	players[2].Anim[1].Load(L"Resource\\흙_정지_215.411.png");       // 상승
-	players[2].Anim[2].Load(L"Resource\\흙_오른쪽_342.271.png");	 // 우측
-	players[2].Anim[3].Load(L"Resource\\흙_하강_215.411.png");       // 하단
-	players[2].Anim[4].Load(L"Resource\\흙_왼쪽_342.271.png");       // 좌측
-	players[2].C_img_X_Size_01 = 215;
-	players[2].C_img_Y_Size_01 = 411;
-	players[2].C_img_Frame = 342;
-	players[2].C_img_X_Size_02 = 342;
-	players[2].C_img_Y_Size_02 = 271;
 
 	block_w.Load(L"Resource\\block1.png");
 	block_h.Load(L"Resource\\block2.png");
@@ -93,14 +58,14 @@ void ImageMgr::LoadImages() {
 	rect.Load(L"Resource\\상자 40.40.png");
 
 
-	
-	
+
+
 	leftArrow.Load(L"Resource\\left_arrow.png");
 	rightArrow.Load(L"Resource\\right_arrow.png");
 	me.Load(L"Resource\\me.png");
 	player1.Load(L"Resource\\player1.png");
 	player2.Load(L"Resource\\player2.png");
-	
+
 	selectBtn.Load(L"Resource\\select_btn.png");
 
 }
@@ -112,10 +77,9 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	{
 	case STAGE_TITLE:
 		robby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
-		
+
 		break;
 	case STAGE_LOADING:
-		//lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		loading.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		if (currneClientNum == 1) {
 			one.Draw(*memdc, 350, 550, 150, 150, 0, 0, 50, 50);
@@ -135,7 +99,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		//me
 		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
 		//if(나의 캐릭터에 따라서)
-		
+
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		if (players[0].role == 'f') {
 			fireStopImage.Draw(*memdc, 150, 200, 100, 205, 0, 0, 215, 411);
@@ -157,7 +121,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		else if (players[1].role == 'e') {
 			earthStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
-		
+
 		player2.Draw(*memdc, 800, 100, 150, 150, 0, 0, 403, 317);
 		if (players[2].role == 'f') {
 			fireStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
@@ -169,14 +133,14 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			earthStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
 		}
 
-		
+
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게		
-		
-	break;
+
+		break;
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
-		for(OBJECT& ft : stage.Ft)
+		for (OBJECT& ft : stage.Ft)
 		{
 			foot_block.Draw(*memdc, ft.x - ft.wid, ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}

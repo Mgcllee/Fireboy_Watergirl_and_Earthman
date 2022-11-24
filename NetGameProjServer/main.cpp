@@ -264,6 +264,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			clientInfo.x -= 5;
 		}
 		packet->x = clientInfo.x;
+		packet->y = clientInfo.y;
 
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(packet), sizeof(MovePacket), 0);
