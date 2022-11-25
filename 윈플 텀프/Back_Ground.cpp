@@ -5,42 +5,26 @@
 
 void Move()
 {
-	/*if (players[currneClientNum].wid_a <= 10.f)
-		players[currneClientNum].wid_a += 0.1f;
-	if (players[currneClientNum].wid_v <= 10.f)
-		players[currneClientNum].wid_v += players[currneClientNum].wid_a;*/
-
 	MovePacket move;
+	move.type = C2SMove;
+	move.id = myId;
 
 	if (keybuffer[VK_LEFT]) {
 		move.x = -1;
-		//players[currneClientNum].direction = -1;
-		//players[currneClientNum].x -= players[currneClientNum].wid_v;
-		//for (OBJECT& ft : currentStage.Ft) {
-		//	if (ft.Ft_Collision(players[currneClientNum])) {
-		//		players[currneClientNum].x += players[currneClientNum].wid_v;
-		//		break;
-		//	}
-		//}
 	}
 	if (keybuffer[VK_RIGHT]) {
 		move.x = 1;
-		//players[currneClientNum].direction = 1;
-		//players[currneClientNum].x += players[currneClientNum].wid_v;
-		//for (OBJECT& ft : currentStage.Ft) {
-		//	if (ft.Ft_Collision(players[currneClientNum])) {
-		//		players[currneClientNum].x -= players[currneClientNum].wid_v;
-		//		break;
-		//	}
-		//}
 	}
 	if (keybuffer[VK_UP]) {
 		move.y = SHRT_MAX;
 	}
 
 	if (keybuffer[VK_LEFT] || keybuffer[VK_RIGHT] || keybuffer[VK_UP]) {
-		move.type = C2SMove;
-		move.id = myId;
+		SendPacket(&move);
+	}
+	else if (!keybuffer[VK_LEFT] && !keybuffer[VK_RIGHT] && !keybuffer[VK_UP]) {
+		move.x = 0;
+		move.y = 0;
 		SendPacket(&move);
 	}
 }

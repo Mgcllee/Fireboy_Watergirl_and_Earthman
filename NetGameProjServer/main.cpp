@@ -252,17 +252,63 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		packet->type = S2CMove;
 		
-		/*if (clientInfo.wid_a <= 10.f)
+		if (clientInfo.wid_a <= 10.f)
 			clientInfo.wid_a += 0.1f;
 		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += clientInfo.wid_a;*/
+			clientInfo.wid_v += clientInfo.wid_a;
+
+		/*
+				if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
+				{
+					if (players[currneClientNum].v < 30.f) {
+						players[currneClientNum].v += players[currneClientNum].g;
+						players[currneClientNum].y -= players[currneClientNum].v;
+
+						for (OBJECT& ft : currentStage.Ft) {
+							if (ft.Ft_Collision(players[currneClientNum])) {
+								players[currneClientNum].v = 0;
+								players[currneClientNum].Down = TRUE;
+								break;
+							}
+						}
+					}
+					else {
+						players[currneClientNum].v = 0;
+						players[currneClientNum].Down = TRUE;
+					}
+				}
+				else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
+				{
+					if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
+						players[currneClientNum].v += players[currneClientNum].g;
+						players[currneClientNum].y += players[currneClientNum].v;
+					}
+					else {
+						players[currneClientNum].Down = FALSE;
+						players[currneClientNum].v = 0.f;
+						keybuffer[VK_UP] = FALSE;
+
+						players[currneClientNum].y = players[currneClientNum].ground;
+					}
+				}
+				*/
 
 		if (packet->x == 1) {
-			clientInfo.x += 5;
+			clientInfo.x += clientInfo.wid_v;
 		}
 		if (packet->x == -1) {
-			clientInfo.x -= 5;
+			clientInfo.x -= clientInfo.wid_v;
 		}
+		if (packet->y == SHRT_MAX) {
+			clientInfo.y -= 50.f;
+		}
+
+		if (packet->x == 0 && packet->y == 0) {
+			// Ä³¸¯ÅÍ ¼Óµµ, °¡¼Óµµ ÃÊ±âÈ­
+			clientInfo.wid_v = 0.f;
+			clientInfo.wid_a = 0.f;
+		}
+
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;
 

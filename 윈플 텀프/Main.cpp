@@ -434,6 +434,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
+		Move();
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
