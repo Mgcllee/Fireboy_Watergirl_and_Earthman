@@ -215,6 +215,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.type = C2SSelectRole;
 			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
+			
 		}
 		break;
 		case BTN_QUIT:
@@ -236,8 +237,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.red_total = currentStage.Red_Jewel.size();
 			currentStage.blue_total = currentStage.Blue_Jewel.size();
 			currentStage.count = 0;
-			SetTimer(hWnd, 1, 30, NULL);
-			SetTimer(hWnd, 2, 100, NULL);
+			SetTimer(hWnd, 1, 30, NULL);//애니메이션
+			SetTimer(hWnd, 2, 100, NULL);//
 			SetTimer(hWnd, 3, 1000, NULL);
 			DestroyWindow(next_button);
 			break;
@@ -430,6 +431,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(selectBtn);*/
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, time);
+	
 
 			for (OBJECT& rj : currentStage.Red_Jewel) {
 				if (rj.GetVisible()) {

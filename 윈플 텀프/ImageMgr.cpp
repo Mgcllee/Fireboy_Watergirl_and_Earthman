@@ -174,6 +174,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게		
 		
 	break;
+	
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 

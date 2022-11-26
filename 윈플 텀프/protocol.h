@@ -19,6 +19,8 @@
 #define S2CExitGame 10// 서버에서 다른 클라이언트에게 정보 알림
 #define C2SRetry 11// 클라이언트가 서버에게 이번 스테이지 재시도 요청 패킷
 #define S2CDoorOpen 12// 문열리는걸 알리는 패킷
+#define S2CStageTimePass 14// 경과 시간 패킷
+#define S2CStageTimeout 15//타임 아웃
 
 
 #define PORT_NUM 9000
@@ -69,4 +71,13 @@ struct typePacket {
 	char type;
 };
 
+//흐른 시간 패킷
+struct S2CStageTimePassPacket {
+	char type;
+	int timePassed;
+};
+//스테이지 타임 아웃
+struct S2CStageTimeoutPacket {
+	char type;
+};
 #pragma pack(pop)

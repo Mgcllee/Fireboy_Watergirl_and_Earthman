@@ -3,6 +3,7 @@
 #include<array>
 #include<mutex>
 #include"protocol.h"
+#include"Timer.h"
 #include<time.h>
 #pragma comment(lib, "ws2_32")
 
@@ -31,6 +32,8 @@ void Display_Err(int Errcode);
 void ConstructPacket(threadInfo& clientInfo, int ioSize); // 패킷 재조립
 void ProcessPacket(threadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
 int GetPacketSize(char packetType);
+void TimeoutStage();
+void StageTimerStart();
 
 void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
 void SelectRole(); // mutex 필요 => 두 클라이언트가 동시에 같은 케릭터 선택을 해버리면 안됨
@@ -51,6 +54,10 @@ array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
 HANDLE multiEvenTthreadHadle[3];
 
 int stageIndex = -1;
+
+Timer _timer;
+
+double timeoutSeconds = 60 * 5;
 
 //HANDLE loadFlag; =>웨이트포실긍
 
@@ -79,7 +86,7 @@ int main(int argv, char** argc)
 	server_addr.sin_port = htons(PORT_NUM);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
+	if (::bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
@@ -199,6 +206,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 	while (true) {
 		if (stageIndex == STAGE_ROLE) {
 			bool isFinish = true;
+			StageTimerStart();
 			for (int i = 0; i < 3; i++) {
 				if (selectPlayerRole[i] == 'n') {
 					isFinish = false;
@@ -222,10 +230,44 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				//팀원과 상의 필요
 				
 				stageIndex = STAGE_01;
+				//stageTimerstart();
 			}
 		}
 	}
 	return 0;
+}
+
+//스테이지 타이머 구현
+void StageTimerStart()
+{
+	if (_timer.IsRunning() == true)
+	{
+		return;
+	}
+
+	_timer.Start(std::chrono::milliseconds(1000), [=]
+		{
+			S2CStageTimePassPacket packet;
+			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
+
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
+			}
+
+			if (timeoutSeconds <= packet.timePassed)
+			{
+				TimeoutStage();
+				S2CStageTimeoutPacket timeoutPacket;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(S2CStageTimeoutPacket), 0);
+				}
+			}
+		});
+}
+
+void TimeoutStage()
+{
+	_timer.Stop();
 }
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
