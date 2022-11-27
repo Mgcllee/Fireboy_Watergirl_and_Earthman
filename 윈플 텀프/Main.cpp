@@ -243,41 +243,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			std::wstring buf = std::to_wstring(players[myId].x) + L", " + std::to_wstring(players[myId].y);
 			SetWindowText(hWnd, buf.c_str());
 
-			/*
-			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
+			if (players[myId].direction == 0 && players[myId].Down == FALSE && keybuffer[VK_UP] == TRUE)
 			{
-				if (players[currneClientNum].v < 30.f) {
-					players[currneClientNum].v += players[currneClientNum].g;
-					players[currneClientNum].y -= players[currneClientNum].v;
-
-					for (OBJECT& ft : currentStage.Ft) {
-						if (ft.Ft_Collision(players[currneClientNum])) {
-							players[currneClientNum].v = 0;
-							players[currneClientNum].Down = TRUE;
-							break;
-						}
-					}
-				}
-				else {
-					players[currneClientNum].v = 0;
-					players[currneClientNum].Down = TRUE;
-				}
+				MovePacket jump;
+				jump.type = C2SMove;
+				jump.id = myId;
+				jump.y = SHRT_MAX;
+				SendPacket(&jump);
 			}
-			else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
+			else if (players[myId].direction == 0 && players[myId].Down == TRUE && keybuffer[VK_UP] == TRUE)
 			{
-				if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
-					players[currneClientNum].v += players[currneClientNum].g;
-					players[currneClientNum].y += players[currneClientNum].v;
-				}
-				else {
-					players[currneClientNum].Down = FALSE;
-					players[currneClientNum].v = 0.f;
-					keybuffer[VK_UP] = FALSE;
-
-					players[currneClientNum].y = players[currneClientNum].ground;
-				}
+				MovePacket jump;
+				jump.type = C2SMove;
+				jump.id = myId;
+				jump.y = SHRT_MIN;
+				SendPacket(&jump);
 			}
-			*/
 
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
@@ -434,7 +415,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
-		keybuffer[wParam] = FALSE;
+		
+		/*keybuffer[wParam] = FALSE;
+		Move();*/
+		
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;

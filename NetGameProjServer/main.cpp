@@ -252,17 +252,44 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		packet->type = S2CMove;
 		
-		/*if (clientInfo.wid_a <= 10.f)
+		if (clientInfo.wid_a <= 10.f)
 			clientInfo.wid_a += 0.1f;
 		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += clientInfo.wid_a;*/
+			clientInfo.wid_v += clientInfo.wid_a;
 
 		if (packet->x == 1) {
-			clientInfo.x += 5;
+			clientInfo.x += clientInfo.wid_v;
 		}
 		if (packet->x == -1) {
-			clientInfo.x -= 5;
+			clientInfo.x -= clientInfo.wid_v;
 		}
+		if (packet->y == SHRT_MAX) {
+			if (clientInfo.v < 30.f) {
+				clientInfo.v += clientInfo.g;
+				clientInfo.y -= clientInfo.v;
+
+			}
+			else {
+				clientInfo.v = 0;
+			}
+		}
+		else if (packet->y == SHRT_MIN) {
+			if (clientInfo.v < 30.f) {
+				clientInfo.v += clientInfo.g;
+				clientInfo.y += clientInfo.v;
+			}
+			else {
+				clientInfo.v = 0.f;
+				// clientInfo.y = clientInfo.ground;
+			}
+		}
+
+		if (packet->x == 0 && packet->y == 0) {
+			// Ä³¸¯ÅÍ ¼Óµµ, °¡¼Óµµ ÃÊ±âÈ­
+			clientInfo.wid_v = 0.f;
+			clientInfo.wid_a = 0.f;
+		}
+
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;
 

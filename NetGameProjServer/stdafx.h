@@ -30,6 +30,9 @@ struct threadInfo {
 	int direction;
 	float wid_v{};
 	float wid_a{};
+
+	float g = 3.f;
+	float v = 0.f;
 };
 
 void Display_Err(int Errcode);
