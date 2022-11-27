@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "protocol.h"
+#include "StageMgr.h"
 
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 	// 클라이언트 작업용 (서버 연결이 필요할 경우 제거)
@@ -74,6 +75,7 @@ void ProcessPacket(char* buf)
 				players[i].role = packet->role;
 				break;
 			}
+		
 	}
 	break;
 	case S2CChangeRole:
@@ -108,6 +110,23 @@ void ProcessPacket(char* buf)
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
 		stageIndex = packet->stageNum;
 		SetEvent(changeStageEvent);
+		StageMgr::StageTimepass = 0;
+		break;
+		StageMgr::IsTimeoutStageEnd = false;
+	}
+	case S2CStageTimePass:
+	{
+		S2CStageTimePassPacket* packet = reinterpret_cast<S2CStageTimePassPacket*>(buf);
+		StageMgr::StageTimepass = packet->timePassed;
+		
+	}
+	break;
+	case S2CStageTimeout:
+	{
+		S2CStageTimeoutPacket* packet = reinterpret_cast<S2CStageTimeoutPacket*>(buf);
+		StageMgr::IsTimeoutStageEnd = true;
+
+		
 	}
 	break;
 	default:
@@ -202,6 +221,13 @@ int GetPacketSize(char packetType)
 		break;
 	case S2CChangeStage:
 		retVal = sizeof(S2CChangeStagePacket);
+		break;
+
+	case S2CStageTimePass:
+		retVal = sizeof(S2CStageTimePassPacket);
+		break;
+	case S2CStageTimeout:
+		retVal = sizeof(S2CStageTimeoutPacket);
 		break;
 	case S2CMove:
 		retVal = sizeof(MovePacket);

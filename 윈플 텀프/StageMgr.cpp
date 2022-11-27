@@ -1,6 +1,11 @@
 #include "StageMgr.h"
 #include"Stage.h"
 
+
+int StageMgr::StageTimepass = 0;
+int StageMgr::EndStageTime = 300;
+bool StageMgr::IsTimeoutStageEnd = false;
+
 StageMgr::StageMgr()
 {
 	myStage[0].title();		// start Title 스테이지
@@ -29,6 +34,13 @@ StageMgr::StageMgr()
 	isUse[STAGE_02]		= false;
 	isUse[STAGE_03]		= false;
 }
+
+void StageMgr::ResetStage()
+{
+	StageMgr::StageTimepass = 0;
+	StageMgr::IsTimeoutStageEnd = false;
+}
+
 
 Stage& StageMgr::getStage(int index)
 {

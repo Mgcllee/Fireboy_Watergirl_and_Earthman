@@ -3,6 +3,7 @@
 #include<array>
 #include<mutex>
 #include"protocol.h"
+#include"Timer.h"
 #include<time.h>
 #pragma comment(lib, "ws2_32")
 
@@ -31,6 +32,8 @@ void Display_Err(int Errcode);
 void ConstructPacket(threadInfo& clientInfo, int ioSize); // ÆĞÅ¶ ÀçÁ¶¸³
 void ProcessPacket(threadInfo& clientInfo, char* packetStart); // ÆĞÅ¶ ÀçÁ¶¸³ ÈÄ, ¸í·É ÇØ¼® ÈÄ Çàµ¿
 int GetPacketSize(char packetType);
+void TimeoutStage();
+void StageTimerStart();
 
 void ChangeRole(); // mutex ÇÊ¿ä ¾øÀ»µí? => change´Â µüÈ÷ ¹®Á¦ ¾ø´Ù°í »ı°¢ÇÔ
 void SelectRole(); // mutex ÇÊ¿ä => µÎ Å¬¶óÀÌ¾ğÆ®°¡ µ¿½Ã¿¡ °°Àº ÄÉ¸¯ÅÍ ¼±ÅÃÀ» ÇØ¹ö¸®¸é ¾ÈµÊ
@@ -51,6 +54,10 @@ array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
 HANDLE multiEvenTthreadHadle[3];
 
 int stageIndex = -1;
+
+Timer _timer;
+
+double timeoutSeconds = 60 * 5;
 
 //HANDLE loadFlag; =>¿şÀÌÆ®Æ÷½Ç±à
 
@@ -79,7 +86,7 @@ int main(int argv, char** argc)
 	server_addr.sin_port = htons(PORT_NUM);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
+	if (::bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
@@ -133,6 +140,7 @@ int main(int argv, char** argc)
 			for (int x = 0; x < 3; x++) {
 				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 			}
+			_timer.Reset();
 			stageIndex = STAGE_ROLE;
 		}
 	}
@@ -199,6 +207,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 	while (true) {
 		if (stageIndex == STAGE_ROLE) {
 			bool isFinish = true;
+		
 			for (int i = 0; i < 3; i++) {
 				if (selectPlayerRole[i] == 'n') {
 					isFinish = false;
@@ -222,10 +231,44 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				//ÆÀ¿ø°ú »óÀÇ ÇÊ¿ä
 				
 				stageIndex = STAGE_01;
+				StageTimerStart();
 			}
 		}
 	}
 	return 0;
+}
+
+//½ºÅ×ÀÌÁö Å¸ÀÌ¸Ó ±¸Çö
+void StageTimerStart()
+{
+	if (_timer.IsRunning() == true)
+	{
+		return;
+	}
+
+	_timer.Start(std::chrono::milliseconds(1000), [=]
+		{
+			S2CStageTimePassPacket packet;
+			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
+
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
+			}
+
+			if (timeoutSeconds <= packet.timePassed)
+			{
+				TimeoutStage();
+				S2CStageTimeoutPacket timeoutPacket;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(S2CStageTimeoutPacket), 0);
+				}
+			}
+		});
+}
+
+void TimeoutStage()
+{
+	_timer.Stop();
 }
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
@@ -287,12 +330,12 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SExitGame:
 	{
-
+		_timer.Stop();
 	}
 	break;
 	case C2SRetry:
 	{
-
+		_timer.Reset();
 	}
 	break;
 	default:

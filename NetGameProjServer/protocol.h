@@ -19,6 +19,10 @@
 #define S2CDoorOpen 12// 문열리는걸 알리는 패킷
 #define S2CAddPlayer 13// 다른 플레이어 정보 받기
 
+#define S2CStageTimePass 14// 경과 시간 패킷
+#define S2CStageTimeout 15//타임 아웃
+
+
 
 #define PORT_NUM 9000
 
@@ -66,6 +70,18 @@ struct MovePacket { // 움직임 동작 패킷
 struct typePacket {
 	//unsigned char size;
 	char type;
+};
+
+
+//스테이지 경과 시간
+struct S2CStageTimePassPacket {
+	char type = S2CStageTimePass;
+	int timePassed;
+};
+
+//스테이지 타임 아웃
+struct S2CStageTimeoutPacket {
+	char type = S2CStageTimeout;
 };
 
 #pragma pack(pop)

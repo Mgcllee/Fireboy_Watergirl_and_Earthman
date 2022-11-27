@@ -20,6 +20,11 @@ public:
 	StageMgr();
 	Stage& getStage(int index);
 
+	static int StageTimepass;
+	static int EndStageTime;
+	static bool IsTimeoutStageEnd;
+
+	void ResetStage();
 private:
 	bool isUse[MAX_STAGE] = { false };
 };

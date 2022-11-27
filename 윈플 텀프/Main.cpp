@@ -13,6 +13,7 @@ SOCKET c_socket;
 int stageIndex = 0;
 int currneClientNum = 1;
 
+
 int prevSize = 0;
 int myId = -1;
 
@@ -102,8 +103,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	g_hWnd = hWnd;
 
-	static int time = 300;
-
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
@@ -157,12 +156,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case BTN_RESTART:
-			time = 300;
+			//stageTime = 300;
 			for (PLAYER& pl : players)
 				pl.on = true;
 			SetTimer(hWnd, 3, 1000, NULL);
 			back = FALSE;
 			currentStage.time_over = FALSE;
+			myStageMgr.ResetStage();
 			DestroyWindow(retry_button);
 			DestroyWindow(end_button);
 			break;
@@ -215,6 +215,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.type = C2SSelectRole;
 			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
+
 		}
 		break;
 		case BTN_QUIT:
@@ -230,14 +231,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			currentStage.clear = FALSE;
 			for (PLAYER& pl : players)
 				pl.on = true;
-			time = 300;
+			//time = 300;
 			currentStage = myStageMgr.getStage(++stageIndex);
-
+			myStageMgr.ResetStage();
 			currentStage.red_total = currentStage.Red_Jewel.size();
 			currentStage.blue_total = currentStage.Blue_Jewel.size();
 			currentStage.count = 0;
-			SetTimer(hWnd, 1, 30, NULL);
-			SetTimer(hWnd, 2, 100, NULL);
+			SetTimer(hWnd, 1, 30, NULL);//애니메이션
+			SetTimer(hWnd, 2, 100, NULL);//
 			SetTimer(hWnd, 3, 1000, NULL);
 			DestroyWindow(next_button);
 			break;
@@ -349,7 +350,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (players[currneClientNum].wid_v - players[currneClientNum].wid_a > 0)
 				players[currneClientNum].wid_v -= players[currneClientNum].wid_a;
 
-			if (--time == 0)
+			if (myStageMgr.IsTimeoutStageEnd == true)
 			{
 				currentStage.time_over = TRUE;
 				back = TRUE;
@@ -358,7 +359,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				end_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 700, 500, 200, 100, hWnd, (HMENU)BTN_QUIT, g_hInst, NULL);
 				SendMessage(end_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.endimg));
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-				KillTimer(hWnd, 5);
 			}
 
 			break;
@@ -429,7 +429,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(selectRoleRightArrow);
 				DestroyWindow(selectBtn);*/
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
-			myImageMgr.DrawTimer(&backMemDC, time);
+			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
+
 
 			for (OBJECT& rj : currentStage.Red_Jewel) {
 				if (rj.GetVisible()) {
@@ -483,7 +484,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
-
 	while (true) {
 		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal != 0 && recvRetVal != -1) {
