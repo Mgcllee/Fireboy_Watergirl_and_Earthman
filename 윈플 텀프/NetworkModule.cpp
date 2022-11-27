@@ -110,6 +110,7 @@ void ProcessPacket(char* buf)
 				}
 				break;
 			}
+		
 	}
 	break;
 	case S2CChangeRole:
@@ -148,8 +149,21 @@ void ProcessPacket(char* buf)
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
 		stageIndex = packet->stageNum;
 		SetEvent(changeStageEvent);
+		break;
 	}
-	break;
+	case S2CStageTimePass:
+	{
+		S2CStageTimePassPacket* packet = reinterpret_cast<S2CStageTimePassPacket*>(buf);
+
+		break;
+	}
+	case S2CStageTimeout:
+	{
+		S2CStageTimeoutPacket* packet = reinterpret_cast<S2CStageTimeoutPacket*>(buf);
+
+
+		break;
+	}
 	default:
 		// Packet Error
 		break;
