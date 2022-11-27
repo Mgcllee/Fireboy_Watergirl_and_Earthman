@@ -9,24 +9,26 @@ void Move()
 	move.type = C2SMove;
 	move.id = myId;
 
+	if (keybuffer[VK_UP]) {
+		move.y = SHRT_MAX;
+		SendPacket(&move);
+		return;
+	}
+	else if (keybuffer[VK_LEFT] && keybuffer[VK_RIGHT]) {
+		return;
+	}
 	if (keybuffer[VK_LEFT]) {
 		move.x = -1;
 	}
 	if (keybuffer[VK_RIGHT]) {
 		move.x = 1;
-	}
-	if (keybuffer[VK_UP]) {
-		move.y = SHRT_MAX;
-	}
-
-	if (keybuffer[VK_LEFT] || keybuffer[VK_RIGHT] || keybuffer[VK_UP]) {
-		SendPacket(&move);
-	}
-	else if (!keybuffer[VK_LEFT] && !keybuffer[VK_RIGHT] && !keybuffer[VK_UP]) {
+	}	
+	if (!keybuffer[VK_LEFT] && !keybuffer[VK_RIGHT] && !keybuffer[VK_UP]) {
 		move.x = 0;
-		move.y = 0;
-		SendPacket(&move);
+		move.y = 0;				
 	}
+	SendPacket(&move);
+	
 }
 
 // WAV형식 음원 분석 함수 (LoadSound()함수에서만 호출)

@@ -63,6 +63,8 @@ int main(int argv, char** argc)
 		}
 
 		cout << "Accept Client[" << i << "]" << endl;
+		threadHandles[i].jumpEventHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
+		ResetEvent(threadHandles[i].jumpEventHandle);
 
 		S2CPlayerPacket loadPacket;
 		loadPacket.type = S2CLoading;
@@ -192,6 +194,77 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				stageIndex = STAGE_01;
 			}
 		}
+		else if (stageIndex == STAGE_01) {
+			for (int i = 0; i < 3; i++) {
+				DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
+				if (retVal == WAIT_OBJECT_0) {
+					if (!threadHandles[i].isJump) {
+						threadHandles[i].isJump = true;
+						threadHandles[i].jumpStartTime = high_resolution_clock::now();
+						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+						cout << "JumpStart Time: " << threadHandles[i].jumpStartTime.time_since_epoch().count() << endl;
+						threadHandles[i].y += threadHandles[i].g;
+						/*if (threadHandles[i].v < 30.f) {
+							threadHandles[i].v += threadHandles[i].g;
+							threadHandles[i].y -= threadHandles[i].v;
+						}
+						else {
+							threadHandles[i].v = 0;
+						}*/
+						MovePacket mPacket;
+						mPacket.id = threadHandles[i].clientId;
+						mPacket.type = S2CMove;
+						mPacket.x = threadHandles[i].x;
+						mPacket.y = threadHandles[i].y;
+						for (int j = 0; j < 3; j++) {
+							send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+						}
+					}
+					else {
+						auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;
+						auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;
+						cout << "current Duration Time: " << duration_cast<milliseconds>(currentDuration).count() << endl;
+
+						if (duration_cast<milliseconds>(startDuration).count() > 300) {
+							cout << "Over Time: " << duration_cast<milliseconds>(startDuration).count() << endl;
+							cout << "Fall Time: " << duration_cast<milliseconds>(currentDuration).count() << endl;
+							if (duration_cast<milliseconds>(startDuration).count() > 800) {
+								ResetEvent(threadHandles[i].jumpEventHandle);
+								threadHandles[i].isJump = false;
+							}
+							else if (duration_cast<milliseconds>(currentDuration).count() > 30) {
+								threadHandles[i].y += 20/*threadHandles[i].g*/;
+								cout << "Fall Time: " << currentDuration.count() << endl;
+								cout << "client y cordinate: " << threadHandles[i].y << endl;
+								threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+							}
+						}
+						else if (duration_cast<milliseconds>(currentDuration).count() > 30) {
+							threadHandles[i].y -= /*threadHandles[i].v*/10;
+							//°è¼Ó Á¡ÇÁ
+						/*	if (threadHandles[i].v < 30.f) {
+								threadHandles[i].v += threadHandles[i].g;
+							}*/
+							/*else {
+								threadHandles[i].v = 0;
+							}*/
+							cout << "Jump Time: " << duration_cast<milliseconds>(startDuration).count() << endl;
+							cout << "client y cordinate: " << threadHandles[i].y << endl;
+							threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+						}
+						MovePacket mPacket;
+						mPacket.id = threadHandles[i].clientId;
+						mPacket.type = S2CMove;
+						mPacket.x = threadHandles[i].x;
+						mPacket.y = threadHandles[i].y;
+						for (int j = 0; j < 3; j++) {
+							send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+						}
+					}
+
+				}
+			}
+		}
 	}
 	return 0;
 }
@@ -251,7 +324,15 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		packet->type = S2CMove;
-		
+		if (packet->y == SHRT_MAX) {
+			//Á¡ÇÁ ÀÌº¥Æ® ÁÖÀÚ
+			DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
+			if (retVal == WAIT_OBJECT_0) {
+				return;
+			}
+			SetEvent(clientInfo.jumpEventHandle);
+			return;
+		}
 		if (clientInfo.wid_a <= 10.f)
 			clientInfo.wid_a += 0.1f;
 		if (clientInfo.wid_v <= 10.f)
@@ -263,26 +344,16 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		if (packet->x == -1) {
 			clientInfo.x -= clientInfo.wid_v;
 		}
-		if (packet->y == SHRT_MAX) {
-			if (clientInfo.v < 30.f) {
-				clientInfo.v += clientInfo.g;
-				clientInfo.y -= clientInfo.v;
-
-			}
-			else {
-				clientInfo.v = 0;
-			}
-		}
-		else if (packet->y == SHRT_MIN) {
-			if (clientInfo.v < 30.f) {
-				clientInfo.v += clientInfo.g;
-				clientInfo.y += clientInfo.v;
-			}
-			else {
-				clientInfo.v = 0.f;
-				// clientInfo.y = clientInfo.ground;
-			}
-		}
+		//else if (packet->y == SHRT_MIN) {
+		//	if (clientInfo.v < 30.f) {
+		//		clientInfo.v += clientInfo.g;
+		//		clientInfo.y += clientInfo.v;
+		//	}
+		//	else {
+		//		clientInfo.v = 0.f;
+		//		// clientInfo.y = clientInfo.ground;
+		//	}
+		//}
 
 		if (packet->x == 0 && packet->y == 0) {
 			// Ä³¸¯ÅÍ ¼Óµµ, °¡¼Óµµ ÃÊ±âÈ­
