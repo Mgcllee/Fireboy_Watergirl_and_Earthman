@@ -1,6 +1,9 @@
 #pragma once
 #include "stdafx.h"
 #include "Stage.h"
+#include "Timer.h"
+#include<time.h>
+
 
 array<threadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
@@ -14,6 +17,14 @@ Stage StageMgr;
 
 DWORD WINAPI ClientWorkThread(LPVOID arg);
 DWORD WINAPI ServerWorkThread(LPVOID arg);
+
+void TimeoutStage();
+void StageTimerStart();
+
+
+Timer _timer;
+
+double timeoutSeconds = 60 * 5;
 
 int main(int argv, char** argc)
 {
@@ -40,7 +51,7 @@ int main(int argv, char** argc)
 	server_addr.sin_port = htons(PORT_NUM);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
+	if (::bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
@@ -192,6 +203,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 				}
 				stageIndex = STAGE_01;
+				StageTimerStart();
 			}
 		}
 		else if (stageIndex == STAGE_01) {
@@ -267,6 +279,38 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		}
 	}
 	return 0;
+}
+
+void StageTimerStart()
+{
+	if (_timer.IsRunning() == true)
+	{
+		return;
+	}
+
+	_timer.Start(std::chrono::milliseconds(1000), [=]
+		{
+			S2CStageTimePassPacket packet;
+			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
+
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
+			}
+
+			if (timeoutSeconds <= packet.timePassed)
+			{
+				TimeoutStage();
+				S2CStageTimeoutPacket timeoutPacket;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(S2CStageTimeoutPacket), 0);
+				}
+			}
+		});
+}
+
+void TimeoutStage()
+{
+	_timer.Stop();
 }
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌

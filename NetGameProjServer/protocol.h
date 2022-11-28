@@ -84,6 +84,7 @@ struct S2CStageTimeoutPacket {
 	char type = S2CStageTimeout;
 };
 
+
 #pragma pack(pop)
 
 
