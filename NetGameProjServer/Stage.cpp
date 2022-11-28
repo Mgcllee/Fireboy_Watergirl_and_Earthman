@@ -27,14 +27,14 @@ void Stage::Stage_1() {
 		Blue_Jewel.emplace_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
 		Red_Jewel.emplace_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 
-		blue_door = OBJECT{ 480, 300, 60, 100, 1260, 60, TRUE };
-		red_door = OBJECT{ 630, 300, 60, 100, 1260, 60, TRUE };
+		blue_door = OBJECT{ 480, 400, 60, 100, 1260, 60, TRUE };
+		red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
-		Ft.emplace_back(OBJECT{ 100, 600, 111, 23, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 250, 500, 111, 23, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 410, 400, 111, 23, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 850, 500, 111, 23, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 1000, 600, 111, 23, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 300, 550, 112, 24, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
+		Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
 	}
 }
 void Stage::Stage_2() {

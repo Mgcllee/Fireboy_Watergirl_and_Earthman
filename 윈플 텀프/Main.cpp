@@ -282,7 +282,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			for (OBJECT& rj : currentStage.Red_Jewel)
 				if (rj.GetVisible() && rj.ChangeFrame(1, false))
 					rj.image_x = 0;
-
+	
 			for (OBJECT& t : currentStage.Trap)
 				if (t.GetVisible())
 					t.ChangeFrame(1, true);

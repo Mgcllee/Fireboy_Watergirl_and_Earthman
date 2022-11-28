@@ -27,7 +27,9 @@ struct threadInfo {
 	int prevSize = 0;
 	char clientId = -1;
 	short x, y, ground = 730;	// 좌표는 캐릭터 중심
-	short hei = 100, wid = 60;	// 캐릭터 크기
+	short hei = 100, wid = 60;	// 캐릭터 크기 (콜라이더 사용)
+
+	bool Falling = false;
 
 	int direction;
 	float wid_v{};

@@ -214,7 +214,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].isJump = true;
 						threadHandles[i].jumpStartTime = high_resolution_clock::now();
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
-
 						threadHandles[i].v = 0.f;
 						threadHandles[i].y = threadHandles[i].ground;
 					}
@@ -227,10 +226,24 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 						// 내부 공통 (변수 or for문)은 필요로 넣은 것이니 밖으로 빼지 말아주세용!
 						if (duration_cast<milliseconds>(startDuration).count() > 300) {
-							if (duration_cast<milliseconds>(currentDuration).count() > 30) {
+							if (threadHandles[i].v < FLT_EPSILON)
+								threadHandles[i].v = 0.f;
+
+							if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {
 								mPacket.x = threadHandles[i].x;
 								threadHandles[i].v += threadHandles[i].g;
-								mPacket.y = threadHandles[i].y += threadHandles[i].v;
+								threadHandles[i].y += threadHandles[i].v;
+
+								for (OBJECT& ft : StageMgr.Ft) {
+									if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) {
+										threadHandles[i].v = 0.f;
+										threadHandles[i].Falling = false;
+										threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei / 2;
+										break;
+									}
+								}
+
+								mPacket.y = threadHandles[i].y;
 								threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 								for (int j = 0; j < 3; j++) {
 									send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
@@ -240,6 +253,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								ResetEvent(threadHandles[i].jumpEventHandle);
 								threadHandles[i].v = 0.f;
 								threadHandles[i].isJump = false;
+								threadHandles[i].Falling = false;
 								mPacket.x = threadHandles[i].x;
 								mPacket.y = threadHandles[i].y = threadHandles[i].ground;
 								for (int j = 0; j < 3; j++) {
@@ -247,52 +261,25 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								}
 							}
 						}
-						else if (duration_cast<milliseconds>(currentDuration).count() > 30) {		// 상승
+						else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) {
 							mPacket.x = threadHandles[i].x;
-							threadHandles[i].v += threadHandles[i].g;
-							mPacket.y = threadHandles[i].y -= threadHandles[i].v;
+							threadHandles[i].v -= threadHandles[i].g;
+							threadHandles[i].y += threadHandles[i].v;
+
+							for (OBJECT& ft : StageMgr.Ft) {
+								if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {
+									threadHandles[i].v = 0.f;
+									threadHandles[i].Falling = true;
+									break;
+								}
+							}
+
+							mPacket.y = threadHandles[i].y += threadHandles[i].v;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
 						}
-						/*
-							
-
-							if (duration_cast<milliseconds>(startDuration).count() > 300) {
-								cout << "Over Time: " << duration_cast<milliseconds>(startDuration).count() << endl;
-								cout << "Fall Time: " << duration_cast<milliseconds>(currentDuration).count() << endl;
-								if (threadHandles[i].y > threadHandles[i].ground) {
-									ResetEvent(threadHandles[i].jumpEventHandle);
-									threadHandles[i].y = threadHandles[i].ground;
-									threadHandles[i].v = 0.f;
-									threadHandles[i].isJump = false;
-								}
-								else if (duration_cast<milliseconds>(currentDuration).count() > 30) {	// 하강
-									threadHandles[i].v += threadHandles[i].g;
-									threadHandles[i].y += threadHandles[i].v;
-
-									if (threadHandles[i].y > threadHandles[i].ground) {
-										ResetEvent(threadHandles[i].jumpEventHandle);
-										threadHandles[i].y = threadHandles[i].ground;
-										threadHandles[i].v = 0.f;
-										threadHandles[i].isJump = false;
-									}
-
-									cout << "Fall Time: " << currentDuration.count() << endl;
-									cout << "client y cordinate: " << threadHandles[i].y << endl;
-									threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
-								}
-
-							}
-							else if (duration_cast<milliseconds>(currentDuration).count() > 30) {		// 상승
-								threadHandles[i].v += threadHandles[i].g;
-								threadHandles[i].y -= threadHandles[i].v;
-								cout << "Jump Time: " << duration_cast<milliseconds>(startDuration).count() << endl;
-								cout << "client y cordinate: " << threadHandles[i].y << endl;
-								threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
-							}
-							*/
 					}
 				}
 			}
