@@ -1,65 +1,19 @@
-#include<iostream>
-#include<WS2tcpip.h>
-#include<array>
-#include<mutex>
-#include"protocol.h"
-#include"Timer.h"
-#include<time.h>
-#pragma comment(lib, "ws2_32")
-
-using namespace std;
-
-#define MAX_BUF_SIZE 256
-
-#define STAGE_TITLE			0
-#define STAGE_LOADING		1
-#define STAGE_ROLE			2
-#define STAGE_01			3
-#define STAGE_02			4
-#define STAGE_03			5
-
-struct threadInfo {
-	HANDLE threadHandle = NULL;
-	SOCKET clientSocket;
-	char recvBuf[MAX_BUF_SIZE] = { 0 };
-	int currentSize;
-	int prevSize = 0;
-	char clientId = -1;
-	short x, y;
-};
-
-void Display_Err(int Errcode);
-void ConstructPacket(threadInfo& clientInfo, int ioSize); // ÆÐÅ¶ ÀçÁ¶¸³
-void ProcessPacket(threadInfo& clientInfo, char* packetStart); // ÆÐÅ¶ ÀçÁ¶¸³ ÈÄ, ¸í·É ÇØ¼® ÈÄ Çàµ¿
-int GetPacketSize(char packetType);
-void TimeoutStage();
-void StageTimerStart();
-
-void ChangeRole(); // mutex ÇÊ¿ä ¾øÀ»µí? => change´Â µüÈ÷ ¹®Á¦ ¾ø´Ù°í »ý°¢ÇÔ
-void SelectRole(); // mutex ÇÊ¿ä => µÎ Å¬¶óÀÌ¾ðÆ®°¡ µ¿½Ã¿¡ °°Àº ÄÉ¸¯ÅÍ ¼±ÅÃÀ» ÇØ¹ö¸®¸é ¾ÈµÊ
-//void MovePacket(); // ¿òÁ÷ÀÏ ¶§ ¸¶´Ù, Àü¼Û
-void CheckJewelryEat();// Áê¾ó¸® ½Àµæ È®ÀÎ
-void CheckOpenDoor(); // ¹® ¿­¸®´Â Á¶°Ç È®ÀÎ
-
-
-DWORD WINAPI ClientWorkThread(LPVOID arg);
-DWORD WINAPI ServerWorkThread(LPVOID arg);
+#pragma once
+#include "stdafx.h"
+#include "Stage.h"
 
 array<threadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
-
-
 HANDLE multiEvenTthreadHadle[3];
 
 int stageIndex = -1;
 
-Timer _timer;
+Stage StageMgr;
 
-double timeoutSeconds = 60 * 5;
-
-//HANDLE loadFlag; =>¿þÀÌÆ®Æ÷½Ç±à
+DWORD WINAPI ClientWorkThread(LPVOID arg);
+DWORD WINAPI ServerWorkThread(LPVOID arg);
 
 int main(int argv, char** argc)
 {
@@ -86,7 +40,7 @@ int main(int argv, char** argc)
 	server_addr.sin_port = htons(PORT_NUM);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-	if (::bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
+	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
@@ -140,7 +94,6 @@ int main(int argv, char** argc)
 			for (int x = 0; x < 3; x++) {
 				send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 			}
-			_timer.Reset();
 			stageIndex = STAGE_ROLE;
 		}
 	}
@@ -207,7 +160,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 	while (true) {
 		if (stageIndex == STAGE_ROLE) {
 			bool isFinish = true;
-		
 			for (int i = 0; i < 3; i++) {
 				if (selectPlayerRole[i] == 'n') {
 					isFinish = false;
@@ -216,64 +168,36 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 			if (isFinish) {
 				//Send All Cleint Next Stage == Stage01
+
+				// Stage 1 ÀÇ Á¤º¸ È¹µæ
+				StageMgr.Stage_1();
+				// ÃÖÃÊ À§Ä¡ ¼³Á¤
+				MovePacket setPosition;
+				setPosition.type = S2CMove;
+				for (int i = 0; i < 3; ++i) {
+					setPosition.id = i;
+					setPosition.x = threadHandles[i].x;
+					setPosition.y = threadHandles[i].y;
+					for (int j = 0; j < 3; ++j) {
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
+					}
+				}
+
 				S2CChangeStagePacket changePacket;
 				changePacket.stageNum = STAGE_01;
 				changePacket.type = S2CChangeStage;
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 				}
-				//clock_t start, finish;
-				//double duration;
-				//start = clock();
-				//finish = clock();
-				//duration = (double)(finish - start) / CLOCKS_PER_SEC;
-				//printf("%fÃÊ", duration);
-				//ÆÀ¿ø°ú »óÀÇ ÇÊ¿ä
-				
 				stageIndex = STAGE_01;
-				StageTimerStart();
 			}
 		}
 	}
 	return 0;
 }
 
-//½ºÅ×ÀÌÁö Å¸ÀÌ¸Ó ±¸Çö
-void StageTimerStart()
-{
-	if (_timer.IsRunning() == true)
-	{
-		return;
-	}
-
-	_timer.Start(std::chrono::milliseconds(1000), [=]
-		{
-			S2CStageTimePassPacket packet;
-			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
-
-			for (int x = 0; x < 3; x++) {
-				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
-			}
-
-			if (timeoutSeconds <= packet.timePassed)
-			{
-				TimeoutStage();
-				S2CStageTimeoutPacket timeoutPacket;
-				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(S2CStageTimeoutPacket), 0);
-				}
-			}
-		});
-}
-
-void TimeoutStage()
-{
-	_timer.Stop();
-}
-
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
 {
-
 	//changePacket() => send S2CChangeRolePacket
 	//selectPacket() => mutex Role container and send S2CSelectPacket
 	//movePacket(); => ¿©±â¼­ Ãæµ¹ Ã¼Å©, º¸¼® Ã¼Å© => ¿©±â¼­ º¸¼®À» ´Ù ¸Ô¾ú´Ù¸é µÎ Å¬¶óÀÌ¾ðÆ®¿¡°Ô ¹® ¿©´Â ÆÐÅ¶ Àü¼Û, ¹® µé¾î°¡¶ó´Â ÆÐÅ¶µµ Àü¼ÛÇØ¾ßµÇ³×
@@ -294,7 +218,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				break;
 			}
 		}
-		if(change)
+		if (change)
 			selectPlayerRole[clientInfo.clientId] = packet->role;
 		selectMutex.unlock();
 		if (change) {
@@ -325,17 +249,36 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SMove:
 	{
+		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
+		packet->type = S2CMove;
+		
+		/*if (clientInfo.wid_a <= 10.f)
+			clientInfo.wid_a += 0.1f;
+		if (clientInfo.wid_v <= 10.f)
+			clientInfo.wid_v += clientInfo.wid_a;*/
 
+		if (packet->x == 1) {
+			clientInfo.x += 5;
+		}
+		if (packet->x == -1) {
+			clientInfo.x -= 5;
+		}
+		packet->x = clientInfo.x;
+		packet->y = clientInfo.y;
+
+		for (int i = 0; i < 3; i++) {
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(packet), sizeof(MovePacket), 0);
+		}
 	}
 	break;
 	case C2SExitGame:
 	{
-		_timer.Stop();
+
 	}
 	break;
 	case C2SRetry:
 	{
-		_timer.Reset();
+
 	}
 	break;
 	default:
@@ -349,26 +292,16 @@ int GetPacketSize(char packetType)
 	int retVal = -1;
 	switch (packetType)
 	{
-	case S2CLoading:
-	case S2CAddPlayer:
-		retVal = sizeof(S2CPlayerPacket);
+	case C2SChangRole:
+	case C2SSelectRole:
+		retVal = sizeof(C2SRolePacket);
 		break;
-	case S2CChangeRole:
-	case S2CSelectRole:
-		retVal = sizeof(S2CRolePacket);
-		break;
-	case S2CChangeStage:
-		retVal = sizeof(S2CChangeStagePacket);
-		break;
-	case S2CMove:
+	case C2SMove:
 		retVal = sizeof(MovePacket);
 		break;
-	case S2CExitGame:
-	case S2CDoorOpen:
+	case C2SRetry:
+	case C2SExitGame:
 		retVal = sizeof(typePacket);
-		break;
-	case S2CJewelryVisibility:
-		retVal = sizeof(S2CJewelryVisibilityPacket);
 		break;
 	default:
 		break;

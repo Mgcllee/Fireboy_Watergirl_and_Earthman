@@ -1,52 +1,10 @@
 #pragma once
-
-#include <WinSock2.h>
-#include <windows.h>
-#include <tchar.h>
-#include <atlimage.h>
-#include <mmsystem.h>
-#include <unordered_map>
-#include <array>
-
-#pragma comment(lib,"winmm.lib")
-#pragma comment (lib, "msimg32.lib")
-
-#define MAX_BUF_SIZE		256
-
-#define BTN_START			100
-#define BTN_RESTART			200
-#define BTN_QUIT			300
-#define BTN_NEXT_STAGE		400
-#define EDIT_SERVER_ADDR	500
-#define BTN_LEFT_ARROW		600
-#define BTN_RIGHT_ARROW		701
-#define BTN_SELECT			800
-
-#define STAGE_TITLE			0
-#define STAGE_LOADING		1
-#define STAGE_ROLE			2
-#define STAGE_01			3
-#define STAGE_02			4
-#define STAGE_03			5
+#include <iostream>
+#include <vector>
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
 #define GROUND_POS_Y		730
-
-// Network Module
-#include <iostream>
-#include <WS2tcpip.h>
-#pragma comment(lib, "ws2_32")
-extern WSADATA	WSAData;
-extern SOCKET	c_socket;
-//===============
-
-void Move();
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
-void LoadSound(HWND hWnd);
 
 class PLAYER {
 public:
@@ -64,16 +22,15 @@ public:
 	float v = 0;			// 속도
 	short Frame = 0;		// 애니메이션 프레임
 
-	CImage Anim[5]{};
 	int C_img_Frame{};
 	int C_img_x{}, C_img_y{};
 	int C_img_X_Size_01{}, C_img_Y_Size_01{};
 	int C_img_X_Size_02{}, C_img_Y_Size_02{};
 
-	bool on = TRUE;
-	bool is_Jumping = FALSE;
-	bool is_Push = FALSE;
-	bool Down = FALSE;
+	bool on = true;
+	bool is_Jumping = true;
+	bool is_Push = true;
+	bool Down = true;
 
 	PLAYER() : id(-1), role('f') {}
 	~PLAYER() {
@@ -81,17 +38,8 @@ public:
 	}
 };
 
-struct RECTANGLE {
-	int x;
-	int y, dic = 0;
-
-	float g = 4;			// 중력 조절로 점프 높이 조정
-	float v = 0;			// 이동 속도
-	bool Down = FALSE;
-};
-
 class OBJECT {
-	bool On = FALSE;			// 사용 여부
+	bool On = false;			// 사용 여부
 
 public:
 	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 위치좌표
@@ -137,7 +85,7 @@ public:
 
 	bool ChangeFrame(int direction, bool replay) {
 		if (MaxWid == image_x + imageMoveWid) {
-			if(replay)
+			if (replay)
 				image_x = 0;
 			return true;
 		}
@@ -148,24 +96,39 @@ public:
 	}
 };
 
-extern PLAYER players[3];
+class Stage
+{
+public:
+	// RECTANGLE Rt;
 
-extern HWND	g_hWnd;
-extern MCI_PLAY_PARMS	mciPlayParms;
-extern BOOL				keybuffer[256];
-extern int currneClientNum;
-extern char recvBuf[MAX_BUF_SIZE];
-extern int prevSize;
-extern int myId;
-extern int stageIndex;
+	short stage;						// 현재 스테이지
+	bool clear;							// Stage 클리어 여부
+	int average;
+	bool time_over;						// 현재 Stage에서 Timer Over 여부
+	int count;							// 애니메이션 프레임 번호
+	int red_total;						// 빨강 보석 총 개수
+	int blue_total;						// 파랑 보석 총 개수
+	bool stair;							// Fire boy와 Water girl 이 문 안 계단을 올라감
 
-extern HANDLE selectMyCharacter;
-extern HANDLE changeStageEvent;
+	OBJECT Ground{ 0, GROUND_POS_Y, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
+	std::vector<OBJECT> Red_Jewel;
+	std::vector<OBJECT> Blue_Jewel;
+	std::vector<OBJECT> Trap;
+	std::vector<OBJECT> Ft;			// 발판 오브젝트
 
+	// OBJECT Trap[90];		
+	OBJECT Die;				// 사망시 나오는 연기 (Max x = 7950, move x = 159)
+	OBJECT blue_door;		// (Max x = 1260, move x = 60) // Max = 1296, Move = 54
+	OBJECT red_door;		// (Max x = 1260, move x = 60) // Max = 1250, Move = 50
+	OBJECT button[5];		// 노랑 버튼(block1.PNG 참고)	(Down BTN Max y = 7, move y = 1) else (Up BTN Max y = 15, move y = 1)
+	OBJECT block[5];		// (Max x = 40, move x = 2)
 
-bool NetworkInit(HWND& hWnd, std::string input_addr);
-void ProcessPacket(char* buf);
-void SendPacket(void* buf);
-void ConstructPacket(void* buf, int ioSize);
-int GetPacketSize(char packetType);
-void Display_Err(HWND hWnd, int Errcode);
+public:
+	void title() {}
+	void lobby() {}
+	void Stage_1();
+	void Stage_2();
+	void Stage_3();
+};
+
+extern Stage currentStage;

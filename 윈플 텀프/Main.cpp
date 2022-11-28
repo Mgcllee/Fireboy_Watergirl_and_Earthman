@@ -3,6 +3,7 @@
 #include "ImageMgr.h"
 #include "StageMgr.h"
 #include "protocol.h"
+#include <string>
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
@@ -114,7 +115,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		nonClientMetrics.cbSize = sizeof(NONCLIENTMETRICS);
 		s_hFont = CreateFontIndirect(&nonClientMetrics.lfCaptionFont);
 
-		server_addr = CreateWindow(L"edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
+		server_addr = CreateWindow(L"edit", L"127.0.0.1", WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
 		SendMessage(server_addr, WM_SETFONT, (WPARAM)s_hFont, (LPARAM)MAKELONG(TRUE, 0));
 
 		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
@@ -143,12 +144,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(start_button);
 				DestroyWindow(server_addr);
 
-				//currentStage = myStageMgr.getStage(stageIndex = STAGE_01);
-
 				if (stageIndex < STAGE_ROLE) {
 					stageIndex = STAGE_LOADING;
 					SetEvent(changeStageEvent);
-					//currentStage = myStageMgr.getStage(stageIndex);
 				}
 			}
 			else {
@@ -172,19 +170,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			C2SRolePacket makePacket;
 			makePacket.type = C2SChangeRole;
 			//f w e
-			makePacket.role = 'f';
 			if (players[0].role == 'e') {
 				players[0].role = 'w';
-				makePacket.role = 'w';
 			}
 			else if (players[0].role == 'w') {
 				players[0].role = 'f';
-				makePacket.role = 'f';
 			}
 			else if (players[0].role == 'f') {
 				players[0].role = 'e';
-				makePacket.role = 'e';
 			}
+			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
 		}
 		break;
@@ -192,20 +187,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//fwe
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangeRole;
-			makePacket.role = 'f';
+			makePacket.type = C2SChangeRole;			
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
-				makePacket.role = 'f';
 			}
 			else if (players[0].role == 'w') {
 				players[0].role = 'e';
-				makePacket.role = 'e';
 			}
 			else if (players[0].role == 'f') {
 				players[0].role = 'w';
-				makePacket.role = 'w';
 			}
+			makePacket.role = players[0].role;
 			SendPacket(&makePacket);
 		}
 		break;
@@ -247,6 +239,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch (wParam) {
 		case 1:
+		{
+			std::wstring buf = std::to_wstring(players[myId].x) + L", " + std::to_wstring(players[myId].y);
+			SetWindowText(hWnd, buf.c_str());
+
+			/*
+			if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == FALSE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y -= players[currneClientNum].v;
+
+					for (OBJECT& ft : currentStage.Ft) {
+						if (ft.Ft_Collision(players[currneClientNum])) {
+							players[currneClientNum].v = 0;
+							players[currneClientNum].Down = TRUE;
+							break;
+						}
+					}
+				}
+				else {
+					players[currneClientNum].v = 0;
+					players[currneClientNum].Down = TRUE;
+				}
+			}
+			else if (players[currneClientNum].direction == 0 && players[currneClientNum].Down == TRUE && keybuffer[VK_UP] == TRUE)
+			{
+				if (players[currneClientNum].v < 30.f && (players[currneClientNum].ground) > players[currneClientNum].y) {
+					players[currneClientNum].v += players[currneClientNum].g;
+					players[currneClientNum].y += players[currneClientNum].v;
+				}
+				else {
+					players[currneClientNum].Down = FALSE;
+					players[currneClientNum].v = 0.f;
+					keybuffer[VK_UP] = FALSE;
+
+					players[currneClientNum].y = players[currneClientNum].ground;
+				}
+			}
+			*/
+
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
@@ -337,6 +369,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					block.ChangeFrame(-1, false);
 				else
 					block.ChangeFrame(1, false);
+		}
 			break;
 		case 2:				// 캐릭터 프레임
 			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
@@ -366,6 +399,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
 			if (retVal == WAIT_OBJECT_0) {
+				
+				char buf[10] = { myId + '0' };
+				SetWindowTextA(hWnd, buf);
+				
 				ResetEvent(selectMyCharacter);
 				ShowWindow(selectRoleLeftArrow, SW_HIDE);
 				ShowWindow(selectRoleRightArrow, SW_HIDE);
@@ -397,10 +434,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
-
-		players[currneClientNum].direction = 0;
-		players[currneClientNum].Down = FALSE;
-
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
