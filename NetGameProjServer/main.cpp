@@ -300,9 +300,9 @@ void StageTimerStart()
 			if (timeoutSeconds <= packet.timePassed)
 			{
 				TimeoutStage();
-				S2CStageTimeoutPacket timeoutPacket;
+				typePacket timeoutPacket;
 				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(S2CStageTimeoutPacket), 0);
+					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
 			}
 		});

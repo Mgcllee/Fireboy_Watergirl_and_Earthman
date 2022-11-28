@@ -163,7 +163,7 @@ void ProcessPacket(char* buf)
 	break;
 	case S2CStageTimeout:
 	{
-		S2CStageTimeoutPacket* packet = reinterpret_cast<S2CStageTimeoutPacket*>(buf);
+		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		StageMgr::IsTimeoutStageEnd = true;
 
 		
@@ -267,7 +267,7 @@ int GetPacketSize(char packetType)
 		retVal = sizeof(S2CStageTimePassPacket);
 		break;
 	case S2CStageTimeout:
-		retVal = sizeof(S2CStageTimeoutPacket);
+		retVal = sizeof(typePacket);
 		break;
 	case S2CMove:
 		retVal = sizeof(MovePacket);
