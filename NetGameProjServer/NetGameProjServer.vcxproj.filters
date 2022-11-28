@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="Stage.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -26,10 +29,13 @@
     <ClInclude Include="protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="Stage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="RoomManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

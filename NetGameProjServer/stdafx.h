@@ -3,12 +3,13 @@
 #include<WS2tcpip.h>
 #include<array>
 #include<mutex>
+#include<chrono>
 #include"protocol.h"
 
 #pragma comment(lib, "ws2_32")
 
 using namespace std;
-
+using namespace chrono;
 #define MAX_BUF_SIZE 256
 
 #define STAGE_TITLE			0
@@ -30,6 +31,14 @@ struct threadInfo {
 	int direction;
 	float wid_v{};
 	float wid_a{};
+
+	float g = 3.0f;
+	float v = 0.0f;
+
+	HANDLE jumpEventHandle = NULL;
+	high_resolution_clock::time_point jumpStartTime;
+	high_resolution_clock::time_point jumpCurrentTime;
+	bool isJump = false;
 };
 
 void Display_Err(int Errcode);
