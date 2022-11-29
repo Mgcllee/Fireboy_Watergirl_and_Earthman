@@ -251,14 +251,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				jump.y = SHRT_MAX;
 				SendPacket(&jump);
 			}
-			else if (players[myId].direction == 0 && players[myId].Down == TRUE && keybuffer[VK_UP] == TRUE)
-			{
-				MovePacket jump;
-				jump.type = C2SMove;
-				jump.id = myId;
-				jump.y = SHRT_MIN;
-				SendPacket(&jump);
-			}
 
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
@@ -290,7 +282,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			for (OBJECT& rj : currentStage.Red_Jewel)
 				if (rj.GetVisible() && rj.ChangeFrame(1, false))
 					rj.image_x = 0;
-
+	
 			for (OBJECT& t : currentStage.Trap)
 				if (t.GetVisible())
 					t.ChangeFrame(1, true);
@@ -414,10 +406,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
-		
 		keybuffer[wParam] = FALSE;
-		//Move();
-		
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;

@@ -26,14 +26,17 @@ struct threadInfo {
 	int currentSize;
 	int prevSize = 0;
 	char clientId = -1;
-	short x, y;
+	short x, y, ground = 730;	// 좌표는 캐릭터 중심
+	short hei = 100, wid = 60;	// 캐릭터 크기 (콜라이더 사용)
+
+	bool Falling = false;
 
 	int direction;
 	float wid_v{};
 	float wid_a{};
 
-	float g = 3.0f;
-	float v = 0.0f;
+	float g = 4.f;
+	float v = 0.f;
 
 	HANDLE jumpEventHandle = NULL;
 	high_resolution_clock::time_point jumpStartTime;

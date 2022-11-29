@@ -53,23 +53,15 @@ public:
 		: x(pos_x), y(pos_y), wid(WID), hei(HEI), MaxWid(MAXWID), imageMoveWid(IMAGEMOVEWID), On(ON) {}
 
 	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
-	bool Collision(PLAYER& pl) {
-		if (
-			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
-			&&
-			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) <= (hei + pl.hei) / 2)
-			) {
+	bool Collision(threadInfo& pl) {
+		if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && (abs(y - pl.y) <= (hei + pl.hei) / 2)) {
 			return true;
 		}
 		else return false;
 	}
 
-	bool Ft_Collision(PLAYER& pl) {
-		if (
-			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) < (wid + pl.wid) / 2)
-			&&
-			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) < (hei + pl.hei) / 2)
-			) {
+	bool Ft_Collision(threadInfo& pl) {
+		if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && ((y - pl.y) < ((hei + pl.hei) / 3.0f))) {
 			return true;
 		}
 		else return false;
