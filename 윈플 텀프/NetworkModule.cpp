@@ -111,7 +111,7 @@ void ProcessPacket(char* buf)
 				}
 				break;
 			}
-		
+
 	}
 	break;
 	case S2CChangeRole:
@@ -124,11 +124,56 @@ void ProcessPacket(char* buf)
 			}
 	}
 	break;
-	case S2CMove:
+	case S2CMove_IDLE:
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
 			if (players[i].id == packet->id) {
+				players[i].direction = DIRECTION::IDLE;
+				players[i].x = packet->x;
+				players[i].y = packet->y;
+				break;
+			}
+		}
+		if (packet->id == myId) {
+			DWORD retVal = WaitForSingleObject(jumpEvent, 0);
+			if (retVal == WAIT_OBJECT_0)
+				ResetEvent(jumpEvent);
+		}
+	}
+	break;
+	case S2CMove_JUMP:
+	{
+		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
+		for (int i = 0; i < 3; ++i) {
+			if (players[i].id == packet->id) {
+				players[i].direction = DIRECTION::JUMP;
+				players[i].x = packet->x;
+				players[i].y = packet->y;
+				break;
+			}
+		}
+	}
+	break;
+	case S2CMove_LEFT:
+	{
+		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
+		for (int i = 0; i < 3; ++i) {
+			if (players[i].id == packet->id) {
+				players[i].direction = DIRECTION::LEFT;
+				players[i].x = packet->x;
+				players[i].y = packet->y;
+				break;
+			}
+		}
+	}
+	break;
+	case S2CMove_RIGHT:
+	{
+		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
+		for (int i = 0; i < 3; ++i) {
+			if (players[i].id == packet->id) {
+				players[i].direction = DIRECTION::RIGHT;
 				players[i].x = packet->x;
 				players[i].y = packet->y;
 				break;
@@ -158,7 +203,7 @@ void ProcessPacket(char* buf)
 	{
 		S2CStageTimePassPacket* packet = reinterpret_cast<S2CStageTimePassPacket*>(buf);
 		StageMgr::StageTimepass = packet->timePassed;
-		
+
 	}
 	break;
 	case S2CStageTimeout:
@@ -166,7 +211,7 @@ void ProcessPacket(char* buf)
 		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		StageMgr::IsTimeoutStageEnd = true;
 
-		
+
 	}
 	break;
 	default:
@@ -269,7 +314,10 @@ int GetPacketSize(char packetType)
 	case S2CStageTimeout:
 		retVal = sizeof(typePacket);
 		break;
-	case S2CMove:
+	case S2CMove_IDLE:
+	case S2CMove_JUMP:
+	case S2CMove_LEFT:
+	case S2CMove_RIGHT:
 		retVal = sizeof(MovePacket);
 		break;
 	case S2CExitGame:

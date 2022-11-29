@@ -48,6 +48,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD LoadWAV(HWND hWnd, LPCTSTR lpszWave);
 void LoadSound(HWND hWnd);
 
+enum DIRECTION {
+	IDLE,
+	JUMP,
+	LEFT,
+	RIGHT
+};
+
 class PLAYER {
 public:
 	int id;						// 다른 클라이언트 식별 정보 - -1 // 아직 안쓰는 상황에 -1
@@ -55,7 +62,7 @@ public:
 	int x, y;					// 우하단 좌표
 	int hei = 100, wid = 60;	// 캐릭터 크기
 
-	int direction;				// 이동방향 (애니메이션에서 사용)
+	int direction = DIRECTION::IDLE;				// 이동방향 (애니메이션에서 사용)
 	float wid_v{};
 	float wid_a{};
 
@@ -162,6 +169,7 @@ extern int stageIndex;
 extern HANDLE selectMyCharacter;
 extern HANDLE changeStageEvent;
 extern HANDLE idleStateEvent;
+extern HANDLE jumpEvent;
 
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);

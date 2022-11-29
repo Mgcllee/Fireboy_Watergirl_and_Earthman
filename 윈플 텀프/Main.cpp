@@ -24,6 +24,7 @@ static BOOL isArrow = true;
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
 HANDLE idleStateEvent = NULL;
+HANDLE jumpEvent = NULL;
 
 HWND g_hWnd;
 DWORD WINAPI ClientrecvThread(LPVOID arg);
@@ -77,9 +78,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 	selectMyCharacter = CreateEvent(NULL, TRUE, FALSE, NULL);
 	changeStageEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	idleStateEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	jumpEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	ResetEvent(selectMyCharacter);
 	ResetEvent(changeStageEvent);
 	ResetEvent(idleStateEvent);
+	ResetEvent(jumpEvent);
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);

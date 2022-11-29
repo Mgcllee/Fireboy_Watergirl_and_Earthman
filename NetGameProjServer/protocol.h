@@ -11,7 +11,7 @@
 #define S2CChangeRole 6// 선택이 아닌 케릭터 뭘 보고 있는지 다른 클라이언트도 알아야 하니까 있는 패킷
 //MovePacket 구분
 #define C2SMove 7
-#define S2CMove 8
+
 //type 구분
 #define C2SExitGame 9// 클라이언트가 게임 종료를 원할 때, 전송
 #define S2CExitGame 10// 서버에서 다른 클라이언트에게 정보 알림
@@ -22,6 +22,10 @@
 #define S2CStageTimePass 14// 경과 시간 패킷
 #define S2CStageTimeout 15//타임 아웃
 
+#define S2CMove_IDLE 16
+#define S2CMove_JUMP 17
+#define S2CMove_LEFT 18
+#define S2CMove_RIGHT 19
 
 
 #define PORT_NUM 9000

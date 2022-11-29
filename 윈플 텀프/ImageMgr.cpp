@@ -285,16 +285,16 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 	for (PLAYER& pl : players) {
 		if (pl.on)
 		{
-			if ((pl.Down == TRUE) && pl.direction == 0) {
+			if (pl.direction == DIRECTION::JUMP) {
 				pl.Anim[3].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
 			}
-			else if (pl.direction == 0) {
+			else if (pl.direction == DIRECTION::IDLE) {
 				pl.Anim[1].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
 			}
-			else if (pl.direction == -1) {
+			else if (pl.direction == DIRECTION::LEFT) {
 				pl.Anim[4].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
 			}
-			else if (pl.direction == 1) {
+			else if (pl.direction == DIRECTION::RIGHT) {
 				pl.Anim[2].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
 			}
 		}

@@ -9,19 +9,23 @@ void Move()
 	move.type = C2SMove;
 	move.id = myId;
 
+	/*DWORD retVal = WaitForSingleObject(jumpEvent, 0);
+	if (WAIT_OBJECT_0 == retVal)
+		return;*/
 	if (keybuffer[VK_UP]) {
+		SetEvent(jumpEvent);
 		move.y = SHRT_MAX;
 	}
-	if (keybuffer[VK_LEFT]) {
+	if (keybuffer[VK_LEFT]) {		
 		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
 		if (WAIT_OBJECT_0 == retVal)
-			ResetEvent(idleStateEvent);
+			ResetEvent(idleStateEvent);		
 		move.x = -1;
 	}
 	if (keybuffer[VK_RIGHT]) {
 		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
 		if (WAIT_OBJECT_0 == retVal)
-			ResetEvent(idleStateEvent);
+			ResetEvent(idleStateEvent);		
 		move.x = 1;
 	}
 	if (!keybuffer[VK_UP] && !keybuffer[VK_RIGHT] && !keybuffer[VK_LEFT]) {
