@@ -243,15 +243,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			std::wstring buf = std::to_wstring(players[myId].x) + L", " + std::to_wstring(players[myId].y);
 			SetWindowText(hWnd, buf.c_str());
 
-			if (players[myId].direction == 0 && players[myId].Down == FALSE && keybuffer[VK_UP] == TRUE)
-			{
-				MovePacket jump;
-				jump.type = C2SMove;
-				jump.id = myId;
-				jump.y = SHRT_MAX;
-				SendPacket(&jump);
-			}
-
 			// 캐릭터 이동과 충돌체크
 			for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {

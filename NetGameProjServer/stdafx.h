@@ -26,7 +26,8 @@ struct threadInfo {
 	int currentSize;
 	int prevSize = 0;
 	char clientId = -1;
-	short x, y, ground = 730;	// 좌표는 캐릭터 중심
+	short x, y;					// 좌표는 캐릭터 중심
+	short ground = 730;
 	short hei = 100, wid = 60;	// 캐릭터 크기 (콜라이더 사용)
 
 	bool Falling = false;
@@ -35,7 +36,7 @@ struct threadInfo {
 	float wid_v{};
 	float wid_a{};
 
-	float g = 4.f;
+	float g = 2.5f;
 	float v = 0.f;
 
 	HANDLE jumpEventHandle = NULL;
