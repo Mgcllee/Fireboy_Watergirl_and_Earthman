@@ -161,6 +161,7 @@ extern int stageIndex;
 
 extern HANDLE selectMyCharacter;
 extern HANDLE changeStageEvent;
+extern HANDLE idleStateEvent;
 
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);

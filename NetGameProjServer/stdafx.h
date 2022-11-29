@@ -19,6 +19,12 @@ using namespace chrono;
 #define STAGE_02			4
 #define STAGE_03			5
 
+enum DIRECTION {
+	NONE,
+	LEFT,
+	RIGHT
+};
+
 struct threadInfo {
 	HANDLE threadHandle = NULL;
 	SOCKET clientSocket;
@@ -32,7 +38,7 @@ struct threadInfo {
 
 	bool Falling = false;
 
-	int direction;
+	DIRECTION direction = NONE;
 	float wid_v{};
 	float wid_a{};
 

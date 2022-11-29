@@ -13,13 +13,26 @@ void Move()
 		move.y = SHRT_MAX;
 	}
 	if (keybuffer[VK_LEFT]) {
+		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
+		if (WAIT_OBJECT_0 == retVal)
+			ResetEvent(idleStateEvent);
 		move.x = -1;
 	}
 	if (keybuffer[VK_RIGHT]) {
+		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
+		if (WAIT_OBJECT_0 == retVal)
+			ResetEvent(idleStateEvent);
 		move.x = 1;
 	}
+	if (!keybuffer[VK_UP] && !keybuffer[VK_RIGHT] && !keybuffer[VK_LEFT]) {
+		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
+		if (WAIT_OBJECT_0 == retVal)
+			return;
+		SetEvent(idleStateEvent);
+		move.y = SHRT_MIN;
+	}
 	SendPacket(&move);
-	
+
 }
 
 // WAV형식 음원 분석 함수 (LoadSound()함수에서만 호출)

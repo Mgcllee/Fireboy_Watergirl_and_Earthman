@@ -209,7 +209,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		else if (stageIndex == STAGE_01) {
 			for (int i = 0; i < 3; i++) {
 				DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
-				if (retVal == WAIT_OBJECT_0) {
+				if (retVal == WAIT_OBJECT_0) {					
 					if (!threadHandles[i].isJump) {
 						cout << "jump start" << endl;
 						threadHandles[i].isJump = true;
@@ -231,6 +231,12 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								threadHandles[i].v = 0.f;
 
 							if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
+								if (threadHandles[i].direction == DIRECTION::LEFT) {
+									threadHandles[i].x -= 10;
+								}
+								else if (threadHandles[i].direction == DIRECTION::RIGHT) {
+									threadHandles[i].x += 10;
+								}
 								mPacket.x = threadHandles[i].x;
 								threadHandles[i].v += threadHandles[i].g;
 								threadHandles[i].y += threadHandles[i].v;
@@ -242,6 +248,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 										threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei / 2; //À§Ä¡ Àâ¾ÆÁÖ±â
 										cout << "resetEvent: jump" << endl;
 										ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
+										threadHandles[i].direction = DIRECTION::NONE;
 										break;
 									}
 								}
@@ -255,6 +262,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							if (threadHandles[i].y > threadHandles[i].ground) {// Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾Ò´Ù¸é
 								cout << "resetEvent: jump" << endl;
 								ResetEvent(threadHandles[i].jumpEventHandle);
+								threadHandles[i].direction = DIRECTION::NONE;
 								threadHandles[i].v = 0.f;
 								threadHandles[i].isJump = false;
 								threadHandles[i].Falling = false;
@@ -266,6 +274,12 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							}
 						}
 						else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
+							if (threadHandles[i].direction == DIRECTION::LEFT) {
+								threadHandles[i].x -= 10;
+							}
+							else if (threadHandles[i].direction == DIRECTION::RIGHT) {
+								threadHandles[i].x += 10;
+							}
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v -= threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
@@ -379,22 +393,25 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		packet->type = S2CMove;
+		DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
+		if (retVal == WAIT_OBJECT_0) {
+			return;
+		}
 		if (packet->y == SHRT_MAX) {
-			DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
-			if (retVal == WAIT_OBJECT_0) {
-				return;
-			}
 			cout << "setEvent: jump" << endl;
 			SetEvent(clientInfo.jumpEventHandle);
 			return;
 		}
-		
+		if (packet->y == SHRT_MIN) {
+			clientInfo.direction = DIRECTION::NONE;
+		}
 		if (packet->x == 1) {
 			if (clientInfo.wid_a <= 10.f)
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
 			clientInfo.x += clientInfo.wid_v;
+			clientInfo.direction = DIRECTION::RIGHT;
 		}
 		if (packet->x == -1) {
 			if (clientInfo.wid_a <= 10.f)
@@ -402,11 +419,12 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
 			clientInfo.x -= clientInfo.wid_v;
+			clientInfo.direction = DIRECTION::LEFT;
 		}
-		if (packet->x == 0 && packet->y == 0) {
-			clientInfo.wid_v = 0.f;
-			clientInfo.wid_a = 0.f;
-		}
+		/*	if (packet->x == 0 && packet->y == 0) {
+				clientInfo.wid_v = 0.f;
+				clientInfo.wid_a = 0.f;
+			}*/
 
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;

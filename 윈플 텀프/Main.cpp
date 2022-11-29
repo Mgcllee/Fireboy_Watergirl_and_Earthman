@@ -23,6 +23,8 @@ static BOOL isArrow = true;
 
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
+HANDLE idleStateEvent = NULL;
+
 HWND g_hWnd;
 DWORD WINAPI ClientrecvThread(LPVOID arg);
 
@@ -74,8 +76,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 
 	selectMyCharacter = CreateEvent(NULL, TRUE, FALSE, NULL);
 	changeStageEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	idleStateEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	ResetEvent(selectMyCharacter);
 	ResetEvent(changeStageEvent);
+	ResetEvent(idleStateEvent);
 
 	// 스테이지 열기
 	currentStage = myStageMgr.getStage(stageIndex);
@@ -398,6 +402,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		hDC = GetDC(hWnd);
 		keybuffer[wParam] = FALSE;
+		Move();
 		InvalidateRect(hWnd, NULL, FALSE);
 		ReleaseDC(hWnd, hDC);
 		break;
