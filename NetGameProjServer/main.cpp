@@ -208,6 +208,18 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		}
 		else if (stageIndex == STAGE_01) {
 			for (int i = 0; i < 3; i++) {
+
+				if (!threadHandles[i].Falling) {
+					//³«ÇÏ »óÈ² Á¶°Ç¹® ¿©±â¿¡
+					//for ft : falling Foot floor
+					if (/*¶³¾îÁø´Ù¸é*/false) {
+						SetEvent(threadHandles[i].jumpEventHandle);
+						threadHandles[i].isJump = true;
+						threadHandles[i].Falling = true;
+						//break; => break to for
+					}
+				}
+
 				DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
 				if (retVal == WAIT_OBJECT_0) {
 					if (!threadHandles[i].isJump) {
@@ -218,65 +230,19 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].v = 0.f;
 						threadHandles[i].y = threadHandles[i].ground;
 					}
-					else {
-						auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		// ÀúÀåµÈ Á¡ÇÁ ½ÃÀÛºÎÅÍ °æ°ú½Ã°£
-						auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;	// ÀúÁ¤µÈ Á¡ÇÁ ÇöÀç ½Ã°¢ºÎÅÍ
-						MovePacket mPacket;
-						mPacket.id = threadHandles[i].clientId;
-						mPacket.type = S2CMove_JUMP;
 
-						// ³»ºÎ °øÅë (º¯¼ö or for¹®)Àº ÇÊ¿ä·Î ³ÖÀº °ÍÀÌ´Ï ¹ÛÀ¸·Î »©Áö ¸»¾ÆÁÖ¼¼¿ë!
-						if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 300) {
-							if (threadHandles[i].v < FLT_EPSILON) // ÀÌ°Å ¼³¸í Á» ½áÁà - v°¡ ¹ºÁö - »ó½Â ³«ÇÏ ¼Óµµ
-								threadHandles[i].v = 0.f;
+					auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		// ÀúÀåµÈ Á¡ÇÁ ½ÃÀÛºÎÅÍ °æ°ú½Ã°£
+					auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;	// ÀúÁ¤µÈ Á¡ÇÁ ÇöÀç ½Ã°¢ºÎÅÍ
+					MovePacket mPacket;
+					mPacket.id = threadHandles[i].clientId;
+					mPacket.type = S2CMove_JUMP;
 
-							if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
-								if (threadHandles[i].direction == DIRECTION::LEFT) {
-									threadHandles[i].x -= 10;
-								}
-								else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-									threadHandles[i].x += 10;
-								}
-								mPacket.x = threadHandles[i].x;
-								threadHandles[i].v += threadHandles[i].g;
-								threadHandles[i].y += threadHandles[i].v;
+					// ³»ºÎ °øÅë (º¯¼ö or for¹®)Àº ÇÊ¿ä·Î ³ÖÀº °ÍÀÌ´Ï ¹ÛÀ¸·Î »©Áö ¸»¾ÆÁÖ¼¼¿ë!
+					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 300) {
+						if (threadHandles[i].v < FLT_EPSILON) // ÀÌ°Å ¼³¸í Á» ½áÁà - v°¡ ¹ºÁö - »ó½Â ³«ÇÏ ¼Óµµ
+							threadHandles[i].v = 0.f;
 
-								for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ´ëÇØ¼­
-									if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
-										ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
-										threadHandles[i].direction = DIRECTION::NONE;
-										threadHandles[i].v = 0.f;
-										threadHandles[i].isJump = false;
-										threadHandles[i].Falling = false;
-										threadHandles[i].y = threadHandles[i].ground = ft.y - (ft.hei * 2); //À§Ä¡ Àâ¾ÆÁÖ±â
-										cout << "resetEvent: jump" << endl;
-										mPacket.type = S2CMove_IDLE;
-										break;
-									}
-								}
-
-								mPacket.y = threadHandles[i].y;
-								threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
-								for (int j = 0; j < 3; j++) {
-									send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-								}
-							}
-							if (threadHandles[i].y > threadHandles[i].ground) {// Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾Ò´Ù¸é
-								cout << "resetEvent: jump" << endl;
-								ResetEvent(threadHandles[i].jumpEventHandle);
-								threadHandles[i].direction = DIRECTION::NONE;
-								threadHandles[i].v = 0.f;
-								threadHandles[i].isJump = false;
-								threadHandles[i].Falling = false;
-								mPacket.x = threadHandles[i].x;
-								mPacket.y = threadHandles[i].y = threadHandles[i].ground; // À§Ä¡ ¸ÂÃçÁÖ±â
-								mPacket.type = S2CMove_IDLE;
-								for (int j = 0; j < 3; j++) {
-									send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-								}
-							}
-						}
-						else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
+						if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
 								threadHandles[i].x -= 10;
 							}
@@ -284,24 +250,70 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								threadHandles[i].x += 10;
 							}
 							mPacket.x = threadHandles[i].x;
-							threadHandles[i].v -= threadHandles[i].g;
+							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
 
-							for (OBJECT& ft : StageMgr.Ft) {
-								if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó
+							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ´ëÇØ¼­
+								if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
+									ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
+									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
-									threadHandles[i].Falling = true;
+									threadHandles[i].isJump = false;
+									threadHandles[i].Falling = false;
+									threadHandles[i].y = threadHandles[i].ground = ft.y - (ft.hei * 2); //À§Ä¡ Àâ¾ÆÁÖ±â
+									cout << "resetEvent: jump" << endl;
+									mPacket.type = S2CMove_IDLE;
 									break;
 								}
 							}
 
-							mPacket.y = threadHandles[i].y += threadHandles[i].v;
-							threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+							mPacket.y = threadHandles[i].y;
+							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
+							for (int j = 0; j < 3; j++) {
+								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+							}
+						}
+						if (threadHandles[i].y > threadHandles[i].ground) {// Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾Ò´Ù¸é
+							cout << "resetEvent: jump" << endl;
+							ResetEvent(threadHandles[i].jumpEventHandle);
+							threadHandles[i].direction = DIRECTION::NONE;
+							threadHandles[i].v = 0.f;
+							threadHandles[i].isJump = false;
+							threadHandles[i].Falling = false;
+							mPacket.x = threadHandles[i].x;
+							mPacket.y = threadHandles[i].y = threadHandles[i].ground; // À§Ä¡ ¸ÂÃçÁÖ±â
+							mPacket.type = S2CMove_IDLE;
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
 						}
 					}
+					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
+						if (threadHandles[i].direction == DIRECTION::LEFT) {
+							threadHandles[i].x -= 10;
+						}
+						else if (threadHandles[i].direction == DIRECTION::RIGHT) {
+							threadHandles[i].x += 10;
+						}
+						mPacket.x = threadHandles[i].x;
+						threadHandles[i].v -= threadHandles[i].g;
+						threadHandles[i].y += threadHandles[i].v;
+
+						for (OBJECT& ft : StageMgr.Ft) {
+							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó
+								threadHandles[i].v = 0.f;
+								threadHandles[i].Falling = true;
+								break;
+							}
+						}
+
+						mPacket.y = threadHandles[i].y += threadHandles[i].v;
+						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+						for (int j = 0; j < 3; j++) {
+							send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+						}
+					}
+
 				}
 			}
 		}
@@ -394,7 +406,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SMove:
 	{
-		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);		
+		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
 		if (retVal == WAIT_OBJECT_0) {
 			return;
