@@ -100,14 +100,14 @@ void ProcessPacket(char* buf)
 				else if (players[i].role == 'e') {
 					players[i].Anim[0].Load(L"Resource\\入_沥瘤_215.411.png");
 					players[i].Anim[1].Load(L"Resource\\入_沥瘤_215.411.png");
-					players[i].Anim[2].Load(L"Resource\\入_坷弗率_342.271.png");
+					players[i].Anim[2].Load(L"Resource\\入_坷弗率_376.480.png");
 					players[i].Anim[3].Load(L"Resource\\入_窍碍_215.411.png");
-					players[i].Anim[4].Load(L"Resource\\入_哭率_342.271.png");
+					players[i].Anim[4].Load(L"Resource\\入_哭率_376.480.png");
 					players[i].C_img_X_Size_01 = 215;
 					players[i].C_img_Y_Size_01 = 411;
-					players[i].C_img_Frame = 342;
-					players[i].C_img_X_Size_02 = 342;
-					players[i].C_img_Y_Size_02 = 271;
+					players[i].C_img_Frame = 376;
+					players[i].C_img_X_Size_02 = 376;
+					players[i].C_img_Y_Size_02 = 480;
 				}
 				break;
 			}

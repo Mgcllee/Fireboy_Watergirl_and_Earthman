@@ -343,7 +343,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 			break;
 		case 2:				// 캐릭터 프레임
-			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 9;
+			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 8;
 			InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case 3:
