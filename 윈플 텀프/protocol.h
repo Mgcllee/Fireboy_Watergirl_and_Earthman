@@ -64,7 +64,7 @@ struct MovePacket { // 움직임 동작 패킷
 	char id; // 클라이언트 구분 패킷
 	short x, y; // 현재 위치
 };
-
+//스테이지 타임 아웃
 struct typePacket {
 	char type;
 };
@@ -74,8 +74,6 @@ struct S2CStageTimePassPacket {
 	char type;
 	int timePassed;
 };
-//스테이지 타임 아웃
-struct S2CStageTimeoutPacket {
-	char type;
-};
+
+
 #pragma pack(pop)
