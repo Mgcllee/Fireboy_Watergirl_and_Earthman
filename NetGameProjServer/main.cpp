@@ -243,12 +243,13 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 								for (OBJECT& ft : StageMgr.Ft) {// 발판에 대해서
 									if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
-										threadHandles[i].v = 0.f;
-										threadHandles[i].Falling = false;
-										threadHandles[i].y = threadHandles[i].ground = ft.y + ft.hei / 2; //위치 잡아주기
-										cout << "resetEvent: jump" << endl;
 										ResetEvent(threadHandles[i].jumpEventHandle); // 점프는 더 이상하지 않음 - 공중에 있지 않는다
 										threadHandles[i].direction = DIRECTION::NONE;
+										threadHandles[i].v = 0.f;
+										threadHandles[i].isJump = false;
+										threadHandles[i].Falling = false;
+										threadHandles[i].y = threadHandles[i].ground = ft.y - (ft.hei * 2); //위치 잡아주기
+										cout << "resetEvent: jump" << endl;
 										mPacket.type = S2CMove_IDLE;
 										break;
 									}
