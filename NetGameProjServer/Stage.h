@@ -122,9 +122,7 @@ public:
 	OBJECT block[5];		// (Max x = 40, move x = 2)
 	OBJECT currentVisibleJewely;
 
-	//명철 인지
-	// 보석 이벤트를 담을 핸들 배열들 -> stage함수에서 초기화 해줌
-	HANDLE* jewelyEatHandle = nullptr;
+	//명철 인지	
 	// 이 스테이지의 최대 보석 갯수
 	int maxJewelyNum = 0;
 
@@ -134,8 +132,6 @@ public:
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();
-private:
-	void initialJewelyNum(); // 보석 배열 할당 초기화
 };
 
 extern Stage currentStage;

@@ -36,7 +36,7 @@
 
 #pragma pack(push, 1)
 
-struct S2CPlayerPacket { // 다른 클라이언트 기다리기위한 패킷  -> 보석 먹은것도 이걸로 쓰자
+struct S2CPlayerPacket { // 다른 클라이언트 기다리기위한 패킷  -> 보석 먹은것도 이걸로 쓰자, Door 들어가는 것도
 	char type;
 	char id; // 클라이언트 고유 id 전송
 };

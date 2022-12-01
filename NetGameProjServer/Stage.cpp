@@ -2,16 +2,6 @@
 #include "stdafx.h"
 #include "Stage.h"
 
-//명철 인지: 모르면 h참조
-void Stage::initialJewelyNum()
-{
-	HANDLE* jewelyEatHandle = new HANDLE[maxJewelyNum];
-	for (int i = 0; i < maxJewelyNum; i++) {
-		jewelyEatHandle[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
-		ResetEvent(jewelyEatHandle[i]);
-	}	
-}
-
 void Stage::Stage_1() {
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
@@ -43,8 +33,7 @@ void Stage::Stage_1() {
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
 	//보석 최대 갯수 정해주고
-	maxJewelyNum = 2;
-	initialJewelyNum(); // 보석 갯수만큼 이벤트 핸들 생성
+	maxJewelyNum = 2;	
 
 	/*jewely.emplace_back();
 	jewely.emplace_back();*/

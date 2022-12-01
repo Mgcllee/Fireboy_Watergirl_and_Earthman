@@ -10,7 +10,7 @@ array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
 HANDLE multiEvenTthreadHadle[3];
-
+HANDLE jewelyEatHandle;
 int stageIndex = -1;
 
 Stage StageMgr;
@@ -18,6 +18,7 @@ Stage StageMgr;
 // 명철 인지 인자들
 int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
 bool isVisibleDoor = false; // 문 비지블 => stage 안에 있으면 상관 없음
+mutex jewelyMutex;
 
 DWORD WINAPI ClientWorkThread(LPVOID arg);
 DWORD WINAPI ServerWorkThread(LPVOID arg);
@@ -119,6 +120,8 @@ int main(int argv, char** argc)
 	cout << "All Clients Accpet" << endl;
 
 	cout << "Start server Main Thread" << endl;
+	jewelyEatHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ResetEvent(jewelyEatHandle);
 	HANDLE serverThread = CreateThread(NULL, 0, ServerWorkThread, reinterpret_cast<LPVOID>(1), 0, NULL);
 
 	while (WSA_WAIT_EVENT_0 + 2 != WSAWaitForMultipleEvents(3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)) {}
@@ -171,15 +174,35 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
 		// 명철 인지: 콜라이드 보석, 문
-		//여기에 보석 체크? => 부하가 있을까? => 없을거 같긴한데 => 없으니 보석 먹는건 여기에 둡시다.
-		//if(threadHandles[myIdex] collide currentVisibleJewely)
-		// SetEvent(stageMgr.jewelyEatHandle[currentJewelyNum]);
-		//currentJewelyNum++
+		//여기에 보석 체크? => 부하가 있을까? => 없을거 같긴한데 => 없으니 보석 먹는건 여기에 둡시다.		
+
+		//// 일단 이걸로 ㄱㄱ
+		//if (true /*threadHandles[myIndex]   collide currentVisibleJewely*/) {
+		//	S2CPlayerPacket jewelyPacket;
+		//	jewelyPacket.id = -1;
+		//	jewelyPacket.type = S2CEatJewely;
+		//	DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
+		//	if (retVal != WAIT_OBJECT_0) {
+		//		//myScore++;
+		//		SetEvent(jewelyEatHandle);
+		//		jewelyPacket.id = myIndex;
+		//	}
+		//	//mutex 넣을 수 도 있어서
+		//	if (jewelyPacket.id != -1)
+		//		for (int j = 0; j < 3; j++)
+		//			send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
 		//
-		if (isVisibleDoor) {
-			//if(threadHandles[myIdex] collide door) => 문에 들어갈 조건 => 문에 닿기
-			// send(); // 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
-		}
+		//}
+		//
+		////
+		//if (isVisibleDoor) {
+		//	//if(threadHandles[myIdex] collide door) => 문에 들어갈 조건 => 문에 닿기
+		//	S2CPlayerPacket intoDoorPacket;
+		//	intoDoorPacket.id = myIndex;
+		//	intoDoorPacket.type = S2CIntoDoor;
+		//	for (int j = 0; j < 3; j++)
+		//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+		//}
 	}
 	return 0;
 }
@@ -221,18 +244,29 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 		}
 		else if (stageIndex >= STAGE_01) { // 어떤 인 게임 스테이지가 오든 이건 고정이니까 == -> >= 으로 수정
-			//명철 인지: 시간 관련은 이한이형이랑 대화해서 해보고
-			//보석 먹는 이벤트 다 켜졌을때 && 게임 오버 1분 이상 남았을때 -> 문 보이게 하기 위한
-			/*if () {// 하지만 시간이 게임 오버까지 1분 이상 남았다면 보석을 다 섭취시 문 위치 보이게 하자
-				//DWORD jewelyEventRetVal = WaitForMultipleObjects(StageMgr.maxJewelyNum, StageMgr.jewelyEatHandle, TRUE, 0);
-			if (jewelyEventRetVal == WAIT_OBJECT_0 + StageMgr.maxJewelyNum - 1) { // -1 맞나 확인 해야됨 일단 임시 코드임 => 모든 보석 섭취 이벤트 모두 시그널 됐다면?
-				//isVisibleDoor => 문 비지블 켜주고 => 이거 키면 문 위치를 알고 들어갈 수 있게 하자\
-
+			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
+			if (jewelyRetVal == WAIT_OBJECT_0) {
+				currentJewelyNum++;
 			}
-			}*/			
-			/*else{ // 보석을 다 못먹어서 어쨌든 문으로 들어가야해요...
-				//isVisibleDoor = true;
-			}*/			
+			//명철 인지: 시간 관련은 이한이형이랑 대화해서 해보고
+			//보석 먹은 갯수 == StageMgr.MaxJewelyNum && 게임 오버 1분 이상 남았을때 -> 문 보이게 하기 위한
+			/*
+			if(!isVisibleDoor){
+			typePacket visibleDoor;
+			visibleDoor.type = S2CDoorVisible;
+				if () {// 하지만 시간이 게임 오버까지 1분 이상 남았다면 보석을 다 섭취시 문 위치 보이게 하자
+					//isVisibleDoor => 문 비지블 켜주고 => 이거 키면 문 위치를 알고 들어갈 수 있게 하자\
+
+					for(int i=0; i< 3; i++)
+						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+				}
+				else if(timeOut){ // 보석을 다 못먹어서 어쨌든 문으로 들어가야해요...
+					//isVisibleDoor = true;
+					for(int i=0; i< 3; i++)
+						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+				}
+			}
+			*/
 
 			for (int i = 0; i < 3; i++) {
 				if (!threadHandles[i].Falling) {
@@ -382,9 +416,6 @@ void TimeoutStage()
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
 {
-	//changePacket() => send S2CChangeRolePacket
-	//selectPacket() => mutex Role container and send S2CSelectPacket
-	//movePacket(); => 여기서 충돌 체크, 보석 체크 => 여기서 보석을 다 먹었다면 두 클라이언트에게 문 여는 패킷 전송, 문 들어가라는 패킷도 전송해야되네
 	if (packetStart == nullptr)
 		return;
 	switch (reinterpret_cast<char*>(packetStart)[0]) {
