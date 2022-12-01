@@ -2,31 +2,31 @@
 
 Timer::Timer()
 {
-	_isRunning = false;
+	isRunning = false;
 }
 Timer::~Timer()
 {
-	if (_isRunning == true)
+	if (isRunning == true)
 	{
 		Stop();
 	}
 }
 bool Timer::IsRunning()
 {
-	return _isRunning;
+	return isRunning;
 }
 void Timer::Start(const Milliseconds& milliseconds, const IntervalCallback& intervalCallback)
 {
-	if (_isRunning == true)
+	if (isRunning == true)
 	{
 		return;
 	}
-	_startTime = std::chrono::steady_clock::now();
-	_isRunning = true;
+	startTime = std::chrono::steady_clock::now();
+	isRunning = true;
 
-	_woker = std::thread([=]
+	woker = std::thread([=]
 		{
-			while (_isRunning == true)
+			while (isRunning == true)
 			{
 				std::this_thread::sleep_for(milliseconds); 
 				intervalCallback();
@@ -35,17 +35,17 @@ void Timer::Start(const Milliseconds& milliseconds, const IntervalCallback& inte
 }
 void Timer::Stop()
 {
-	_isRunning = false;
-	_woker.join();
+	isRunning = false;
+	woker.join();
 }
 
 void Timer::Reset()
 {
-	_startTime = std::chrono::steady_clock::now();
+	startTime = std::chrono::steady_clock::now();
 }
 
 long long Timer::GetElapsedTime()
 {
 	std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
-	return std::chrono::duration_cast<std::chrono::milliseconds>(current - _startTime).count();
+	return std::chrono::duration_cast<std::chrono::milliseconds>(current - startTime).count();
 }

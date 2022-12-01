@@ -20,7 +20,9 @@
 #define EDIT_SERVER_ADDR	500
 #define BTN_LEFT_ARROW		600
 #define BTN_RIGHT_ARROW		701
+
 #define BTN_SELECT			800
+#define	BTN_STOP			900
 
 #define STAGE_TITLE			0
 #define STAGE_LOADING		1

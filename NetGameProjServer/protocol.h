@@ -26,6 +26,8 @@
 #define S2CMove_JUMP 17
 #define S2CMove_LEFT 18
 #define S2CMove_RIGHT 19
+#define C2SEndout 20// 클라 종료시 전송
+#define S2CEndout 21// 클라 종료시 전송
 
 
 #define PORT_NUM 9000
@@ -85,6 +87,14 @@ struct S2CStageTimePassPacket {
 	int timePassed;
 };
 
+
+struct C2SEndPacket {
+	char type;
+};
+
+struct S2CEndPacket {
+	char type;
+};
 
 #pragma pack(pop)
 

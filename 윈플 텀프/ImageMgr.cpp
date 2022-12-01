@@ -67,6 +67,7 @@ void ImageMgr::LoadImages() {
 	player2.Load(L"Resource\\player2.png");
 
 	selectBtn.Load(L"Resource\\select_btn.png");
+	btnend.Load(L"Resource\\end.png");
 
 }
 

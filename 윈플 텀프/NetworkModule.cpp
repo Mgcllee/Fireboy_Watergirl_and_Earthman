@@ -184,9 +184,12 @@ void ProcessPacket(char* buf)
 	case S2CDoorOpen:
 
 		break;
-	case S2CExitGame:
-
+	case S2CEndout:
+	{
+		C2SEndPacket* packet = reinterpret_cast<C2SEndPacket*>(buf);
+		exit(1);
 		break;
+	}
 	case S2CJewelryVisibility:
 
 		break;
@@ -246,8 +249,11 @@ void SendPacket(void* buf)
 	case C2SRetry:
 
 		break;
-	case C2SExitGame:
-
+	case C2SEndout:
+		size = sizeof(C2SEndPacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
+		exit(1);
 		break;
 
 	default:
@@ -320,7 +326,9 @@ int GetPacketSize(char packetType)
 	case S2CMove_RIGHT:
 		retVal = sizeof(MovePacket);
 		break;
-	case S2CExitGame:
+	case C2SEndout:
+		retVal = sizeof(S2CEndPacket);
+		break;
 	case S2CDoorOpen:
 		retVal = sizeof(typePacket);
 		break;

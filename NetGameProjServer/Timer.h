@@ -17,7 +17,7 @@ public :
 	long long GetElapsedTime();
 	void Reset();
 private:
-	std::thread _woker;
-	std::atomic_bool _isRunning;
-	std::chrono::steady_clock::time_point _startTime;
+	std::thread woker;
+	std::atomic_bool isRunning;
+	std::chrono::steady_clock::time_point startTime;
 };
