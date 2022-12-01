@@ -2,6 +2,16 @@
 #include "stdafx.h"
 #include "Stage.h"
 
+//명철 인지: 모르면 h참조
+void Stage::initialJewelyNum()
+{
+	HANDLE* jewelyEatHandle = new HANDLE[maxJewelyNum];
+	for (int i = 0; i < maxJewelyNum; i++) {
+		jewelyEatHandle[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
+		ResetEvent(jewelyEatHandle[i]);
+	}	
+}
+
 void Stage::Stage_1() {
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
@@ -12,30 +22,42 @@ void Stage::Stage_1() {
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
 
-	if (Red_Jewel.empty() && Blue_Jewel.empty())
-	{
-		Die.SetVisible(false);
-		Red_Jewel.clear();
-		Blue_Jewel.clear();
+	Die.SetVisible(false);
 
-		Trap.reserve(3);
+	//명철 인지
+	//jewely queeue Clear
+	for (int i = 0; i < jewely.size(); i++)
+		jewely.pop();
 
-		for (auto& t : Trap) {
-			t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
-		}
+	Trap.reserve(3);
 
-		Blue_Jewel.emplace_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-		Red_Jewel.emplace_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
-
-		blue_door = OBJECT{ 480, 400, 60, 100, 1260, 60, TRUE };
-		red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
-
-		Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 300, 550, 112, 24, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
-		Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
+	for (auto& t : Trap) {
+		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
+
+	//명철 인지
+	//queue니까 일단 첫번째 보석은 current 한테 주고
+	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
+	//jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+	//아직 안보여줄 보석은 큐에 저장
+	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
+
+	//보석 최대 갯수 정해주고
+	maxJewelyNum = 2;
+	initialJewelyNum(); // 보석 갯수만큼 이벤트 핸들 생성
+
+	/*jewely.emplace_back();
+	jewely.emplace_back();*/
+
+	blue_door = OBJECT{ 480, 400, 60, 100, 1260, 60, TRUE };
+	red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
+
+	Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 300, 550, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
+
 }
 void Stage::Stage_2() {
 	//if (order == 0) {

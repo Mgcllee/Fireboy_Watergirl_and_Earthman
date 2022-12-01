@@ -15,6 +15,10 @@ int stageIndex = -1;
 
 Stage StageMgr;
 
+// 명철 인지 인자들
+int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
+bool isVisibleDoor = false; // 문 비지블 => stage 안에 있으면 상관 없음
+
 DWORD WINAPI ClientWorkThread(LPVOID arg);
 DWORD WINAPI ServerWorkThread(LPVOID arg);
 
@@ -66,6 +70,8 @@ int main(int argv, char** argc)
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
 		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
+		u_long blockingMode = 0;
+		ioctlsocket(threadHandles[i].clientSocket, FIONBIO, &blockingMode);
 		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
@@ -158,13 +164,21 @@ void ConstructPacket(threadInfo& clientInfo, int ioSize)
 
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
-	//WaitForSingleObject(loadFlag, INFINITE);
-
 	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
 		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
 		if (recvRetVal != 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
+		}
+		// 명철 인지: 콜라이드 보석, 문
+		//여기에 보석 체크? => 부하가 있을까? => 없을거 같긴한데 => 없으니 보석 먹는건 여기에 둡시다.
+		//if(threadHandles[myIdex] collide currentVisibleJewely)
+		// SetEvent(stageMgr.jewelyEatHandle[currentJewelyNum]);
+		//currentJewelyNum++
+		//
+		if (isVisibleDoor) {
+			//if(threadHandles[myIdex] collide door) => 문에 들어갈 조건 => 문에 닿기
+			// send(); // 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
 		}
 	}
 	return 0;
@@ -182,8 +196,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 			}
 			if (isFinish) {
-				//Send All Cleint Next Stage == Stage01
-
 				// Stage 1 의 정보 획득
 				StageMgr.Stage_1();
 				// 최초 위치 설정
@@ -208,10 +220,23 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				StageTimerStart();
 			}
 		}
-		else if (stageIndex == STAGE_01) {
-			for (int i = 0; i < 3; i++) {
+		else if (stageIndex >= STAGE_01) { // 어떤 인 게임 스테이지가 오든 이건 고정이니까 == -> >= 으로 수정
+			//명철 인지: 시간 관련은 이한이형이랑 대화해서 해보고
+			//보석 먹는 이벤트 다 켜졌을때 && 게임 오버 1분 이상 남았을때 -> 문 보이게 하기 위한
+			/*if () {// 하지만 시간이 게임 오버까지 1분 이상 남았다면 보석을 다 섭취시 문 위치 보이게 하자
+				//DWORD jewelyEventRetVal = WaitForMultipleObjects(StageMgr.maxJewelyNum, StageMgr.jewelyEatHandle, TRUE, 0);
+			if (jewelyEventRetVal == WAIT_OBJECT_0 + StageMgr.maxJewelyNum - 1) { // -1 맞나 확인 해야됨 일단 임시 코드임 => 모든 보석 섭취 이벤트 모두 시그널 됐다면?
+				//isVisibleDoor => 문 비지블 켜주고 => 이거 키면 문 위치를 알고 들어갈 수 있게 하자\
 
+			}
+			}*/			
+			/*else{ // 보석을 다 못먹어서 어쨌든 문으로 들어가야해요...
+				//isVisibleDoor = true;
+			}*/			
+
+			for (int i = 0; i < 3; i++) {
 				if (!threadHandles[i].Falling) {
+					//명철 인지:
 					//낙하 상황 조건문 여기에
 					//for ft : falling Foot floor
 					if (/*떨어진다면*/false) {

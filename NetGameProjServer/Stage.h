@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <utility>
+
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
@@ -103,17 +106,27 @@ public:
 	bool stair;							// Fire boy와 Water girl 이 문 안 계단을 올라감
 
 	OBJECT Ground{ 0, GROUND_POS_Y, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
-	std::vector<OBJECT> Red_Jewel;
-	std::vector<OBJECT> Blue_Jewel;
+	
+	// 명철 인지
+	// 보석을 하나씩 꺼내서 보여주자
+	std::queue<OBJECT> jewely;
+		
 	std::vector<OBJECT> Trap;
 	std::vector<OBJECT> Ft;			// 발판 오브젝트
 
-	// OBJECT Trap[90];		
+	// OBJECT Trap[90];
 	OBJECT Die;				// 사망시 나오는 연기 (Max x = 7950, move x = 159)
 	OBJECT blue_door;		// (Max x = 1260, move x = 60) // Max = 1296, Move = 54
 	OBJECT red_door;		// (Max x = 1260, move x = 60) // Max = 1250, Move = 50
 	OBJECT button[5];		// 노랑 버튼(block1.PNG 참고)	(Down BTN Max y = 7, move y = 1) else (Up BTN Max y = 15, move y = 1)
 	OBJECT block[5];		// (Max x = 40, move x = 2)
+	OBJECT currentVisibleJewely;
+
+	//명철 인지
+	// 보석 이벤트를 담을 핸들 배열들 -> stage함수에서 초기화 해줌
+	HANDLE* jewelyEatHandle = nullptr;
+	// 이 스테이지의 최대 보석 갯수
+	int maxJewelyNum = 0;
 
 public:
 	void title() {}
@@ -121,6 +134,8 @@ public:
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();
+private:
+	void initialJewelyNum(); // 보석 배열 할당 초기화
 };
 
 extern Stage currentStage;
