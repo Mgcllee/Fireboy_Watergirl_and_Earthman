@@ -71,6 +71,8 @@ struct MovePacket { // 움직임 동작 패킷
 	short x, y; // 현재 위치
 };
 
+//스테이지 타임 아웃
+
 struct typePacket {
 	//unsigned char size;
 	char type;
@@ -81,11 +83,6 @@ struct typePacket {
 struct S2CStageTimePassPacket {
 	char type = S2CStageTimePass;
 	int timePassed;
-};
-
-//스테이지 타임 아웃
-struct S2CStageTimeoutPacket {
-	char type = S2CStageTimeout;
 };
 
 

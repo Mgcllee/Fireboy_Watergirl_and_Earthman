@@ -110,7 +110,9 @@ int main(int argv, char** argc)
 			stageIndex = STAGE_ROLE;
 		}
 	}
+	cout << "All Clients Accpet" << endl;
 
+	cout << "Start server Main Thread" << endl;
 	HANDLE serverThread = CreateThread(NULL, 0, ServerWorkThread, reinterpret_cast<LPVOID>(1), 0, NULL);
 
 	while (WSA_WAIT_EVENT_0 + 2 != WSAWaitForMultipleEvents(3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)) {}
