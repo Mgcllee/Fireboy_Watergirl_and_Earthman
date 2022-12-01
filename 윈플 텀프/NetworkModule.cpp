@@ -181,15 +181,12 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CDoorOpen:
-
-		break;
 	case S2CExitGame:
 
 		break;
-	case S2CJewelryVisibility:
+		/*case S2CJewelryVisibility:
 
-		break;
+			break;*/
 	case S2CChangeStage:
 	{
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
@@ -210,8 +207,33 @@ void ProcessPacket(char* buf)
 	{
 		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		StageMgr::IsTimeoutStageEnd = true;
+	}
+	break;
+	case S2CDoorVisible:
+		doorVisible = true;
+		break;
+	case S2CIntoDoor:
+	{
+		//Client Into Door = true; => PlayerInfo에서 bool넣어서 판단하고 애니메이션 해서 비지블 관리
+		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 
-
+		for (int i = 0; i < 3; i++) {
+			if (players[i].id == packet->id) {
+				players[i].isIntoDoor = true;
+				players[i].Frame = 0;
+			}
+		}
+	}
+	break;
+	case S2CEatJewely:
+	{
+		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
+		
+		for (int i = 0; i < 3; i++) {
+			if (players[i].id == packet->id) {
+				// score ++;
+			}
+		}		
 	}
 	break;
 	default:
@@ -232,11 +254,10 @@ void SendPacket(void* buf)
 		packet = new char[size];
 		memcpy(packet, buf, size);
 		break;
-	case C2SChangeRole:
+	case C2SChangRole:
 		size = sizeof(C2SRolePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
-
 		break;
 	case C2SMove:
 		size = sizeof(MovePacket);
@@ -298,6 +319,8 @@ int GetPacketSize(char packetType)
 	{
 	case S2CLoading:
 	case S2CAddPlayer:
+	case S2CIntoDoor:
+	case S2CEatJewely:
 		retVal = sizeof(S2CPlayerPacket);
 		break;
 	case S2CChangeRole:
@@ -307,7 +330,6 @@ int GetPacketSize(char packetType)
 	case S2CChangeStage:
 		retVal = sizeof(S2CChangeStagePacket);
 		break;
-
 	case S2CStageTimePass:
 		retVal = sizeof(S2CStageTimePassPacket);
 		break;
@@ -321,12 +343,12 @@ int GetPacketSize(char packetType)
 		retVal = sizeof(MovePacket);
 		break;
 	case S2CExitGame:
-	case S2CDoorOpen:
+	case S2CDoorVisible:
 		retVal = sizeof(typePacket);
 		break;
-	case S2CJewelryVisibility:
-		retVal = sizeof(S2CJewelryVisibilityPacket);
-		break;
+		/*case S2CJewelryVisibility:
+			retVal = sizeof(S2CJewelryVisibilityPacket);
+			break;*/
 	default:
 		break;
 	}

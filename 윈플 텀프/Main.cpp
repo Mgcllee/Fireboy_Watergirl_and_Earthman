@@ -17,7 +17,7 @@ int currneClientNum = 1;
 
 int prevSize = 0;
 int myId = -1;
-
+bool doorVisible = false;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
 
@@ -175,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case BTN_LEFT_ARROW:
 		{
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangeRole;
+			makePacket.type = C2SChangRole;
 			//f w e
 			if (players[0].role == 'e') {
 				players[0].role = 'w';
@@ -194,7 +194,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//fwe
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangeRole;			
+			makePacket.type = C2SChangRole;			
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
 			}

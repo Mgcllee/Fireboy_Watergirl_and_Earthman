@@ -81,6 +81,7 @@ public:
 	bool is_Jumping = FALSE;
 	bool is_Push = FALSE;
 	bool Down = FALSE;
+	bool isIntoDoor = FALSE;
 
 	PLAYER() : id(-1), role('f') {}
 	~PLAYER() {
@@ -165,6 +166,7 @@ extern char recvBuf[MAX_BUF_SIZE];
 extern int prevSize;
 extern int myId;
 extern int stageIndex;
+extern bool doorVisible;
 
 extern HANDLE selectMyCharacter;
 extern HANDLE changeStageEvent;

@@ -283,7 +283,10 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 // Fire boy와 Water girl의 애니메이션 재생 함수
 void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 	for (PLAYER& pl : players) {
-		if (pl.on)
+		if (pl.isIntoDoor) {
+			//들어가는 애니메이션 출력
+		}
+		else if (pl.on)
 		{
 			if (pl.direction == DIRECTION::JUMP) {
 				pl.Anim[3].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0, 0, pl.C_img_X_Size_01, pl.C_img_Y_Size_01);
