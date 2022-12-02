@@ -22,6 +22,10 @@ public:
 	CImage leftArrow, rightArrow;
 	CImage me, player1, player2;
 	CImage selectBtn;
+
+	CImage btnend;
+
+
 public:
 	void LoadImages();
 	void DrawMap(HDC* memdc, short stageNum, Stage& stage);

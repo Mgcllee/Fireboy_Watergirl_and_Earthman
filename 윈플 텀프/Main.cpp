@@ -99,8 +99,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 HWND start_button, retry_button, end_button, next_button, server_addr;
 HWND selectRoleLeftArrow;
 HWND selectBtn;
+HWND btnend;
 HWND selectRoleRightArrow;
 BOOL back = FALSE;
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -114,8 +116,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
+		
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
-
+		
+		
 		static HFONT s_hFont = (HFONT)NULL;
 		NONCLIENTMETRICS nonClientMetrics;
 		ZeroMemory(&nonClientMetrics, sizeof(nonClientMetrics));
@@ -128,9 +132,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
 		selectRoleLeftArrow = CreateWindow(L"button", L"Left", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
 		selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 500, 620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
+		btnend = CreateWindow(L"button", L"end", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 280, 242, 142, hWnd, (HMENU)BTN_STOP, g_hInst, NULL);
 		SendMessage(selectRoleLeftArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
 		SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
 		SendMessage(selectBtn, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.selectBtn));
+		SendMessage(btnend, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.btnend));
+		
 
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
@@ -241,8 +248,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SetTimer(hWnd, 3, 1000, NULL);
 			DestroyWindow(next_button);
 			break;
+		
+		case BTN_STOP:
+			exit(1);
+			C2SEndPacket endPacket;
+			endPacket.type = C2SEndout;
+			SendPacket(&endPacket);
+			break;
 		}
-		break;
+		
 	case WM_TIMER:
 		switch (wParam) {
 		case 1:
