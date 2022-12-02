@@ -522,6 +522,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		
 	}
 	break;
+
 	case C2SRetry:
 	{
 

@@ -181,6 +181,12 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
+	case S2CEndout:
+	{
+		C2SEndPacket* packet = reinterpret_cast<C2SEndPacket*>(buf);
+		exit(1);
+		break;
+	}
 	case S2CExitGame:
 
 		break;
@@ -228,12 +234,12 @@ void ProcessPacket(char* buf)
 	case S2CEatJewely:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
-		
+
 		for (int i = 0; i < 3; i++) {
 			if (players[i].id == packet->id) {
 				// score ++;
 			}
-		}		
+		}
 	}
 	break;
 	default:
@@ -271,6 +277,12 @@ void SendPacket(void* buf)
 
 		break;
 
+	case C2SEndout:
+		size = sizeof(C2SEndPacket);
+		packet = new char[size];
+		memcpy(packet, buf, size);
+		exit(1);
+		break;
 	default:
 		// Packet Error
 		break;
@@ -349,6 +361,9 @@ int GetPacketSize(char packetType)
 		/*case S2CJewelryVisibility:
 			retVal = sizeof(S2CJewelryVisibilityPacket);
 			break;*/
+	case C2SEndout:
+		retVal = sizeof(S2CEndPacket);
+		break;
 	default:
 		break;
 	}

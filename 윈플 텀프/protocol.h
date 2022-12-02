@@ -30,6 +30,8 @@
 #define S2CEatJewely 20 // 보석을 누군가 먹었으니 다음 보석을 띄우라고 알려주기 위한 패킷
 #define S2CIntoDoor 21 // 문으로 들어가는 애니메이션을 위한 패킷 타입
 
+#define C2SEndout 22//
+#define S2CEndout 23
 
 
 #define PORT_NUM 9000
@@ -80,6 +82,13 @@ struct typePacket {
 struct S2CStageTimePassPacket {
 	char type = S2CStageTimePass;
 	int timePassed;
+};
+
+struct C2SEndPacket {
+	char type;
+};
+struct S2CEndPacket {
+	char type;
 };
 
 #pragma pack(pop)
