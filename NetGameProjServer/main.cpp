@@ -5,7 +5,7 @@
 #include<time.h>
 
 
-array<threadInfo, 3> threadHandles;
+array<ThreadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
@@ -146,7 +146,7 @@ void Display_Err(int Errcode)
 	LocalFree(lpMsgBuf);
 }
 
-void ConstructPacket(threadInfo& clientInfo, int ioSize)
+void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
 {
 	int restSize = ioSize + clientInfo.prevSize;
 	int needSize = 0;
@@ -229,6 +229,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					setPosition.x = threadHandles[i].x;
 					setPosition.y = threadHandles[i].y;
 					for (int j = 0; j < 3; ++j) {
+						threadHandles[j].onBoard = StageMgr.Ground;
 						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
 					}
 				}
@@ -269,15 +270,13 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			*/
 
 			for (int i = 0; i < 3; i++) {
-				if (!threadHandles[i].Falling) {
-					//명철 인지:
-					//낙하 상황 조건문 여기에
-					//for ft : falling Foot floor
-					if (/*떨어진다면*/false) {
+				if (!threadHandles[i].Falling) {	
+					if (threadHandles[i].onBoard.FT_Collide_Fall(threadHandles[i])) {
 						SetEvent(threadHandles[i].jumpEventHandle);
 						threadHandles[i].isJump = true;
 						threadHandles[i].Falling = true;
-						//break; => break to for
+						threadHandles[i].jumpStartTime = high_resolution_clock::now();
+						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 					}
 				}
 
@@ -300,10 +299,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 					// 내부 공통 (변수 or for문)은 필요로 넣은 것이니 밖으로 빼지 말아주세용!
 					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 300) {
-						if (threadHandles[i].v < FLT_EPSILON) // 이거 설명 좀 써줘 - v가 뭔지 - 상승 낙하 속도
+						if (threadHandles[i].v < FLT_EPSILON)
 							threadHandles[i].v = 0.f;
 
-						if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {//30ms마다 또는 y가 위에 떠 있을때
+						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms마다 또는 y가 위에 떠 있을때
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
 								threadHandles[i].x -= 10;
 							}
@@ -314,40 +313,41 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
 
-							for (OBJECT& ft : StageMgr.Ft) {// 발판에 대해서
-								if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
+							for (OBJECT& ft : StageMgr.Ft) {// 발판에 안착
+								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
+									cout << "collide on Board" << endl;
 									ResetEvent(threadHandles[i].jumpEventHandle); // 점프는 더 이상하지 않음 - 공중에 있지 않는다
 									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
 									threadHandles[i].isJump = false;
 									threadHandles[i].Falling = false;
-									threadHandles[i].y = threadHandles[i].ground = ft.y - (ft.hei * 2); //위치 잡아주기
+									threadHandles[i].onBoard = ft;
+									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; //위치 잡아주기
 									cout << "resetEvent: jump" << endl;
 									mPacket.type = S2CMove_IDLE;
 									break;
 								}
 							}
-
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // 다음과 점프시간을 위해 현재 점프한 시간 저장
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
 						}
-						if (threadHandles[i].y > threadHandles[i].ground) {// 캐릭터가 땅에 닿았다면
-							cout << "resetEvent: jump" << endl;
-							ResetEvent(threadHandles[i].jumpEventHandle);
-							threadHandles[i].direction = DIRECTION::NONE;
-							threadHandles[i].v = 0.f;
-							threadHandles[i].isJump = false;
-							threadHandles[i].Falling = false;
-							mPacket.x = threadHandles[i].x;
-							mPacket.y = threadHandles[i].y = threadHandles[i].ground; // 위치 맞춰주기
-							mPacket.type = S2CMove_IDLE;
-							for (int j = 0; j < 3; j++) {
-								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-							}
-						}
+						//if (threadHandles[i].y > threadHandles[i].ground) {// 캐릭터가 땅에 닿았다면
+						//	cout << "resetEvent: jump" << endl;
+						//	ResetEvent(threadHandles[i].jumpEventHandle);
+						//	threadHandles[i].direction = DIRECTION::NONE;
+						//	threadHandles[i].v = 0.f;
+						//	threadHandles[i].isJump = false;
+						//	threadHandles[i].Falling = false;							
+						//	mPacket.x = threadHandles[i].x;
+						//	mPacket.y = threadHandles[i].y = threadHandles[i].ground; // 위치 맞춰주기
+						//	mPacket.type = S2CMove_IDLE;
+						//	for (int j = 0; j < 3; j++) {
+						//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+						//	}
+						//}
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //상승
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
@@ -361,13 +361,14 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].y += threadHandles[i].v;
 
 						for (OBJECT& ft : StageMgr.Ft) {
-							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//올라가다가 발판에 걸렸다면 떨어져라
+							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//올라가다가 발판에 걸렸다면 떨어져라 머리 충돌
+								cout << "collide head" << endl;
+
 								threadHandles[i].v = 0.f;
 								threadHandles[i].Falling = true;
 								break;
 							}
 						}
-
 						mPacket.y = threadHandles[i].y += threadHandles[i].v;
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						for (int j = 0; j < 3; j++) {
@@ -414,7 +415,7 @@ void TimeoutStage()
 	_timer.Stop();
 }
 
-void ProcessPacket(threadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
+void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // 아직 쓰지않는 함수 - recv()하면서 불러줌
 {
 	if (packetStart == nullptr)
 		return;

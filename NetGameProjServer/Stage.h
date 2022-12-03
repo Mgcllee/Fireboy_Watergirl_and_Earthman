@@ -3,7 +3,7 @@
 #include <vector>
 #include <queue>
 #include <utility>
-
+#include "object.h"
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
@@ -41,56 +41,6 @@ public:
 	}
 };
 
-class OBJECT {
-	bool On = false;			// 사용 여부
-
-public:
-	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 위치좌표
-	int image_x{}, image_y{};	// 출력할 이미지 프레임 기준점 (스프라이트 이미지)
-	int wid{}, hei{};			// 가로길이, 세로길이
-	int MaxWid{};				// 전체 스프라이트 가로길이
-	int imageMoveWid{};			// 스프라이트 이미지 이동
-
-	OBJECT() {};
-	OBJECT(int pos_x, int pos_y, int WID, int HEI, int MAXWID, int IMAGEMOVEWID, bool ON)
-		: x(pos_x), y(pos_y), wid(WID), hei(HEI), MaxWid(MAXWID), imageMoveWid(IMAGEMOVEWID), On(ON) {}
-
-	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
-	bool Collision(threadInfo& pl) {
-		if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && (abs(y - pl.y) <= (hei + pl.hei) / 2)) {
-			return true;
-		}
-		else return false;
-	}
-
-	bool Ft_Collision(threadInfo& pl) {
-		if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && ((y - pl.y) < ((hei + pl.hei) / 3.0f))) {
-			return true;
-		}
-		else return false;
-	}
-
-	void SetVisible(bool in) {
-		On = in;
-	}
-
-	bool GetVisible() {
-		return On;
-	}
-
-	bool ChangeFrame(int direction, bool replay) {
-		if (MaxWid == image_x + imageMoveWid) {
-			if (replay)
-				image_x = 0;
-			return true;
-		}
-		else {
-			image_x += (imageMoveWid * direction);
-			return false;
-		}
-	}
-};
-
 class Stage
 {
 public:
@@ -105,7 +55,7 @@ public:
 	int blue_total;						// 파랑 보석 총 개수
 	bool stair;							// Fire boy와 Water girl 이 문 안 계단을 올라감
 
-	OBJECT Ground{ 0, GROUND_POS_Y, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
+	OBJECT Ground{ WINDOW_WID / 2, WINDOW_HEI, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
 	
 	// 명철 인지
 	// 보석을 하나씩 꺼내서 보여주자
