@@ -532,6 +532,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket),0);
 		}
+		cout << "°­Á¦Á¾·á ½ÇÇà" << endl;
 	}
 	break;
 
