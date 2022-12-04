@@ -281,7 +281,7 @@ void SendPacket(void* buf)
 		size = sizeof(C2SEndPacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
-		exit(1);
+		
 		break;
 	default:
 		// Packet Error
@@ -291,6 +291,10 @@ void SendPacket(void* buf)
 	if (packet != nullptr) {
 		send(c_socket, packet, size, NULL);
 		delete[] packet;
+		if (reinterpret_cast<char*>(buf)[0] == C2SEndout)
+		{
+			exit(1);
+		}
 	}
 }
 
@@ -355,12 +359,14 @@ int GetPacketSize(char packetType)
 		retVal = sizeof(MovePacket);
 		break;
 	case S2CExitGame:
+	case S2CEndout:
 	case S2CDoorVisible:
 		retVal = sizeof(typePacket);
 		break;
 		/*case S2CJewelryVisibility:
 			retVal = sizeof(S2CJewelryVisibilityPacket);
 			break;*/
+
 	case C2SEndout:
 		retVal = sizeof(S2CEndPacket);
 		break;

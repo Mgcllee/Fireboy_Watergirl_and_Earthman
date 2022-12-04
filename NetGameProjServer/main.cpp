@@ -412,7 +412,7 @@ void StageTimerStart()
 void TimeoutStage()
 {
 	_timer.Stop();
-}
+} 
 
 void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
 {
@@ -516,7 +516,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		sendPacket.type = S2CEndout;
 
 		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket), 0);
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket),0);
 		}
 
 		
@@ -537,6 +537,7 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 int GetPacketSize(char packetType)
 {
 	int retVal = -1;
+	int exit = 1;
 	switch (packetType)
 	{
 	case C2SChangRole:

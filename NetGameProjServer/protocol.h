@@ -88,7 +88,7 @@ struct C2SEndPacket {
 	char type;
 };
 struct S2CEndPacket {
-	char type;
+	char type ;
 };
 
 #pragma pack(pop)
