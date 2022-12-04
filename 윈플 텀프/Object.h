@@ -1,8 +1,9 @@
 #pragma once
-//#include"ThreadInfo.h"
-class ThreadInfo;
-class OBJECT {
-	bool On = false;			// 사용 여부
+#include<wtypes.h>
+#include"Player.h"
+class OBJECT
+{
+	bool On = FALSE;			// 사용 여부
 
 public:
 	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 위치좌표
@@ -14,6 +15,29 @@ public:
 	OBJECT() {};
 	OBJECT(int pos_x, int pos_y, int WID, int HEI, int MAXWID, int IMAGEMOVEWID, bool ON)
 		: x(pos_x), y(pos_y), wid(WID), hei(HEI), MaxWid(MAXWID), imageMoveWid(IMAGEMOVEWID), On(ON) {}
+
+	// 충돌 확인 함수, Player(fire boy or water girl) 입력을 받아 this Object로 충돌 비교
+	bool Collision(PLAYER& pl) {
+		if (
+			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) <= (wid + pl.wid) / 2)
+			&&
+			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) <= (hei + pl.hei) / 2)
+			) {
+			return true;
+		}
+		else return false;
+	}
+
+	bool Ft_Collision(PLAYER& pl) {
+		if (
+			(abs((x - wid / 2) - (pl.x - pl.wid / 2)) < (wid + pl.wid) / 2)
+			&&
+			(abs((y - hei / 2) - (pl.y - pl.hei / 2)) < (hei + pl.hei) / 2)
+			) {
+			return true;
+		}
+		else return false;
+	}
 
 	void SetVisible(bool in) {
 		On = in;
@@ -34,8 +58,5 @@ public:
 			return false;
 		}
 	}
-	bool Collision(ThreadInfo& pl);
-	bool FT_Collide_Fall(ThreadInfo& pl);
-	bool Ft_Collision(ThreadInfo& pl);
-	bool OBJECT_Collide(ThreadInfo& pl);
 };
+

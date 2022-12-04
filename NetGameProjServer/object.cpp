@@ -5,7 +5,7 @@ bool OBJECT::Collision(ThreadInfo& pl) {
 	/*if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && (abs(y - pl.y) <= (hei + pl.hei) / 2)) {
 		return true;
 	}*/
-	if (pl.x > x - wid / 2  && pl.x - 60 < x + wid / 2) { // 사이 안에 있고
+	if (pl.x  > x - wid / 2  && pl.x - 60 < x + wid / 2) { // 사이 안에 있고
 		if (pl.y - 60 < y && pl.y > y) // 머리가 밑에 닿았을때
 			return true;
 	}
@@ -30,3 +30,32 @@ bool OBJECT::FT_Collide_Fall(ThreadInfo& pl) {
 	return false;
 }
 
+bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
+{
+	if (pl.x - 60 > x - wid / 2 && pl.x - 60 < x + wid / 2) { // 사이 안에 있고
+		if (pl.y < y && pl.y > y - hei) 
+			return true;
+		if (pl.y - 60 < y && pl.y - 60 > y - hei)
+			return true;
+	}
+	if (pl.x > x - wid / 2 && pl.x < x + wid / 2) {
+		if (pl.y < y && pl.y > y - hei)
+			return true;
+		if (pl.y - 60 < y && pl.y - 60 > y - hei)
+			return true;
+	}
+	if (x - wid / 2 > pl.x - 60 && x - wid / 2 < pl.x) {
+		if (pl.y - 60< y && pl.y > y)
+			return true;
+		if (pl.y - 60 < y - hei && pl.y > y - hei)
+			return true;
+	}
+	if (x + wid / 2 > pl.x - 60 && x + wid / 2 < pl.x) {
+		if (pl.y - 60 < y && pl.y > y)
+			return true;
+		if (pl.y - 60 < y - hei && pl.y > y - hei)
+			return true;
+	}
+
+	return false;
+}

@@ -1,5 +1,6 @@
+#include"stdafx.h"
 #include "Stage.h"
-Stage currentStage;
+
 
 void Stage::Loading()
 {
@@ -20,20 +21,17 @@ void Stage::Stage_1() {
 	players[2].x = 500;
 	players[2].y = 730;
 
-	if(Red_Jewel.empty() && Blue_Jewel.empty())
-	{
+	
 		Die.SetVisible(false);
-		Red_Jewel.clear();
-		Blue_Jewel.clear();
+		currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
+		jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
+		maxJewelyNum = 2;
 		Trap.reserve(3);
 
 		for (auto& t : Trap) {
 			t = OBJECT{0, 0, 20, 20, 230, 23, FALSE};
 		}
-		
-		Blue_Jewel.emplace_back(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-		Red_Jewel.emplace_back(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 
 		blue_door = OBJECT{ 480, 400, 60, 100, 1260, 60, TRUE };
 		red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
@@ -43,7 +41,7 @@ void Stage::Stage_1() {
 		Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
 		Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
 		Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
-	}
+	
 }
 void Stage::Stage_2() {
 	//if (order == 0) {

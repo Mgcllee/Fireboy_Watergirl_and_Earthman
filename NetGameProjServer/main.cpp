@@ -71,7 +71,7 @@ int main(int argv, char** argc)
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
 		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
-		u_long blockingMode = 0;
+		u_long blockingMode = 1;
 		ioctlsocket(threadHandles[i].clientSocket, FIONBIO, &blockingMode);
 		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
@@ -168,41 +168,41 @@ void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	int myIndex = reinterpret_cast<int>(arg);
-	while (true) {
+	while (true) {		
 		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
-		if (recvRetVal != 0) {
+		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
 		// ¸íÃ¶ ÀÎÁö: ÄÝ¶óÀÌµå º¸¼®, ¹®
 		//¿©±â¿¡ º¸¼® Ã¼Å©? => ºÎÇÏ°¡ ÀÖÀ»±î? => ¾øÀ»°Å °°±äÇÑµ¥ => ¾øÀ¸´Ï º¸¼® ¸Ô´Â°Ç ¿©±â¿¡ µÓ½Ã´Ù.		
 
 		//// ÀÏ´Ü ÀÌ°É·Î ¤¡¤¡
-		//if (true /*threadHandles[myIndex]   collide currentVisibleJewely*/) {
-		//	S2CPlayerPacket jewelyPacket;
-		//	jewelyPacket.id = -1;
-		//	jewelyPacket.type = S2CEatJewely;
-		//	DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
-		//	if (retVal != WAIT_OBJECT_0) {
-		//		//myScore++;
-		//		SetEvent(jewelyEatHandle);
-		//		jewelyPacket.id = myIndex;
-		//	}
-		//	//mutex ³ÖÀ» ¼ö µµ ÀÖ¾î¼­
-		//	if (jewelyPacket.id != -1)
-		//		for (int j = 0; j < 3; j++)
-		//			send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+		if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
+			S2CPlayerPacket jewelyPacket;
+			jewelyPacket.id = -1;
+			jewelyPacket.type = S2CEatJewely;
+			DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
+			if (retVal != WAIT_OBJECT_0) {
+				threadHandles[myIndex].score++;
+				SetEvent(jewelyEatHandle);
+				jewelyPacket.id = myIndex;
+			}
+			//mutex ³ÖÀ» ¼ö µµ ÀÖ¾î¼­
+			if (jewelyPacket.id != -1)
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+		
+		}
+		
 		//
-		//}
-		//
-		////
-		//if (isVisibleDoor) {
-		//	//if(threadHandles[myIdex] collide door) => ¹®¿¡ µé¾î°¥ Á¶°Ç => ¹®¿¡ ´ê±â
-		//	S2CPlayerPacket intoDoorPacket;
-		//	intoDoorPacket.id = myIndex;
-		//	intoDoorPacket.type = S2CIntoDoor;
-		//	for (int j = 0; j < 3; j++)
-		//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// ¹®À¸·Î µé¾î°¡¶ó ¸í·É => ÀÌ°Å ¿À¸é Å¬¶ó´Â ¹®À¸·Î µé¾î°¡´Â ¾Ö´Ï¸ÞÀÌ¼Ç
-		//}
+		if (isVisibleDoor) {
+			//if(threadHandles[myIdex] collide door) => ¹®¿¡ µé¾î°¥ Á¶°Ç => ¹®¿¡ ´ê±â
+			S2CPlayerPacket intoDoorPacket;
+			intoDoorPacket.id = myIndex;
+			intoDoorPacket.type = S2CIntoDoor;
+			for (int j = 0; j < 3; j++)
+				send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// ¹®À¸·Î µé¾î°¡¶ó ¸í·É => ÀÌ°Å ¿À¸é Å¬¶ó´Â ¹®À¸·Î µé¾î°¡´Â ¾Ö´Ï¸ÞÀÌ¼Ç
+		}
 	}
 	return 0;
 }
@@ -247,30 +247,30 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		else if (stageIndex >= STAGE_01) { // ¾î¶² ÀÎ °ÔÀÓ ½ºÅ×ÀÌÁö°¡ ¿Àµç ÀÌ°Ç °íÁ¤ÀÌ´Ï±î == -> >= À¸·Î ¼öÁ¤
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
 			if (jewelyRetVal == WAIT_OBJECT_0) {
+				if (!StageMgr.jewely.empty()) {
+					StageMgr.currentVisibleJewely = StageMgr.jewely.front();
+					StageMgr.jewely.pop();
+				}
 				currentJewelyNum++;
+				ResetEvent(jewelyEatHandle);
 			}
 			//¸íÃ¶ ÀÎÁö: ½Ã°£ °ü·ÃÀº ÀÌÇÑÀÌÇüÀÌ¶û ´ëÈ­ÇØ¼­ ÇØº¸°í
 			//º¸¼® ¸ÔÀº °¹¼ö == StageMgr.MaxJewelyNum && °ÔÀÓ ¿À¹ö 1ºÐ ÀÌ»ó ³²¾ÒÀ»¶§ -> ¹® º¸ÀÌ°Ô ÇÏ±â À§ÇÑ
-			/*
-			if(!isVisibleDoor){
-			typePacket visibleDoor;
-			visibleDoor.type = S2CDoorVisible;
-				if () {// ÇÏÁö¸¸ ½Ã°£ÀÌ °ÔÀÓ ¿À¹ö±îÁö 1ºÐ ÀÌ»ó ³²¾Ò´Ù¸é º¸¼®À» ´Ù ¼·Ãë½Ã ¹® À§Ä¡ º¸ÀÌ°Ô ÇÏÀÚ
-					//isVisibleDoor => ¹® ºñÁöºí ÄÑÁÖ°í => ÀÌ°Å Å°¸é ¹® À§Ä¡¸¦ ¾Ë°í µé¾î°¥ ¼ö ÀÖ°Ô ÇÏÀÚ\
 
-					for(int i=0; i< 3; i++)
-						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-				}
-				else if(timeOut){ // º¸¼®À» ´Ù ¸ø¸Ô¾î¼­ ¾îÂ·µç ¹®À¸·Î µé¾î°¡¾ßÇØ¿ä...
-					//isVisibleDoor = true;
-					for(int i=0; i< 3; i++)
-						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+			if (!isVisibleDoor) {
+				typePacket visibleDoor;
+				visibleDoor.type = S2CDoorVisible;
+				if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {// ÇÏÁö¸¸ ½Ã°£ÀÌ °ÔÀÓ ¿À¹ö±îÁö 1ºÐ ÀÌ»ó ³²¾Ò´Ù¸é º¸¼®À» ´Ù ¼·Ãë½Ã ¹® À§Ä¡ º¸ÀÌ°Ô ÇÏÀÚ
+					//isVisibleDoor => ¹® ºñÁöºí ÄÑÁÖ°í => ÀÌ°Å Å°¸é ¹® À§Ä¡¸¦ ¾Ë°í µé¾î°¥ ¼ö ÀÖ°Ô ÇÏÀÚ\					
+					for (int i = 0; i < 3; i++)
+						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
+					isVisibleDoor = true;
 				}
 			}
-			*/
+
 
 			for (int i = 0; i < 3; i++) {
-				if (!threadHandles[i].Falling) {	
+				if (!threadHandles[i].Falling) {
 					if (threadHandles[i].onBoard.FT_Collide_Fall(threadHandles[i])) {
 						SetEvent(threadHandles[i].jumpEventHandle);
 						threadHandles[i].isJump = true;
@@ -407,6 +407,16 @@ void StageTimerStart()
 					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
 			}
+			if (packet.timePassed >= 60 * 4) {
+				if (!isVisibleDoor) {
+					typePacket visibleDoorPacket;
+					visibleDoorPacket.type = S2CDoorVisible;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
+					}
+					isVisibleDoor = true;
+				}
+			}
 		});
 }
 
@@ -519,8 +529,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket), 0);
 		}
-
-		
 	}
 	break;
 

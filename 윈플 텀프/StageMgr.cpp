@@ -1,3 +1,4 @@
+#include"stdafx.h"	
 #include "StageMgr.h"
 #include"Stage.h"
 

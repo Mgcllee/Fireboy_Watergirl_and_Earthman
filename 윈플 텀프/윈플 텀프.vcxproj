@@ -170,6 +170,8 @@
   <ItemGroup>
     <ClInclude Include="GameSound.h" />
     <ClInclude Include="ImageMgr.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageMgr.h" />

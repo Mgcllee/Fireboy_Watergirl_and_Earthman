@@ -1,4 +1,5 @@
 #pragma once
+#include"stdafx.h"
 #include "Stage.h"
 #include"ImageMgr.h"
 
@@ -146,8 +147,12 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, ft.x - (ft.wid / 2), ft.y - (ft.hei), ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
-		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, stage.red_door.wid, stage.red_door.hei, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
-		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, stage.blue_door.wid, stage.blue_door.hei, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+		if(doorVisible)
+			door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, stage.red_door.wid, stage.red_door.hei, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
+		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, stage.blue_door.wid, stage.blue_door.hei, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+		if (currentJewelyNum < currentStage.maxJewelyNum) {
+			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
+		}
 		break;
 	case STAGE_02:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);

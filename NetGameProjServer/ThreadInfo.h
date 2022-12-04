@@ -41,5 +41,7 @@ public:
 
 		OBJECT onBoard;
 		bool isJump = false;
+
+		int score = 0;
 };
 

@@ -7,6 +7,7 @@
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
+Stage currentStage;
 
 WSADATA WSAData;
 SOCKET c_socket;
@@ -20,6 +21,7 @@ int myId = -1;
 bool doorVisible = false;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
+int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
 
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
@@ -116,10 +118,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE: {	// 프로그램 최초 실행에서 1회 실행
 		start_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 450, 600, 158, 60, hWnd, (HMENU)BTN_START, g_hInst, NULL);
-		
+
 		SendMessage(start_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.buttonimg));
-		
-		
+
+
 		static HFONT s_hFont = (HFONT)NULL;
 		NONCLIENTMETRICS nonClientMetrics;
 		ZeroMemory(&nonClientMetrics, sizeof(nonClientMetrics));
@@ -137,7 +139,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
 		SendMessage(selectBtn, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.selectBtn));
 		SendMessage(btnend, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.btnend));
-		
+
 
 		SetTimer(hWnd, 1, 30, NULL);
 		SetTimer(hWnd, 2, 100, NULL);
@@ -201,7 +203,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//fwe
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangRole;			
+			makePacket.type = C2SChangRole;
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
 			}
@@ -232,23 +234,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			PostQuitMessage(0);
 			break;
 
-		case BTN_NEXT_STAGE:
-			back = FALSE;
-			currentStage.clear = FALSE;
-			for (PLAYER& pl : players)
-				pl.on = true;
-			//time = 300;
-			currentStage = myStageMgr.getStage(++stageIndex);
-			myStageMgr.ResetStage();
-			currentStage.red_total = currentStage.Red_Jewel.size();
-			currentStage.blue_total = currentStage.Blue_Jewel.size();
-			currentStage.count = 0;
-			SetTimer(hWnd, 1, 30, NULL);//애니메이션
-			SetTimer(hWnd, 2, 100, NULL);//
-			SetTimer(hWnd, 3, 1000, NULL);
-			DestroyWindow(next_button);
-			break;
-		
+			//case BTN_NEXT_STAGE:
+			//	back = FALSE;
+			//	currentStage.clear = FALSE;
+			//	for (PLAYER& pl : players)
+			//		pl.on = true;
+			//	//time = 300;
+			//	currentStage = myStageMgr.getStage(++stageIndex);
+			//	myStageMgr.ResetStage();
+			//	currentStage.red_total = currentStage.Red_Jewel.size();
+			//	currentStage.blue_total = currentStage.Blue_Jewel.size();
+			//	currentStage.count = 0;
+			//	SetTimer(hWnd, 1, 30, NULL);//애니메이션
+			//	SetTimer(hWnd, 2, 100, NULL);//
+			//	SetTimer(hWnd, 3, 1000, NULL);
+			//	DestroyWindow(next_button);
+			//	break;
+
 		case BTN_STOP:
 			exit(1);
 			C2SEndPacket endPacket;
@@ -256,7 +258,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendPacket(&endPacket);
 			break;
 		}
-		
+
 	case WM_TIMER:
 		switch (wParam) {
 		case 1:
@@ -265,13 +267,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SetWindowText(hWnd, buf.c_str());
 
 			// 캐릭터 이동과 충돌체크
-			for (PLAYER& pl : players) {
+			/*for (PLAYER& pl : players) {
 				for (auto& bj : currentStage.Blue_Jewel) {
 					if (bj.Collision(pl)) {
 						bj.SetVisible(false);
 					}
 				}
-			}
+			}*/
 
 			if (STAGE_01 <= currentStage.stage)
 			{
@@ -287,14 +289,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			for (OBJECT& bj : currentStage.Blue_Jewel)
+			/*for (OBJECT& bj : currentStage.Blue_Jewel)
 				if (bj.GetVisible() && bj.ChangeFrame(1, false))
-					bj.image_x = 0;
+					bj.image_x = 0;*/
 
-			for (OBJECT& rj : currentStage.Red_Jewel)
-				if (rj.GetVisible() && rj.ChangeFrame(1, false))
-					rj.image_x = 0;
-	
+					//for (OBJECT& rj : currentStage.currentVisibleJewely)
+			if (currentStage.currentVisibleJewely.GetVisible() && currentStage.currentVisibleJewely.ChangeFrame(1, false))
+				currentStage.currentVisibleJewely.image_x = 0;
+
 			for (OBJECT& t : currentStage.Trap)
 				if (t.GetVisible())
 					t.ChangeFrame(1, true);
@@ -355,7 +357,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				else
 					block.ChangeFrame(1, false);
 		}
-			break;
+		break;
 		case 2:				// 캐릭터 프레임
 			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 8;
 			InvalidateRect(hWnd, NULL, FALSE);
@@ -384,10 +386,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
 			if (retVal == WAIT_OBJECT_0) {
-				
+
 				char buf[10] = { myId + '0' };
 				SetWindowTextA(hWnd, buf);
-				
+
 				ResetEvent(selectMyCharacter);
 				ShowWindow(selectRoleLeftArrow, SW_HIDE);
 				ShowWindow(selectRoleRightArrow, SW_HIDE);
@@ -451,7 +453,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
 
 
-			for (OBJECT& rj : currentStage.Red_Jewel) {
+			/*for (OBJECT& rj : currentStage.Red_Jewel) {
 				if (rj.GetVisible()) {
 					rj.ChangeFrame(1, true);
 					myImageMgr.Jewelry_red.Draw(backMemDC, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
@@ -461,7 +463,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (bj.GetVisible()) {
 					myImageMgr.Jewelry_blue.Draw(backMemDC, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
 				}
-			}
+			}*/
+			if (currentStage.maxJewelyNum == currentJewelyNum)
+				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);
 
 			// 사망시 연기 Anim
 			if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(backMemDC, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
