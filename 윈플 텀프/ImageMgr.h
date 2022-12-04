@@ -1,5 +1,6 @@
 #pragma once
-#include "stdafx.h"
+//#include "stdafx.h"
+#include <atlimage.h>
 #include"Stage.h"
 
 
@@ -31,4 +32,6 @@ public:
 	void DrawMap(HDC* memdc, short stageNum, Stage& stage);
 	void DrawTimer(HDC* memdc, short time);
 	void DrawPlayers(HDC* memdc, Stage& stage);
+	void DrawScore(HDC* memdc);
+	void DrawScoreNum(HDC* memdc, short x, short y, int num);
 };

@@ -4,13 +4,14 @@
 #include<array>
 #include<mutex>
 #include<chrono>
+#include"ThreadInfo.h"
+#include"object.h"
 #include"protocol.h"
 
 #pragma comment(lib, "ws2_32")
 
 using namespace std;
 using namespace chrono;
-#define MAX_BUF_SIZE 256
 
 #define STAGE_TITLE			0
 #define STAGE_LOADING		1
@@ -19,41 +20,10 @@ using namespace chrono;
 #define STAGE_02			4
 #define STAGE_03			5
 
-enum DIRECTION {
-	NONE,
-	LEFT,
-	RIGHT
-};
-
-struct threadInfo {
-	HANDLE threadHandle = NULL;
-	SOCKET clientSocket;
-	char recvBuf[MAX_BUF_SIZE] = { 0 };
-	int currentSize;
-	int prevSize = 0;
-	char clientId = -1;
-	short x, y;					// 좌표는 캐릭터 중심
-	short ground = 730;
-	short hei = 100, wid = 60;	// 캐릭터 크기 (콜라이더 사용)
-
-	bool Falling = false;
-
-	DIRECTION direction = NONE;
-	float wid_v{};
-	float wid_a{};
-
-	float g = 2.5f;
-	float v = 0.f;
-
-	HANDLE jumpEventHandle = NULL;
-	high_resolution_clock::time_point jumpStartTime;
-	high_resolution_clock::time_point jumpCurrentTime;
-	bool isJump = false;
-};
 
 void Display_Err(int Errcode);
-void ConstructPacket(threadInfo& clientInfo, int ioSize); // 패킷 재조립
-void ProcessPacket(threadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
+void ConstructPacket(ThreadInfo& clientInfo, int ioSize); // 패킷 재조립
+void ProcessPacket(ThreadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
 int GetPacketSize(char packetType);
 
 void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
@@ -63,7 +33,7 @@ void CheckJewelryEat();// 쥬얼리 습득 확인
 void CheckOpenDoor(); // 문 열리는 조건 확인
 
 
-extern array<threadInfo, 3> threadHandles;
+extern array<ThreadInfo, 3> threadHandles;
 extern array<char, 3> playerRole;
 extern mutex selectMutex;
 extern array<char, 3> selectPlayerRole;

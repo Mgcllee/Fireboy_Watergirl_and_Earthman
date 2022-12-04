@@ -1,5 +1,5 @@
 #pragma once
-
+#include<WS2tcpip.h>
 #include "stdafx.h"
 #include "protocol.h"
 #include "StageMgr.h"
@@ -234,10 +234,15 @@ void ProcessPacket(char* buf)
 	case S2CEatJewely:
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
-
 		for (int i = 0; i < 3; i++) {
 			if (players[i].id == packet->id) {
-				// score ++;
+				players[i].score += 1;
+				currentJewelyNum++;
+				if (!currentStage.jewely.empty()) {
+					currentStage.currentVisibleJewely = currentStage.jewely.front();
+					currentStage.jewely.pop();
+				}
+				break;
 			}
 		}
 	}

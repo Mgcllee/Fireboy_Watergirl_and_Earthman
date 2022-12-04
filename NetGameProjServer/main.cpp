@@ -5,7 +5,7 @@
 #include<time.h>
 
 
-array<threadInfo, 3> threadHandles;
+array<ThreadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
 mutex selectMutex;
 array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
@@ -71,7 +71,7 @@ int main(int argv, char** argc)
 		SOCKADDR_IN cl_addr;
 		int addr_size = sizeof(cl_addr);
 		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
-		u_long blockingMode = 0;
+		u_long blockingMode = 1;
 		ioctlsocket(threadHandles[i].clientSocket, FIONBIO, &blockingMode);
 		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
@@ -146,7 +146,7 @@ void Display_Err(int Errcode)
 	LocalFree(lpMsgBuf);
 }
 
-void ConstructPacket(threadInfo& clientInfo, int ioSize)
+void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
 {
 	int restSize = ioSize + clientInfo.prevSize;
 	int needSize = 0;
@@ -170,39 +170,40 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 	int myIndex = reinterpret_cast<int>(arg);
 	while (true) {
 		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
-		if (recvRetVal != 0) {
+		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
 		// ¸íÃ¶ ÀÎÁö: ÄÝ¶óÀÌµå º¸¼®, ¹®
 		//¿©±â¿¡ º¸¼® Ã¼Å©? => ºÎÇÏ°¡ ÀÖÀ»±î? => ¾øÀ»°Å °°±äÇÑµ¥ => ¾øÀ¸´Ï º¸¼® ¸Ô´Â°Ç ¿©±â¿¡ µÓ½Ã´Ù.		
 
 		//// ÀÏ´Ü ÀÌ°É·Î ¤¡¤¡
-		//if (true /*threadHandles[myIndex]   collide currentVisibleJewely*/) {
-		//	S2CPlayerPacket jewelyPacket;
-		//	jewelyPacket.id = -1;
-		//	jewelyPacket.type = S2CEatJewely;
-		//	DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
-		//	if (retVal != WAIT_OBJECT_0) {
-		//		//myScore++;
-		//		SetEvent(jewelyEatHandle);
-		//		jewelyPacket.id = myIndex;
-		//	}
-		//	//mutex ³ÖÀ» ¼ö µµ ÀÖ¾î¼­
-		//	if (jewelyPacket.id != -1)
-		//		for (int j = 0; j < 3; j++)
-		//			send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+		if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
+			S2CPlayerPacket jewelyPacket;
+			jewelyPacket.id = -1;
+			jewelyPacket.type = S2CEatJewely;
+			DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
+			if (retVal != WAIT_OBJECT_0) {
+				threadHandles[myIndex].score++;
+				SetEvent(jewelyEatHandle);
+				jewelyPacket.id = myIndex;
+			}
+			//mutex ³ÖÀ» ¼ö µµ ÀÖ¾î¼­
+			if (jewelyPacket.id != -1)
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+
+		}
+
 		//
-		//}
-		//
-		////
-		//if (isVisibleDoor) {
-		//	//if(threadHandles[myIdex] collide door) => ¹®¿¡ µé¾î°¥ Á¶°Ç => ¹®¿¡ ´ê±â
-		//	S2CPlayerPacket intoDoorPacket;
-		//	intoDoorPacket.id = myIndex;
-		//	intoDoorPacket.type = S2CIntoDoor;
-		//	for (int j = 0; j < 3; j++)
-		//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// ¹®À¸·Î µé¾î°¡¶ó ¸í·É => ÀÌ°Å ¿À¸é Å¬¶ó´Â ¹®À¸·Î µé¾î°¡´Â ¾Ö´Ï¸ÞÀÌ¼Ç
-		//}
+		if (isVisibleDoor) {
+			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
+				S2CPlayerPacket intoDoorPacket;
+				intoDoorPacket.id = myIndex;
+				intoDoorPacket.type = S2CIntoDoor;
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// ¹®À¸·Î µé¾î°¡¶ó ¸í·É => ÀÌ°Å ¿À¸é Å¬¶ó´Â ¹®À¸·Î µé¾î°¡´Â ¾Ö´Ï¸ÞÀÌ¼Ç
+			}
+		}
 	}
 	return 0;
 }
@@ -229,6 +230,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					setPosition.x = threadHandles[i].x;
 					setPosition.y = threadHandles[i].y;
 					for (int j = 0; j < 3; ++j) {
+						threadHandles[j].onBoard = StageMgr.Ground;
 						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
 					}
 				}
@@ -246,38 +248,38 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		else if (stageIndex >= STAGE_01) { // ¾î¶² ÀÎ °ÔÀÓ ½ºÅ×ÀÌÁö°¡ ¿Àµç ÀÌ°Ç °íÁ¤ÀÌ´Ï±î == -> >= À¸·Î ¼öÁ¤
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
 			if (jewelyRetVal == WAIT_OBJECT_0) {
+				if (!StageMgr.jewely.empty()) {
+					StageMgr.currentVisibleJewely = StageMgr.jewely.front();
+					StageMgr.jewely.pop();
+					ResetEvent(jewelyEatHandle);
+				}
 				currentJewelyNum++;
 			}
 			//¸íÃ¶ ÀÎÁö: ½Ã°£ °ü·ÃÀº ÀÌÇÑÀÌÇüÀÌ¶û ´ëÈ­ÇØ¼­ ÇØº¸°í
 			//º¸¼® ¸ÔÀº °¹¼ö == StageMgr.MaxJewelyNum && °ÔÀÓ ¿À¹ö 1ºÐ ÀÌ»ó ³²¾ÒÀ»¶§ -> ¹® º¸ÀÌ°Ô ÇÏ±â À§ÇÑ
-			/*
-			if(!isVisibleDoor){
-			typePacket visibleDoor;
-			visibleDoor.type = S2CDoorVisible;
-				if () {// ÇÏÁö¸¸ ½Ã°£ÀÌ °ÔÀÓ ¿À¹ö±îÁö 1ºÐ ÀÌ»ó ³²¾Ò´Ù¸é º¸¼®À» ´Ù ¼·Ãë½Ã ¹® À§Ä¡ º¸ÀÌ°Ô ÇÏÀÚ
-					//isVisibleDoor => ¹® ºñÁöºí ÄÑÁÖ°í => ÀÌ°Å Å°¸é ¹® À§Ä¡¸¦ ¾Ë°í µé¾î°¥ ¼ö ÀÖ°Ô ÇÏÀÚ\
 
-					for(int i=0; i< 3; i++)
-						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-				}
-				else if(timeOut){ // º¸¼®À» ´Ù ¸ø¸Ô¾î¼­ ¾îÂ·µç ¹®À¸·Î µé¾î°¡¾ßÇØ¿ä...
-					//isVisibleDoor = true;
-					for(int i=0; i< 3; i++)
-						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+			if (!isVisibleDoor) {
+				if (currentJewelyNum == StageMgr.maxJewelyNum) {
+					typePacket visibleDoor;
+					visibleDoor.type = S2CDoorVisible;
+					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {// ÇÏÁö¸¸ ½Ã°£ÀÌ °ÔÀÓ ¿À¹ö±îÁö 1ºÐ ÀÌ»ó ³²¾Ò´Ù¸é º¸¼®À» ´Ù ¼·Ãë½Ã ¹® À§Ä¡ º¸ÀÌ°Ô ÇÏÀÚ
+						//isVisibleDoor => ¹® ºñÁöºí ÄÑÁÖ°í => ÀÌ°Å Å°¸é ¹® À§Ä¡¸¦ ¾Ë°í µé¾î°¥ ¼ö ÀÖ°Ô ÇÏÀÚ\					
+						for (int i = 0; i < 3; i++)
+							send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
+						isVisibleDoor = true;
+					}
 				}
 			}
-			*/
+
 
 			for (int i = 0; i < 3; i++) {
 				if (!threadHandles[i].Falling) {
-					//¸íÃ¶ ÀÎÁö:
-					//³«ÇÏ »óÈ² Á¶°Ç¹® ¿©±â¿¡
-					//for ft : falling Foot floor
-					if (/*¶³¾îÁø´Ù¸é*/false) {
+					if (threadHandles[i].onBoard.FT_Collide_Fall(threadHandles[i])) {
 						SetEvent(threadHandles[i].jumpEventHandle);
 						threadHandles[i].isJump = true;
 						threadHandles[i].Falling = true;
-						//break; => break to for
+						threadHandles[i].jumpStartTime = high_resolution_clock::now();
+						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 					}
 				}
 
@@ -300,10 +302,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 					// ³»ºÎ °øÅë (º¯¼ö or for¹®)Àº ÇÊ¿ä·Î ³ÖÀº °ÍÀÌ´Ï ¹ÛÀ¸·Î »©Áö ¸»¾ÆÁÖ¼¼¿ë!
 					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 300) {
-						if (threadHandles[i].v < FLT_EPSILON) // ÀÌ°Å ¼³¸í Á» ½áÁà - v°¡ ¹ºÁö - »ó½Â ³«ÇÏ ¼Óµµ
+						if (threadHandles[i].v < FLT_EPSILON)
 							threadHandles[i].v = 0.f;
 
-						if (duration_cast<milliseconds>(currentDuration).count() > 30 && ((threadHandles[i].y) < threadHandles[i].ground)) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
+						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
 								threadHandles[i].x -= 10;
 							}
@@ -314,40 +316,41 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
 
-							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ´ëÇØ¼­
-								if (ft.Ft_Collision(threadHandles[i]) && (threadHandles[i].y < ft.y + ft.hei / 2)) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
+							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ¾ÈÂø
+								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
+									cout << "collide on Board" << endl;
 									ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
 									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
 									threadHandles[i].isJump = false;
 									threadHandles[i].Falling = false;
-									threadHandles[i].y = threadHandles[i].ground = ft.y - (ft.hei * 2); //À§Ä¡ Àâ¾ÆÁÖ±â
+									threadHandles[i].onBoard = ft;
+									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; //À§Ä¡ Àâ¾ÆÁÖ±â
 									cout << "resetEvent: jump" << endl;
 									mPacket.type = S2CMove_IDLE;
 									break;
 								}
 							}
-
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
 						}
-						if (threadHandles[i].y > threadHandles[i].ground) {// Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾Ò´Ù¸é
-							cout << "resetEvent: jump" << endl;
-							ResetEvent(threadHandles[i].jumpEventHandle);
-							threadHandles[i].direction = DIRECTION::NONE;
-							threadHandles[i].v = 0.f;
-							threadHandles[i].isJump = false;
-							threadHandles[i].Falling = false;
-							mPacket.x = threadHandles[i].x;
-							mPacket.y = threadHandles[i].y = threadHandles[i].ground; // À§Ä¡ ¸ÂÃçÁÖ±â
-							mPacket.type = S2CMove_IDLE;
-							for (int j = 0; j < 3; j++) {
-								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-							}
-						}
+						//if (threadHandles[i].y > threadHandles[i].ground) {// Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾Ò´Ù¸é
+						//	cout << "resetEvent: jump" << endl;
+						//	ResetEvent(threadHandles[i].jumpEventHandle);
+						//	threadHandles[i].direction = DIRECTION::NONE;
+						//	threadHandles[i].v = 0.f;
+						//	threadHandles[i].isJump = false;
+						//	threadHandles[i].Falling = false;							
+						//	mPacket.x = threadHandles[i].x;
+						//	mPacket.y = threadHandles[i].y = threadHandles[i].ground; // À§Ä¡ ¸ÂÃçÁÖ±â
+						//	mPacket.type = S2CMove_IDLE;
+						//	for (int j = 0; j < 3; j++) {
+						//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+						//	}
+						//}
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
@@ -361,13 +364,14 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].y += threadHandles[i].v;
 
 						for (OBJECT& ft : StageMgr.Ft) {
-							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó
+							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó ¸Ó¸® Ãæµ¹
+								cout << "collide head" << endl;
+
 								threadHandles[i].v = 0.f;
 								threadHandles[i].Falling = true;
 								break;
 							}
 						}
-
 						mPacket.y = threadHandles[i].y += threadHandles[i].v;
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						for (int j = 0; j < 3; j++) {
@@ -406,6 +410,16 @@ void StageTimerStart()
 					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
 			}
+			if (packet.timePassed >= 60 * 4) {
+				if (!isVisibleDoor) {
+					typePacket visibleDoorPacket;
+					visibleDoorPacket.type = S2CDoorVisible;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
+					}
+					isVisibleDoor = true;
+				}
+			}
 		});
 }
 
@@ -414,7 +428,7 @@ void TimeoutStage()
 	_timer.Stop();
 } 
 
-void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
+void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
 {
 	if (packetStart == nullptr)
 		return;
@@ -518,8 +532,6 @@ void ProcessPacket(threadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket),0);
 		}
-
-		
 	}
 	break;
 
