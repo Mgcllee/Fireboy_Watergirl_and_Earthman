@@ -168,7 +168,7 @@ void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	int myIndex = reinterpret_cast<int>(arg);
-	while (true) {		
+	while (true) {
 		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
 		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
@@ -191,17 +191,18 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 			if (jewelyPacket.id != -1)
 				for (int j = 0; j < 3; j++)
 					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
-		
+
 		}
-		
+
 		//
 		if (isVisibleDoor) {
-			//if(threadHandles[myIdex] collide door) => 문에 들어갈 조건 => 문에 닿기
-			S2CPlayerPacket intoDoorPacket;
-			intoDoorPacket.id = myIndex;
-			intoDoorPacket.type = S2CIntoDoor;
-			for (int j = 0; j < 3; j++)
-				send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
+				S2CPlayerPacket intoDoorPacket;
+				intoDoorPacket.id = myIndex;
+				intoDoorPacket.type = S2CIntoDoor;
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+			}
 		}
 	}
 	return 0;
@@ -250,21 +251,23 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				if (!StageMgr.jewely.empty()) {
 					StageMgr.currentVisibleJewely = StageMgr.jewely.front();
 					StageMgr.jewely.pop();
+					ResetEvent(jewelyEatHandle);
 				}
 				currentJewelyNum++;
-				ResetEvent(jewelyEatHandle);
 			}
 			//명철 인지: 시간 관련은 이한이형이랑 대화해서 해보고
 			//보석 먹은 갯수 == StageMgr.MaxJewelyNum && 게임 오버 1분 이상 남았을때 -> 문 보이게 하기 위한
 
 			if (!isVisibleDoor) {
-				typePacket visibleDoor;
-				visibleDoor.type = S2CDoorVisible;
-				if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {// 하지만 시간이 게임 오버까지 1분 이상 남았다면 보석을 다 섭취시 문 위치 보이게 하자
-					//isVisibleDoor => 문 비지블 켜주고 => 이거 키면 문 위치를 알고 들어갈 수 있게 하자\					
-					for (int i = 0; i < 3; i++)
-						send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
-					isVisibleDoor = true;
+				if (currentJewelyNum == StageMgr.maxJewelyNum) {
+					typePacket visibleDoor;
+					visibleDoor.type = S2CDoorVisible;
+					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {// 하지만 시간이 게임 오버까지 1분 이상 남았다면 보석을 다 섭취시 문 위치 보이게 하자
+						//isVisibleDoor => 문 비지블 켜주고 => 이거 키면 문 위치를 알고 들어갈 수 있게 하자\					
+						for (int i = 0; i < 3; i++)
+							send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
+						isVisibleDoor = true;
+					}
 				}
 			}
 

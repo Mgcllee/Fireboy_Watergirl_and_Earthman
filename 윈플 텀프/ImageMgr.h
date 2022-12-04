@@ -32,4 +32,6 @@ public:
 	void DrawMap(HDC* memdc, short stageNum, Stage& stage);
 	void DrawTimer(HDC* memdc, short time);
 	void DrawPlayers(HDC* memdc, Stage& stage);
+	void DrawScore(HDC* memdc);
+	void DrawScoreNum(HDC* memdc, short x, short y, int num);
 };

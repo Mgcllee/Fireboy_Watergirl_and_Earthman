@@ -341,7 +341,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						btn.ChangeFrame(1, false);
 			}
 
-			if (currentStage.blue_door.Collision(players[1]))
+			/*if (currentStage.blue_door.Collision(players[1]))
 				currentStage.blue_door.ChangeFrame(1, false);
 			else if (currentStage.blue_door.image_x != 0) {
 
@@ -349,7 +349,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					currentStage.blue_door.image_x -= currentStage.blue_door.imageMoveWid;
 
 				currentStage.blue_door.ChangeFrame(-1, false);
-			}
+			}*/
 
 			for (OBJECT& block : currentStage.block)
 				if (block.GetVisible())
@@ -451,7 +451,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				DestroyWindow(selectBtn);*/
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
-
+			myImageMgr.DrawScore(&backMemDC);
 
 			/*for (OBJECT& rj : currentStage.Red_Jewel) {
 				if (rj.GetVisible()) {
@@ -464,7 +464,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					myImageMgr.Jewelry_blue.Draw(backMemDC, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
 				}
 			}*/
-			if (currentStage.maxJewelyNum == currentJewelyNum)
+			if (currentStage.maxJewelyNum < currentJewelyNum)
 				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);
 
 			// »ç¸Á½Ã ¿¬±â Anim
@@ -473,8 +473,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (currentStage.time_over) myImageMgr.timeout.Draw(backMemDC, 400, 200, 400, 250, 0, 0, 486, 286);
 			if (currentStage.stair)
 			{
-				myImageMgr.red_stair.Draw(backMemDC, currentStage.red_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 50, 73);
-				myImageMgr.blue_stair.Draw(backMemDC, currentStage.blue_door.x, currentStage.red_door.y + 30, 50, 80, currentStage.red_door.image_x, 0, 54, 77);
+				myImageMgr.red_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 50, 73);
+				//myImageMgr.blue_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 54, 77);
 				for (PLAYER& pl : players)
 					pl.on = false;
 			}

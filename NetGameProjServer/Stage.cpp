@@ -38,8 +38,8 @@ void Stage::Stage_1() {
 	/*jewely.emplace_back();
 	jewely.emplace_back();*/
 
-	blue_door = OBJECT{ 480, 400, 60, 100, 1260, 60, TRUE };
-	red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
+	door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });

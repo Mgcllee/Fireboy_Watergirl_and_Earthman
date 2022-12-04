@@ -136,7 +136,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		}
 
 
-		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게		
+		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 
 		break;
 	case STAGE_01:
@@ -148,7 +148,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		}
 
 		if(doorVisible)
-			door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, stage.red_door.wid, stage.red_door.hei, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
+			door_red.Draw(*memdc, stage.door.x, stage.door.y, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, stage.blue_door.wid, stage.blue_door.hei, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 		if (currentJewelyNum < currentStage.maxJewelyNum) {
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
@@ -162,8 +162,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
-		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
-		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
+		//door_blue.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		break;
 	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
@@ -177,8 +177,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		block_w.Draw(*memdc, stage.block[0].x + stage.block[0].image_x, stage.block[0].y, 100 + stage.block[0].image_x, 30, -stage.block[0].image_x, 0, 83 + stage.block[0].image_x, 25);
 
-		door_red.Draw(*memdc, stage.red_door.x, stage.red_door.y, 60, 100, stage.red_door.image_x, stage.red_door.image_y, 60, 104);
-		door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
+		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
+		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
 		break;
@@ -307,5 +307,51 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 				pl.Anim[2].Draw(*memdc, pl.x - pl.wid, pl.y - pl.hei, pl.wid, pl.hei, 0 + pl.C_img_Frame * pl.Frame, 0, pl.C_img_X_Size_02, pl.C_img_Y_Size_02);
 			}
 		}
+	}
+}
+
+void ImageMgr::DrawScore(HDC* memdc)
+{	
+	players[0].Anim[1].Draw(*memdc, 900, 50, 100, 150, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 920, 70, players[0].score);
+	players[1].Anim[1].Draw(*memdc, 1000, 50, 100, 150, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 1020, 70, players[1].score);
+	players[2].Anim[1].Draw(*memdc, 1100, 50, 100, 150, 0, 0, players[2].C_img_X_Size_01, players[2].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 1140, 70, players[2].score);
+}
+
+void ImageMgr::DrawScoreNum(HDC* memdc, short x, short y, int num)
+{
+	switch (num) {
+	case 0:
+		zero.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 1:
+		one.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 2:
+		two.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 3:
+		three.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 4:
+		four.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 5:
+		five.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 6:
+		six.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 7:
+		seven.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 8:
+		eight.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
+	case 9:
+		nine.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		break;
 	}
 }
