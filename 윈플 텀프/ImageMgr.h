@@ -26,6 +26,8 @@ public:
 
 	CImage btnend;
 
+	CImage first, second, third;
+	CImage finish;
 
 public:
 	void LoadImages();

@@ -25,9 +25,11 @@ StageMgr::StageMgr()
 	myStage[4].Stage_2();
 	myStage[4].stage = STAGE_02;
 
-	myStage[5].Stage_3();
+	myStage[5].SelectCharacter();
 	myStage[5].stage = STAGE_03;
 
+	myStage[RESULT];
+	myStage[5].stage = RESULT;
 	// 酒流 备泅等 何盒父 true
 	isUse[STAGE_TITLE]	= true;
 	isUse[STAGE_LOADING]= true;
@@ -35,6 +37,7 @@ StageMgr::StageMgr()
 	isUse[STAGE_01]		= true;
 	isUse[STAGE_02]		= true;
 	isUse[STAGE_03]		= false;
+	isUse[RESULT]		= true;
 }
 
 void StageMgr::ResetStage()

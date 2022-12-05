@@ -70,6 +70,12 @@ void ImageMgr::LoadImages() {
 	selectBtn.Load(L"Resource\\select_btn.png");
 	btnend.Load(L"Resource\\end.png");
 
+	first.Load(L"Resource\\first.png");
+	second.Load(L"Resource\\second.png");
+	third.Load(L"Resource\\third.png");
+	finish.Load(L"Resource\\finish.png");
+
+
 }
 
 // 현재 스테이지에 맞춰 오브젝트와 배경 그리기
@@ -99,7 +105,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 	case STAGE_ROLE:
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
-		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 403, 317);
+		me.Draw(*memdc, 150, 100, 150, 150, 0, 0, 139, 90);
 		//if(나의 캐릭터에 따라서)
 
 		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
@@ -113,7 +119,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			earthStopImage.Draw(*memdc, 150, 200, 100, 205, 0, 0, 215, 411);
 		}
 
-		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 403, 317);
+		player1.Draw(*memdc, 450, 100, 150, 150, 0, 0, 213, 91);
 		if (players[1].role == 'f') {
 			fireStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
@@ -124,7 +130,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			earthStopImage.Draw(*memdc, 500, 200, 100, 205, 0, 0, 215, 411);
 		}
 
-		player2.Draw(*memdc, 800, 100, 150, 150, 0, 0, 403, 317);
+		player2.Draw(*memdc, 800, 100, 150, 150, 0, 0, 216, 85);
 		if (players[2].role == 'f') {
 			fireStopImage.Draw(*memdc, 750, 200, 100, 205, 0, 0, 215, 411);
 		}
@@ -163,7 +169,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		}
 
 		if (doorVisible)
-			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y,	60, 104);
+			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
 
 		if (currentJewelyNum < currentStage.maxJewelyNum) {
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
@@ -188,37 +194,75 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
 		break;
+	case RESULT:
+	{
+		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
+
+		for (int i = 0; i < 2; i++) {
+			for (int j = i + 1; j < 3; j++) {
+				if (players[i].score < players[j].score)
+					std::swap(players[i], players[j]);
+			}
+		}
+		finish.Draw(*memdc, 450, 10, 300, 150, 0, 0, 172, 48);
+		first.Draw(*memdc, 200, 180, 200, 100, 0, 0, 68, 48);
+		second.Draw(*memdc, 500, 180, 200, 100, 0, 0, 87, 48);
+		third.Draw(*memdc, 800, 180, 200, 100, 0, 0, 76, 48);
+
+		for (int i = 0; i < 3; i++) {
+			//players[i].Anim[1].Draw(*memdc, 200 + 300 * i, 250, 200, 320, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
+			switch (players[i].role)
+			{
+			case'f':
+				fireStopImage.Draw(*memdc, 200 + 300 * i, 250, 200, 320, 0, 0, 215, 411);
+				break;
+			case'w':
+				waterStopImage.Draw(*memdc, 200 + 300 * i, 250, 200, 320, 0, 0, 215, 411);
+				break;
+			case'e':
+				earthStopImage.Draw(*memdc, 200 + 300 * i, 250, 200, 320, 0, 0, 215, 411);
+				break;
+			default:
+				break;
+			}
+			if (players[i].id == myId) {
+				me.Draw(*memdc, 200 + 300 * i + 45, 560, 120, 100, 0, 0, 139, 90);
+			}
+			DrawScoreNum(memdc, 200 + 300* i + 75, 640, players[i].score);
+		}		
+	}	
+	break;
 	}
-#ifdef _DEBUG
-	zero.Draw(*memdc, 100, 0, 50, 100, 0, 0, 50, 50);
-	one.Draw(*memdc, 100, 100, 50, 100, 0, 0, 50, 50);
-	two.Draw(*memdc, 100, 200, 50, 100, 0, 0, 50, 50);
-	three.Draw(*memdc, 100, 300, 50, 100, 0, 0, 50, 50);
-	four.Draw(*memdc, 100, 400, 50, 100, 0, 0, 50, 50);
-	five.Draw(*memdc, 100, 500, 50, 100, 0, 0, 50, 50);
-	six.Draw(*memdc, 100, 600, 50, 100, 0, 0, 50, 50);
-	seven.Draw(*memdc, 100, 700, 50, 100, 0, 0, 50, 50);
-	eight.Draw(*memdc, 100, 800, 50, 100, 0, 0, 50, 50);
-	nine.Draw(*memdc, 100, 900, 50, 100, 0, 0, 50, 50);
-
-	zero.Draw(*memdc, 0, 600, 50, 70, 0, 0, 50, 50);
-	one.Draw(*memdc, 100, 600, 50, 70, 0, 0, 50, 50);
-	two.Draw(*memdc, 200, 600, 50, 70, 0, 0, 50, 50);
-	three.Draw(*memdc, 300, 600, 50, 70, 0, 0, 50, 50);
-	four.Draw(*memdc, 400, 600, 50, 70, 0, 0, 50, 50);
-	five.Draw(*memdc, 500, 600, 50, 70, 0, 0, 50, 50);
-	six.Draw(*memdc, 600, 600, 50, 70, 0, 0, 50, 50);
-	seven.Draw(*memdc, 700, 600, 50, 70, 0, 0, 50, 50);
-	eight.Draw(*memdc, 800, 600, 50, 70, 0, 0, 50, 50);
-	nine.Draw(*memdc, 900, 600, 50, 70, 0, 0, 50, 50);
-
-	one.Draw(*memdc, 1000, 600, 50, 70, 0, 0, 50, 50);
-	zero.Draw(*memdc, 1050, 600, 50, 70, 0, 0, 50, 50);
-	one.Draw(*memdc, 1100, 600, 50, 70, 0, 0, 50, 50);
-	one.Draw(*memdc, 1150, 600, 50, 70, 0, 0, 50, 50);
-	one.Draw(*memdc, 1200, 600, 50, 70, 0, 0, 50, 50);
-	two.Draw(*memdc, 1250, 600, 50, 70, 0, 0, 50, 50);
-#endif
+//#ifdef _DEBUG
+//	zero.Draw(*memdc, 100, 0, 50, 100, 0, 0, 50, 50);
+//	one.Draw(*memdc, 100, 100, 50, 100, 0, 0, 50, 50);
+//	two.Draw(*memdc, 100, 200, 50, 100, 0, 0, 50, 50);
+//	three.Draw(*memdc, 100, 300, 50, 100, 0, 0, 50, 50);
+//	four.Draw(*memdc, 100, 400, 50, 100, 0, 0, 50, 50);
+//	five.Draw(*memdc, 100, 500, 50, 100, 0, 0, 50, 50);
+//	six.Draw(*memdc, 100, 600, 50, 100, 0, 0, 50, 50);
+//	seven.Draw(*memdc, 100, 700, 50, 100, 0, 0, 50, 50);
+//	eight.Draw(*memdc, 100, 800, 50, 100, 0, 0, 50, 50);
+//	nine.Draw(*memdc, 100, 900, 50, 100, 0, 0, 50, 50);
+//
+//	zero.Draw(*memdc, 0, 600, 50, 70, 0, 0, 50, 50);
+//	one.Draw(*memdc, 100, 600, 50, 70, 0, 0, 50, 50);
+//	two.Draw(*memdc, 200, 600, 50, 70, 0, 0, 50, 50);
+//	three.Draw(*memdc, 300, 600, 50, 70, 0, 0, 50, 50);
+//	four.Draw(*memdc, 400, 600, 50, 70, 0, 0, 50, 50);
+//	five.Draw(*memdc, 500, 600, 50, 70, 0, 0, 50, 50);
+//	six.Draw(*memdc, 600, 600, 50, 70, 0, 0, 50, 50);
+//	seven.Draw(*memdc, 700, 600, 50, 70, 0, 0, 50, 50);
+//	eight.Draw(*memdc, 800, 600, 50, 70, 0, 0, 50, 50);
+//	nine.Draw(*memdc, 900, 600, 50, 70, 0, 0, 50, 50);
+//
+//	one.Draw(*memdc, 1000, 600, 50, 70, 0, 0, 50, 50);
+//	zero.Draw(*memdc, 1050, 600, 50, 70, 0, 0, 50, 50);
+//	one.Draw(*memdc, 1100, 600, 50, 70, 0, 0, 50, 50);
+//	one.Draw(*memdc, 1150, 600, 50, 70, 0, 0, 50, 50);
+//	one.Draw(*memdc, 1200, 600, 50, 70, 0, 0, 50, 50);
+//	two.Draw(*memdc, 1250, 600, 50, 70, 0, 0, 50, 50);
+//#endif
 }
 
 // 스테이지 진행 화면에서 중앙, 상단에 있는 Timer 그리기
@@ -359,46 +403,46 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 
 void ImageMgr::DrawScore(HDC* memdc)
 {
-	players[0].Anim[1].Draw(*memdc, 900, 50, 100, 150, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
-	DrawScoreNum(memdc, 920, 70, players[0].score);
-	players[1].Anim[1].Draw(*memdc, 1000, 50, 100, 150, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
-	DrawScoreNum(memdc, 1020, 70, players[1].score);
-	players[2].Anim[1].Draw(*memdc, 1100, 50, 100, 150, 0, 0, players[2].C_img_X_Size_01, players[2].C_img_Y_Size_01);
-	DrawScoreNum(memdc, 1140, 70, players[2].score);
+	players[0].Anim[1].Draw(*memdc, 1000 - 55, 20, 70, 100, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 1020 - 55, 120, players[0].score);
+	players[1].Anim[1].Draw(*memdc, 1080 - 55, 20, 70, 100, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 1100 - 55, 120, players[1].score);
+	players[2].Anim[1].Draw(*memdc, 1160 - 55, 20, 70, 100, 0, 0, players[2].C_img_X_Size_01, players[2].C_img_Y_Size_01);
+	DrawScoreNum(memdc, 1180 - 55, 120, players[2].score);
 }
 
 void ImageMgr::DrawScoreNum(HDC* memdc, short x, short y, int num)
 {
 	switch (num) {
 	case 0:
-		zero.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		zero.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 1:
-		one.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		one.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 2:
-		two.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		two.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 3:
-		three.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		three.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 4:
-		four.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		four.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 5:
-		five.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		five.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 6:
-		six.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		six.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 7:
-		seven.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		seven.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 8:
-		eight.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		eight.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	case 9:
-		nine.Draw(*memdc, x, y, 10, 15, 0, 0, 50, 50);
+		nine.Draw(*memdc, x, y, 30, 45, 0, 0, 50, 50);
 		break;
 	}
 }
