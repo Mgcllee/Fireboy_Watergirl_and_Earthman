@@ -50,6 +50,12 @@ void Stage::Stage_1() {
 
 }
 void Stage::Stage_2() {
+	for (int i = 0; i < jewely.size(); i++)
+		jewely.pop();
+	Ft.clear();
+	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+	maxJewelyNum = 8;
+
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
 
@@ -81,7 +87,7 @@ void Stage::Stage_2() {
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
 
 	//보석 최대 갯수 정해주고
-	maxJewelyNum = 8;
+	//maxJewelyNum = 8;
 
 	/*
 	Trap[0].x = 200;

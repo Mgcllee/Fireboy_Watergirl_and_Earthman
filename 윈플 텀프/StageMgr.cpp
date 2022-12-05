@@ -19,8 +19,8 @@ StageMgr::StageMgr()
 	myStage[2].stage = STAGE_ROLE;
 
 	// 임시 스테이지
-	myStage[3].Stage_2();
-	myStage[3].stage = STAGE_02;
+	myStage[3].Stage_1();
+	myStage[3].stage = STAGE_01;
 
 	myStage[4].Stage_2();
 	myStage[4].stage = STAGE_02;
@@ -33,7 +33,7 @@ StageMgr::StageMgr()
 	isUse[STAGE_LOADING]= true;
 	isUse[STAGE_ROLE]	= true;
 	isUse[STAGE_01]		= true;
-	isUse[STAGE_02]		= false;
+	isUse[STAGE_02]		= true;
 	isUse[STAGE_03]		= false;
 }
 

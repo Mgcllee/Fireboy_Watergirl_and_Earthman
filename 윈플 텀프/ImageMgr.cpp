@@ -159,7 +159,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x - (ft.wid / 2), ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
 		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);

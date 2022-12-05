@@ -36,6 +36,7 @@ void Stage::Stage_1() {
 	door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
+	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 300, 550, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
@@ -44,6 +45,11 @@ void Stage::Stage_1() {
 }
 
 void Stage::Stage_2() {
+	for (int i = 0; i < jewely.size(); i++)
+		jewely.pop();
+	Ft.clear();
+	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+	maxJewelyNum = 8;
 	players[0].x = 600;
 	players[0].y = 730;
 
@@ -53,6 +59,7 @@ void Stage::Stage_2() {
 	players[2].x = 500;
 	players[2].y = 730;
 
+	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 400, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 380, 400, 224, 24, 0, 0, TRUE });

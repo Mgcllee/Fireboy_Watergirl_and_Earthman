@@ -32,7 +32,7 @@ Timer _timer;
 double timeoutSeconds = 60 * 5;
 
 int main(int argv, char** argc)
-{
+{ 
 	wcout.imbue(std::locale("korean"));
 
 
@@ -236,12 +236,12 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 
 				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = STAGE_01;
+				changePacket.stageNum = STAGE_02;
 				changePacket.type = S2CChangeStage;
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 				}
-				stageIndex = STAGE_01;
+				stageIndex = STAGE_02;
 				StageTimerStart();
 			}
 		}
@@ -286,7 +286,9 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
 				if (retVal == WAIT_OBJECT_0) {
 					if (!threadHandles[i].isJump) {
+#ifdef _DEBUG
 						cout << "jump start" << endl;
+#endif
 						threadHandles[i].isJump = true;
 						threadHandles[i].jumpStartTime = high_resolution_clock::now();
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
@@ -307,10 +309,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
-								threadHandles[i].x -= 10;
+								threadHandles[i].x -= 15;
 							}
 							else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-								threadHandles[i].x += 10;
+								threadHandles[i].x += 15;
 							}
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v += threadHandles[i].g;
@@ -318,7 +320,9 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ¾ÈÂø
 								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
+#ifdef _DEBUG
 									cout << "collide on Board" << endl;
+#endif
 									ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
 									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
@@ -326,7 +330,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									threadHandles[i].Falling = false;
 									threadHandles[i].onBoard = ft;
 									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; //À§Ä¡ Àâ¾ÆÁÖ±â
+#ifdef DEBUG
+
 									cout << "resetEvent: jump" << endl;
+#endif
 									mPacket.type = S2CMove_IDLE;
 									break;
 								}
@@ -354,10 +361,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
-							threadHandles[i].x -= 10;
+							threadHandles[i].x -= 15;
 						}
 						else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-							threadHandles[i].x += 10;
+							threadHandles[i].x += 15;
 						}
 						mPacket.x = threadHandles[i].x;
 						threadHandles[i].v -= threadHandles[i].g;
@@ -484,7 +491,9 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			return;
 		}
 		if (packet->y == SHRT_MAX) {
+#ifdef _DEBUG
 			cout << "setEvent: jump" << endl;
+#endif
 			SetEvent(clientInfo.jumpEventHandle);
 			packet->type = S2CMove_JUMP;
 		}
@@ -528,7 +537,9 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket),0);
 		}
+#ifdef _DEBUG
 		cout << "°­Á¦Á¾·á ½ÇÇà" << endl;
+#endif
 	}
 	break;
 
