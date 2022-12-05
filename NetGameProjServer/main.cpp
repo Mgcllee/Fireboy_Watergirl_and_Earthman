@@ -221,7 +221,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 			if (isFinish) {
 				// Stage 1 ÀÇ Á¤º¸ È¹µæ
-				StageMgr.Stage_1();
+				StageMgr.Stage_2();
 				// ÃÖÃÊ À§Ä¡ ¼³Á¤
 				MovePacket setPosition;
 				setPosition.type = S2CMove_IDLE;
@@ -510,10 +510,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			clientInfo.direction = DIRECTION::LEFT;
 			packet->type = S2CMove_LEFT;
 		}
-		/*	if (packet->x == 0 && packet->y == 0) {
-				clientInfo.wid_v = 0.f;
-				clientInfo.wid_a = 0.f;
-			}*/
 
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;

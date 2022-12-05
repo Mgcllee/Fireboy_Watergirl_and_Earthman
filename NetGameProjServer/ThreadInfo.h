@@ -32,7 +32,7 @@ public:
 		float wid_v{};
 		float wid_a{};
 
-		float g = 2.5f;
+		float g = 3.0f;
 		float v = 0.f;
 
 		HANDLE jumpEventHandle = NULL;

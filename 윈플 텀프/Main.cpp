@@ -233,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(end_button);
 			PostQuitMessage(0);
 			break;
-
+			  
 			//case BTN_NEXT_STAGE:
 			//	back = FALSE;
 			//	currentStage.clear = FALSE;
@@ -249,7 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//	SetTimer(hWnd, 2, 100, NULL);//
 			//	SetTimer(hWnd, 3, 1000, NULL);
 			//	DestroyWindow(next_button);
-			//	break;
+			//	break;  
 
 		case BTN_STOP:
 			PostQuitMessage(0);
@@ -263,18 +263,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case 1:
 		{
-			std::wstring buf = std::to_wstring(players[myId].x) + L", " + std::to_wstring(players[myId].y);
-			SetWindowText(hWnd, buf.c_str());
-
-			// 캐릭터 이동과 충돌체크
-			/*for (PLAYER& pl : players) {
-				for (auto& bj : currentStage.Blue_Jewel) {
-					if (bj.Collision(pl)) {
-						bj.SetVisible(false);
-					}
-				}
-			}*/
-
 			if (STAGE_01 <= currentStage.stage)
 			{
 				for (PLAYER& pl : players) {
@@ -289,11 +277,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			/*for (OBJECT& bj : currentStage.Blue_Jewel)
-				if (bj.GetVisible() && bj.ChangeFrame(1, false))
-					bj.image_x = 0;*/
-
-					//for (OBJECT& rj : currentStage.currentVisibleJewely)
 			if (currentStage.currentVisibleJewely.GetVisible() && currentStage.currentVisibleJewely.ChangeFrame(1, false))
 				currentStage.currentVisibleJewely.image_x = 0;
 
@@ -322,34 +305,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			// 스테이스 클리어 후 문으로 들어가는 애니메이션
-			// if (currentStage.red_door.Collision(players[1]) && currentStage.blue_door.Collision(players[0]))
-			//{
-			//	// if (currentStage.red_door.ChangeFrame(1) && currentStage.blue_door.ChangeFrame(1)) {
-			//	if (currentStage.blue_door.ChangeFrame(1)) {
-			//		currentStage.stair = FALSE;
-			//		currentStage.red_door.image_x = 0;
-			//		currentStage.blue_door.image_x = 0;
-			//		next_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 400, 200, 100, hWnd, (HMENU)BTN_NEXT_STAGE, g_hInst, NULL);
-			//		SendMessage(next_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.clear_img));
-			//	}
-			//}
-
 			for (PLAYER& pl : players) {
 				for (OBJECT& btn : currentStage.button)
 					if (btn.GetVisible() && btn.Collision(pl))
 						btn.ChangeFrame(1, false);
 			}
-
-			/*if (currentStage.blue_door.Collision(players[1]))
-				currentStage.blue_door.ChangeFrame(1, false);
-			else if (currentStage.blue_door.image_x != 0) {
-
-				if (currentStage.blue_door.image_x + currentStage.blue_door.imageMoveWid == currentStage.blue_door.MaxWid)
-					currentStage.blue_door.image_x -= currentStage.blue_door.imageMoveWid;
-
-				currentStage.blue_door.ChangeFrame(-1, false);
-			}*/
 
 			for (OBJECT& block : currentStage.block)
 				if (block.GetVisible())
@@ -360,16 +320,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 		case 2:				// 캐릭터 프레임
 			for (PLAYER& pl : players) pl.Frame = (pl.Frame + 1) % 8;
-			InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case 3:
-
-			if (players[currneClientNum].wid_a > 0)
-				players[currneClientNum].wid_a -= 1;
-
-			if (players[currneClientNum].wid_v - players[currneClientNum].wid_a > 0)
-				players[currneClientNum].wid_v -= players[currneClientNum].wid_a;
-
 			if (myStageMgr.IsTimeoutStageEnd == true)
 			{
 				currentStage.time_over = TRUE;
@@ -380,7 +332,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SendMessage(end_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.endimg));
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 			}
-
 			break;
 		case 4:
 		{
@@ -446,24 +397,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		else if (STAGE_ROLE < currentStage.stage) {
-			/*	DestroyWindow(selectRoleLeftArrow);
-				DestroyWindow(selectRoleRightArrow);
-				DestroyWindow(selectBtn);*/
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
 			myImageMgr.DrawScore(&backMemDC);
 
-			/*for (OBJECT& rj : currentStage.Red_Jewel) {
-				if (rj.GetVisible()) {
-					rj.ChangeFrame(1, true);
-					myImageMgr.Jewelry_red.Draw(backMemDC, rj.x, rj.y, rj.wid, rj.hei, rj.image_x, 0, 28, 24);
-				}
-			}
-			for (OBJECT& bj : currentStage.Blue_Jewel) {
-				if (bj.GetVisible()) {
-					myImageMgr.Jewelry_blue.Draw(backMemDC, bj.x, bj.y, bj.wid, bj.hei, bj.image_x, 0, 28, 24);
-				}
-			}*/
 			if (currentStage.maxJewelyNum < currentJewelyNum)
 				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);
 
@@ -474,7 +411,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (currentStage.stair)
 			{
 				myImageMgr.red_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 50, 73);
-				//myImageMgr.blue_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 54, 77);
+				//  myImageMgr.blue_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 54, 77);
 				for (PLAYER& pl : players)
 					pl.on = false;
 			}

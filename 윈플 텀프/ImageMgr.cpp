@@ -289,8 +289,19 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 // Fire boy와 Water girl의 애니메이션 재생 함수
 void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 	for (PLAYER& pl : players) {
-		if (pl.isIntoDoor) {
-			//들어가는 애니메이션 출력
+		if (pl.isIntoDoor) { 
+			// 스테이스 클리어 후 문으로 들어가는 애니메이션
+			// if (currentStage.red_door.Collision(players[1]) && currentStage.blue_door.Collision(players[0]))
+			//{
+			//	// if (currentStage.red_door.ChangeFrame(1) && currentStage.blue_door.ChangeFrame(1)) {
+			//	if (currentStage.blue_door.ChangeFrame(1)) {
+			//		currentStage.stair = FALSE;
+			//		currentStage.red_door.image_x = 0;
+			//		currentStage.blue_door.image_x = 0;
+			//		next_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 400, 200, 100, hWnd, (HMENU)BTN_NEXT_STAGE, g_hInst, NULL);
+			//		SendMessage(next_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.clear_img));
+			//	}
+			//}
 		}
 		else if (pl.on)
 		{

@@ -18,8 +18,9 @@ StageMgr::StageMgr()
 	myStage[2].lobby();		// lobby 스테이지 (=캐릭터 선택 스테이지)
 	myStage[2].stage = STAGE_ROLE;
 
-	myStage[3].Stage_1();
-	myStage[3].stage = STAGE_01;
+	// 임시 스테이지
+	myStage[3].Stage_2();
+	myStage[3].stage = STAGE_02;
 
 	myStage[4].Stage_2();
 	myStage[4].stage = STAGE_02;
