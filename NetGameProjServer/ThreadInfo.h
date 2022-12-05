@@ -36,6 +36,7 @@ public:
 		float v = 0.f;
 
 		HANDLE jumpEventHandle = NULL;
+		HANDLE intDoor = NULL;
 		high_resolution_clock::time_point jumpStartTime;
 		high_resolution_clock::time_point jumpCurrentTime;
 

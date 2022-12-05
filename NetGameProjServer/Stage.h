@@ -79,6 +79,24 @@ public:
 public:
 	void title() {}
 	void lobby() {}
+	void getStage(int index)
+	{
+		switch (index)
+		{
+		case STAGE_01:
+			Stage_1();
+			break;
+		case STAGE_02:
+			Stage_2();
+			break;
+		case STAGE_03:
+			Stage_3();
+			break;
+		default:
+			break;
+		}
+	}
+private:
 	void Stage_1();
 	void Stage_2();
 	void Stage_3();

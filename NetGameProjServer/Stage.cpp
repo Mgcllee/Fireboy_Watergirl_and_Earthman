@@ -33,12 +33,12 @@ void Stage::Stage_1() {
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
 	//보석 최대 갯수 정해주고
-	maxJewelyNum = 2;	
+	maxJewelyNum = 2;
 
 	/*jewely.emplace_back();
 	jewely.emplace_back();*/
 
-	door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
 	Ft.push_back(Ground);
@@ -64,6 +64,7 @@ void Stage::Stage_2() {
 
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
+	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });

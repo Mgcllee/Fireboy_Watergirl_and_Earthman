@@ -33,10 +33,10 @@ void Stage::Stage_1() {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
-	Ft.push_back(Ground);
+	//Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 300, 550, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 600, 450, 224, 24, 0, 0, TRUE });
@@ -48,6 +48,9 @@ void Stage::Stage_2() {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
+
+	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
+
 	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	maxJewelyNum = 8;
 	players[0].x = 600;
@@ -59,7 +62,7 @@ void Stage::Stage_2() {
 	players[2].x = 500;
 	players[2].y = 730;
 
-	Ft.push_back(Ground);
+	//Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 400, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 380, 400, 224, 24, 0, 0, TRUE });
@@ -72,13 +75,13 @@ void Stage::Stage_2() {
 
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
 	//아직 안보여줄 보석은 큐에 저장
-	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, TRUE });
 
 	//보석 최대 갯수 정해주고
 	maxJewelyNum = 8;
