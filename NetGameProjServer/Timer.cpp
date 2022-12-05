@@ -9,6 +9,7 @@ Timer::~Timer()
 	if (isRunning == true)
 	{
 		Stop();
+		woker.join();
 	}
 }
 bool Timer::IsRunning()
@@ -36,7 +37,7 @@ void Timer::Start(const Milliseconds& milliseconds, const IntervalCallback& inte
 void Timer::Stop()
 {
 	isRunning = false;
-	woker.join();
+	//woker.join();
 }
 
 void Timer::Reset()
