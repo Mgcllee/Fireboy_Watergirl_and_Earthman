@@ -401,8 +401,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
 			myImageMgr.DrawScore(&backMemDC);
 
-			if (currentStage.maxJewelyNum < currentJewelyNum)
-				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);
+		/*	if (currentStage.maxJewelyNum > currentJewelyNum)
+				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);*/
 
 			// »ç¸Á½Ã ¿¬±â Anim
 			if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(backMemDC, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);

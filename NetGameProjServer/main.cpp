@@ -269,8 +269,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				currentJewelyNum = 0;
 				stageIndex = stageIndex++;
 				StageMgr.getStage(stageIndex);
-				MovePacket setPosition;
-				setPosition.type = S2CMove_IDLE;
+				ResetEvent(jewelyEatHandle);
 
 				S2CChangeStagePacket changePacket;
 				changePacket.stageNum = stageIndex;
@@ -281,6 +280,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 
 					//스테이지당 최초위치 할당
+					MovePacket setPosition;
+					setPosition.type = S2CMove_IDLE;
 					setPosition.id = i;
 					setPosition.x = threadHandles[i].x;
 					setPosition.y = threadHandles[i].y;
@@ -291,6 +292,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 				}
 				StageTimerStart();
+				isNextStage = false;
 			}
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
 			if (jewelyRetVal == WAIT_OBJECT_0) {
@@ -367,7 +369,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
 							
-
 							for (OBJECT& ft : StageMgr.Ft) {// 발판에 안착
 								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
 #ifdef _DEBUG

@@ -24,7 +24,7 @@ void Stage::Stage_1() {
 
 	Die.SetVisible(false);
 	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
-	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, TRUE });
 
 	maxJewelyNum = 2;
 	Trap.reserve(3);
@@ -49,7 +49,7 @@ void Stage::Stage_2() {
 		jewely.pop();
 	Ft.clear();
 
-	door = OBJECT{ 700, 250 + 24, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 250 - 24, 60, 100, 0, 0, TRUE };
 
 	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	maxJewelyNum = 8;
