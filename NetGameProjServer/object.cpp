@@ -6,8 +6,9 @@ bool OBJECT::Collision(ThreadInfo& pl) {
 	/*if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && (abs(y - pl.y) <= (hei + pl.hei) / 2)) {
 		return true;
 	}*/
-	if (pl.x > x - wid / 2 && pl.x - 60 < x + wid / 2) { // 사이 안에 있고
+	if (pl.x + 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) { // 사이 안에 있고
 		if (pl.y - 60 < y && pl.y > y) {// 머리가 밑에 닿았을때
+			std::cout << "collide head" << std::endl;
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		Ft_Collision Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
 //			std::cout << "Ft_Collision wid : " << wid << ", " << hei << std::endl;
@@ -22,9 +23,10 @@ bool OBJECT::Ft_Collision(ThreadInfo& pl) {
 	/*if ((abs(x - pl.x) <= (wid + pl.wid) / 2) && ((y - pl.y) < ((hei + pl.hei) / 3.0f))) {
 		return true;
 	}*/
-	if (pl.x > x - wid / 2 && pl.x - 60 < x + wid / 2) {// 사이 안에 있고
+	if (pl.x - 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) {// 사이 안에 있고
 		if (pl.y - 60 < y - hei && pl.y > y - hei) // 다리가 위에 닿았을때
 		{
+			std::cout << "collide foot" << std::endl;
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		Ft_Collision Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
 //			std::cout << "Ft_Collision wid : " << wid << ", " << hei << std::endl;
@@ -36,7 +38,7 @@ bool OBJECT::Ft_Collision(ThreadInfo& pl) {
 }
 
 bool OBJECT::FT_Collide_Fall(ThreadInfo& pl) {
-	if (pl.x < x - wid / 2 || pl.x - 60 > x + wid / 2) {
+	if (pl.x - 5 < x - wid / 2 || pl.x - 55 > x + wid / 2) {
 //#ifdef _DEBUG
 //		std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		FT_Collide_Fall Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
 //		std::cout << "FT_Collide_Fall wid : " << wid << ", " << hei << std::endl;
@@ -48,7 +50,7 @@ bool OBJECT::FT_Collide_Fall(ThreadInfo& pl) {
 
 bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
 {
-	if (pl.x - 60 > x - wid / 2 && pl.x - 60 < x + wid / 2) { // 사이 안에 있고
+	if (pl.x - 55 > x - wid / 2 && pl.x - 55 < x + wid / 2) { // 사이 안에 있고
 		if (pl.y < y && pl.y > y - hei) {
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		OBJECT_Collide Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
@@ -64,7 +66,7 @@ bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
 			return true;
 		}
 	}
-	if (pl.x > x - wid / 2 && pl.x < x + wid / 2) {
+	if (pl.x-5 > x - wid / 2 && pl.x-5 < x + wid / 2) {
 		if (pl.y < y && pl.y > y - hei) {
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		OBJECT_Collide Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
@@ -80,7 +82,7 @@ bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
 			return true;
 		}
 	}
-	if (x - wid / 2 > pl.x - 60 && x - wid / 2 < pl.x) {
+	if (x - wid / 2 > pl.x - 55 && x - wid / 2 < pl.x-5) {
 		if (pl.y - 60 < y && pl.y > y) {
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		OBJECT_Collide Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
@@ -96,7 +98,7 @@ bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
 			return true;
 		}
 	}
-	if (x + wid / 2 > pl.x - 60 && x + wid / 2 < pl.x) {
+	if (x + wid / 2 > pl.x - 55 && x + wid / 2 < pl.x - 5) {
 		if (pl.y - 60 < y && pl.y > y) {
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		OBJECT_Collide Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
