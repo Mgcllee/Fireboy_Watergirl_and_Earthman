@@ -275,11 +275,14 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			for (int i = 0; i < 3; i++) {
 				if (!threadHandles[i].Falling) {
 					if (threadHandles[i].onBoard.FT_Collide_Fall(threadHandles[i])) {
+						DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
+						if (retVal != WAIT_OBJECT_0) {
 						SetEvent(threadHandles[i].jumpEventHandle);
 						threadHandles[i].isJump = true;
 						threadHandles[i].Falling = true;
 						threadHandles[i].jumpStartTime = high_resolution_clock::now();
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
+						}
 					}
 				}
 
@@ -303,7 +306,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					mPacket.type = S2CMove_JUMP;
 
 					// 내부 공통 (변수 or for문)은 필요로 넣은 것이니 밖으로 빼지 말아주세용!
-					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 300) {
+					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 270) {
 						if (threadHandles[i].v < FLT_EPSILON)
 							threadHandles[i].v = 0.f;
 
