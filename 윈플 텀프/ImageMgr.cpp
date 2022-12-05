@@ -162,7 +162,13 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, ft.x - (ft.wid / 2), ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
-		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
+		if (doorVisible)
+			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y,	60, 104);
+
+		if (currentJewelyNum < currentStage.maxJewelyNum) {
+			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
+		}
+
 		//door_blue.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		break;
 	case STAGE_03:
@@ -184,27 +190,27 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		break;
 	}
 #ifdef _DEBUG
-	zero.Draw(*memdc,100,	0,	 50, 100, 0, 0, 50, 50);
-	one.Draw(*memdc,	100,100, 50, 100, 0, 0, 50, 50);
-	two.Draw(*memdc,	100,200, 50, 100, 0, 0, 50, 50);
-	three.Draw(*memdc,	100,300, 50, 100, 0, 0, 50, 50);
-	four.Draw(*memdc,	100,400, 50, 100, 0, 0, 50, 50);
-	five.Draw(*memdc,	100,500, 50, 100, 0, 0, 50, 50);
-	six.Draw(*memdc,	100,600, 50, 100, 0, 0, 50, 50);
-	seven.Draw(*memdc,	100,700, 50, 100, 0, 0, 50, 50);
-	eight.Draw(*memdc,	100,800, 50, 100, 0, 0, 50, 50);
-	nine.Draw(*memdc,	100,900, 50, 100, 0, 0, 50, 50);
+	zero.Draw(*memdc, 100, 0, 50, 100, 0, 0, 50, 50);
+	one.Draw(*memdc, 100, 100, 50, 100, 0, 0, 50, 50);
+	two.Draw(*memdc, 100, 200, 50, 100, 0, 0, 50, 50);
+	three.Draw(*memdc, 100, 300, 50, 100, 0, 0, 50, 50);
+	four.Draw(*memdc, 100, 400, 50, 100, 0, 0, 50, 50);
+	five.Draw(*memdc, 100, 500, 50, 100, 0, 0, 50, 50);
+	six.Draw(*memdc, 100, 600, 50, 100, 0, 0, 50, 50);
+	seven.Draw(*memdc, 100, 700, 50, 100, 0, 0, 50, 50);
+	eight.Draw(*memdc, 100, 800, 50, 100, 0, 0, 50, 50);
+	nine.Draw(*memdc, 100, 900, 50, 100, 0, 0, 50, 50);
 
-	zero.Draw(*memdc,	0,	600, 50, 70, 0, 0, 50, 50);
-	one.Draw(*memdc,	100,600, 50, 70, 0, 0, 50, 50);
-	two.Draw(*memdc,	200,600, 50, 70, 0, 0, 50, 50);
-	three.Draw(*memdc,	300,600, 50, 70, 0, 0, 50, 50);
-	four.Draw(*memdc,	400,600, 50, 70, 0, 0, 50, 50);
-	five.Draw(*memdc,	500,600, 50, 70, 0, 0, 50, 50);
-	six.Draw(*memdc,	600,600, 50, 70, 0, 0, 50, 50);
-	seven.Draw(*memdc,	700,600, 50, 70, 0, 0, 50, 50);
-	eight.Draw(*memdc,	800,600, 50, 70, 0, 0, 50, 50);
-	nine.Draw(*memdc,	900,600, 50, 70, 0, 0, 50, 50);
+	zero.Draw(*memdc, 0, 600, 50, 70, 0, 0, 50, 50);
+	one.Draw(*memdc, 100, 600, 50, 70, 0, 0, 50, 50);
+	two.Draw(*memdc, 200, 600, 50, 70, 0, 0, 50, 50);
+	three.Draw(*memdc, 300, 600, 50, 70, 0, 0, 50, 50);
+	four.Draw(*memdc, 400, 600, 50, 70, 0, 0, 50, 50);
+	five.Draw(*memdc, 500, 600, 50, 70, 0, 0, 50, 50);
+	six.Draw(*memdc, 600, 600, 50, 70, 0, 0, 50, 50);
+	seven.Draw(*memdc, 700, 600, 50, 70, 0, 0, 50, 50);
+	eight.Draw(*memdc, 800, 600, 50, 70, 0, 0, 50, 50);
+	nine.Draw(*memdc, 900, 600, 50, 70, 0, 0, 50, 50);
 
 	one.Draw(*memdc, 1000, 600, 50, 70, 0, 0, 50, 50);
 	zero.Draw(*memdc, 1050, 600, 50, 70, 0, 0, 50, 50);

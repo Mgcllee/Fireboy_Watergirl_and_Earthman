@@ -199,12 +199,18 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 		//
 		if (isVisibleDoor) {
 			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
-				S2CPlayerPacket intoDoorPacket;
-				intoDoorPacket.id = myIndex;
-				intoDoorPacket.type = S2CIntoDoor;
-				SetEvent(threadHandles[myIndex].intDoor);
-				for (int j = 0; j < 3; j++)
-					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+				DWORD retValDoor = WaitForSingleObject(threadHandles[myIndex].intDoor, 0);
+				if (retValDoor != WAIT_OBJECT_0) {
+#ifdef DEBUG
+					cout << "into Door" << selectPlayerRole[myIndex] << "stage: " << stageIndex << endl;
+#endif // DEBUG
+					S2CPlayerPacket intoDoorPacket;
+					intoDoorPacket.id = myIndex;
+					intoDoorPacket.type = S2CIntoDoor;
+					SetEvent(threadHandles[myIndex].intDoor);
+					for (int j = 0; j < 3; j++)
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+				}
 			}
 		}
 	}
@@ -240,7 +246,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 
 				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = STAGE_01;
+				changePacket.stageNum = stageIndex;
 				changePacket.type = S2CChangeStage;
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
@@ -259,9 +265,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 
 			if (isNextStage) {
+				isVisibleDoor = false;
+				currentJewelyNum = 0;
 				stageIndex = stageIndex++;
 				StageMgr.getStage(stageIndex);
-
 				MovePacket setPosition;
 				setPosition.type = S2CMove_IDLE;
 
@@ -270,7 +277,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				changePacket.type = S2CChangeStage;
 				for (int i = 0; i < 3; i++) {
 					ResetEvent(threadHandles[i].intDoor);
-					isVisibleDoor = false;
 					//스테이지 변경 패킷 전송
 					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
 
@@ -360,16 +366,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
-
-							//for (OBJECT& ft : StageMgr.Ft) {
-							//	if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//올라가다가 발판에 걸렸다면 떨어져라 머리 충돌
-							//		cout << "collide head" << endl;
-
-							//		threadHandles[i].v = 0.f;
-							//		threadHandles[i].Falling = true;
-							//		break;
-							//	}
-							//}
+							
 
 							for (OBJECT& ft : StageMgr.Ft) {// 발판에 안착
 								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
@@ -396,21 +393,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
-						}
-						//if (threadHandles[i].y > threadHandles[i].ground) {// 캐릭터가 땅에 닿았다면
-						//	cout << "resetEvent: jump" << endl;
-						//	ResetEvent(threadHandles[i].jumpEventHandle);
-						//	threadHandles[i].direction = DIRECTION::NONE;
-						//	threadHandles[i].v = 0.f;
-						//	threadHandles[i].isJump = false;
-						//	threadHandles[i].Falling = false;							
-						//	mPacket.x = threadHandles[i].x;
-						//	mPacket.y = threadHandles[i].y = threadHandles[i].ground; // 위치 맞춰주기
-						//	mPacket.type = S2CMove_IDLE;
-						//	for (int j = 0; j < 3; j++) {
-						//		send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
-						//	}
-						//}
+						}					
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //상승
 						if (threadHandles[i].direction == DIRECTION::LEFT) {

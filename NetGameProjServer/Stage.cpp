@@ -64,7 +64,7 @@ void Stage::Stage_2() {
 
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
-	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 250 + 24, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });

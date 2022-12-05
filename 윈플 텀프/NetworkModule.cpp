@@ -199,8 +199,12 @@ void ProcessPacket(char* buf)
 		stageIndex = packet->stageNum;
 		SetEvent(changeStageEvent);
 		StageMgr::StageTimepass = 0;
-		break;
+		currentJewelyNum = 0;
 		StageMgr::IsTimeoutStageEnd = false;
+		for (PLAYER& pl : players)
+			pl.isIntoDoor = false;
+		doorVisible = false;
+		break;
 	}
 	case S2CStageTimePass:
 	{

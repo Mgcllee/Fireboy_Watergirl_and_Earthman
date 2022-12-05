@@ -49,7 +49,7 @@ void Stage::Stage_2() {
 		jewely.pop();
 	Ft.clear();
 
-	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 250 + 24, 60, 100, 0, 0, TRUE };
 
 	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	maxJewelyNum = 8;
