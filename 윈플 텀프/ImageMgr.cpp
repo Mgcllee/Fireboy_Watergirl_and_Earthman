@@ -147,8 +147,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			foot_block.Draw(*memdc, ft.x - (ft.wid / 2), ft.y - (ft.hei), ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 
-		if(doorVisible)
-			door_red.Draw(*memdc, stage.door.x, stage.door.y, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
+		if (doorVisible)
+			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, stage.blue_door.wid, stage.blue_door.hei, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 		if (currentJewelyNum < currentStage.maxJewelyNum) {
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
@@ -183,6 +183,36 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
 		break;
 	}
+#ifdef _DEBUG
+	zero.Draw(*memdc,100,	0,	 50, 100, 0, 0, 50, 50);
+	one.Draw(*memdc,	100,100, 50, 100, 0, 0, 50, 50);
+	two.Draw(*memdc,	100,200, 50, 100, 0, 0, 50, 50);
+	three.Draw(*memdc,	100,300, 50, 100, 0, 0, 50, 50);
+	four.Draw(*memdc,	100,400, 50, 100, 0, 0, 50, 50);
+	five.Draw(*memdc,	100,500, 50, 100, 0, 0, 50, 50);
+	six.Draw(*memdc,	100,600, 50, 100, 0, 0, 50, 50);
+	seven.Draw(*memdc,	100,700, 50, 100, 0, 0, 50, 50);
+	eight.Draw(*memdc,	100,800, 50, 100, 0, 0, 50, 50);
+	nine.Draw(*memdc,	100,900, 50, 100, 0, 0, 50, 50);
+
+	zero.Draw(*memdc,	0,	600, 50, 70, 0, 0, 50, 50);
+	one.Draw(*memdc,	100,600, 50, 70, 0, 0, 50, 50);
+	two.Draw(*memdc,	200,600, 50, 70, 0, 0, 50, 50);
+	three.Draw(*memdc,	300,600, 50, 70, 0, 0, 50, 50);
+	four.Draw(*memdc,	400,600, 50, 70, 0, 0, 50, 50);
+	five.Draw(*memdc,	500,600, 50, 70, 0, 0, 50, 50);
+	six.Draw(*memdc,	600,600, 50, 70, 0, 0, 50, 50);
+	seven.Draw(*memdc,	700,600, 50, 70, 0, 0, 50, 50);
+	eight.Draw(*memdc,	800,600, 50, 70, 0, 0, 50, 50);
+	nine.Draw(*memdc,	900,600, 50, 70, 0, 0, 50, 50);
+
+	one.Draw(*memdc, 1000, 600, 50, 70, 0, 0, 50, 50);
+	zero.Draw(*memdc, 1050, 600, 50, 70, 0, 0, 50, 50);
+	one.Draw(*memdc, 1100, 600, 50, 70, 0, 0, 50, 50);
+	one.Draw(*memdc, 1150, 600, 50, 70, 0, 0, 50, 50);
+	one.Draw(*memdc, 1200, 600, 50, 70, 0, 0, 50, 50);
+	two.Draw(*memdc, 1250, 600, 50, 70, 0, 0, 50, 50);
+#endif
 }
 
 // 스테이지 진행 화면에서 중앙, 상단에 있는 Timer 그리기
@@ -289,7 +319,7 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 // Fire boy와 Water girl의 애니메이션 재생 함수
 void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 	for (PLAYER& pl : players) {
-		if (pl.isIntoDoor) { 
+		if (pl.isIntoDoor) {
 			// 스테이스 클리어 후 문으로 들어가는 애니메이션
 			// if (currentStage.red_door.Collision(players[1]) && currentStage.blue_door.Collision(players[0]))
 			//{
@@ -322,7 +352,7 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 }
 
 void ImageMgr::DrawScore(HDC* memdc)
-{	
+{
 	players[0].Anim[1].Draw(*memdc, 900, 50, 100, 150, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
 	DrawScoreNum(memdc, 920, 70, players[0].score);
 	players[1].Anim[1].Draw(*memdc, 1000, 50, 100, 150, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);

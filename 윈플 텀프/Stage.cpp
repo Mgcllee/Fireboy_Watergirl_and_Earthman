@@ -33,7 +33,7 @@ void Stage::Stage_1() {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
 	//Ft.push_back(Ground);
@@ -49,7 +49,7 @@ void Stage::Stage_2() {
 		jewely.pop();
 	Ft.clear();
 
-	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
 	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	maxJewelyNum = 8;
