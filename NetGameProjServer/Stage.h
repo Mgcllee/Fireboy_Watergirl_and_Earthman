@@ -84,7 +84,7 @@ public:
 		switch (index)
 		{
 		case STAGE_01:
-			Stage_1();
+			Stage_3();
 			break;
 		case STAGE_02:
 			Stage_2();
@@ -103,3 +103,77 @@ private:
 };
 
 extern Stage currentStage;
+
+/*
+// Stage 03에 나오는 박스를 양쪽에서 밀었을 때 처리
+void Push() {
+	//if (water.is_Push == FALSE && fire.is_Push == FALSE) {
+	//	if (water.y == Rt.y && abs(water.x - Rt.x) <= 60) {			// 불과 접촉
+	//		water.is_Push = TRUE;
+	//	}
+	//	if (fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {		// 물과 접촉
+	//		fire.is_Push = TRUE;
+	//	}
+	//}
+	//// 충돌 체크
+	//if (water.is_Push == TRUE && water.y == Rt.y && abs(water.x - Rt.x) <= 60) {
+	//	if (Rt.dic == 0) {
+	//		Rt.dic = water.dic;
+	//	}
+
+	//	if (Rt.dic == water.dic) {
+	//		if (Rt.dic == 1) {
+	//			Rt.x = water.x + 60;
+	//		}
+	//		else if (Rt.dic == -1) {
+	//			Rt.x = water.x - 60;
+	//		}
+	//	}
+	//}
+	//else if (water.is_Push == TRUE && Rt.dic != water.dic) {
+	//	Rt.dic = 0;
+	//	water.is_Push = FALSE;
+	//	return;
+	//}
+
+	//if (fire.is_Push == TRUE && fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {
+	//	if (Rt.dic == 0) {
+	//		Rt.dic = fire.dic;
+	//	}
+
+	//	if (Rt.dic == fire.dic) {
+	//		if (Rt.dic == 1) {
+	//			Rt.x = fire.x + 60;
+	//		}
+	//		else if (Rt.dic == -1) {
+	//			Rt.x = fire.x - 60;
+	//		}
+	//	}
+	//}
+	//else if (fire.is_Push == TRUE && Rt.dic != fire.dic) {
+	//	Rt.dic = 0;
+	//	fire.is_Push = FALSE;
+	//	return;
+	//}
+
+	//for (int i = 0; i < 20 && Ft[i].x != NULL; ++i) {
+	//	if ((Rt.y == Ft[i].y && Ft[i].x > Rt.x - 60) || (Rt.y == Ft[i].y && Ft[i].x + Ft[i].wid < Rt.x)) {
+	//		Rt.Down = TRUE;
+	//	}
+	//}
+	//if (Rt.Down) {
+	//	if (Rt.y + (Rt.v + Rt.g) >= 730) {
+	//		Rt.v = 0;
+	//		Rt.y = 730;
+	//		Rt.Down = FALSE;
+	//		return;
+	//	}
+	//	if (Rt.y <= 730) {
+	//		Rt.v = Rt.v + Rt.g;
+	//		Rt.y = Rt.y + Rt.v;
+	//		return;
+	//	}
+	//}
+}
+
+*/
