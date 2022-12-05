@@ -86,136 +86,180 @@ void Stage::Stage_2() {
 	//보석 최대 갯수 정해주고
 	maxJewelyNum = 8;
 
-	//if (order == 0) {
-	//	water.x = 100;
-	//	water.y = 730;
-	//	fire.x = 1100;
-	//	fire.y = 730;
+	/*
+	if (order == 0) {
+		water.x = 100;
+		water.y = 730;
+		fire.x = 1100;
+		fire.y = 730;
 
-	//	fire.on = TRUE;
-	//	water.on = TRUE;
+		fire.on = TRUE;
+		water.on = TRUE;
 
-	//	{
-	//		Die.On = FALSE;
-	//		Die.On = FALSE;
-	//		for (int i = 0; i < 20; i++)
-	//		{
-	//			Jewelry[i].image_x = 0;
-	//			Jewelry[i].image_y = 0;
-	//			Jewelry[i].x = 0;
-	//			Jewelry[i].y = 0;
-	//			Jewelry[i].wid = 50;
-	//			Jewelry[i].hei = 50;
-	//		}
+		{
+			Die.On = FALSE;
+			Die.On = FALSE;
+			for (int i = 0; i < 20; i++)
+			{
+				Jewelry[i].image_x = 0;
+				Jewelry[i].image_y = 0;
+				Jewelry[i].x = 0;
+				Jewelry[i].y = 0;
+				Jewelry[i].wid = 50;
+				Jewelry[i].hei = 50;
+			}
 
-	//		for (int i = 0; i < 90; i++)
-	//		{
-	//			Trap[i].image_x = 0;
-	//			Trap[i].image_y = 0;
-	//			Trap[i].x = 0;
-	//			Trap[i].y = 0;
-	//			Trap[i].wid = 20;
-	//			Trap[i].hei = 20;
-	//		}
+			for (int i = 0; i < 90; i++)
+			{
+				Trap[i].image_x = 0;
+				Trap[i].image_y = 0;
+				Trap[i].x = 0;
+				Trap[i].y = 0;
+				Trap[i].wid = 20;
+				Trap[i].hei = 20;
+			}
 
-	//		for (int i = 0; i < 20; i++)
-	//		{
-	//			Ft[i].x = 0;
-	//			Ft[i].y = 0;
-	//		}
-	//		Jewelry[0].On = TRUE;
-	//		Jewelry[0].x = 450;
-	//		Jewelry[0].y = 550;
+			for (int i = 0; i < 20; i++)
+			{
+				Ft[i].x = 0;
+				Ft[i].y = 0;
+			}
+			Jewelry[0].On = TRUE;
+			Jewelry[0].x = 450;
+			Jewelry[0].y = 550;
 
-	//		Jewelry[1].On = TRUE;
-	//		Jewelry[1].x = 150;
-	//		Jewelry[1].y = 450;
+			Jewelry[1].On = TRUE;
+			Jewelry[1].x = 150;
+			Jewelry[1].y = 450;
 
-	//		Jewelry[2].On = TRUE;
-	//		Jewelry[2].x = 750;
-	//		Jewelry[2].y = 350;
+			Jewelry[2].On = TRUE;
+			Jewelry[2].x = 750;
+			Jewelry[2].y = 350;
 
-	//		Jewelry[3].On = TRUE;
-	//		Jewelry[3].x = 1000;
-	//		Jewelry[3].y = 250;
+			Jewelry[3].On = TRUE;
+			Jewelry[3].x = 1000;
+			Jewelry[3].y = 250;
 
-	//		Jewelry[4].On = TRUE;
-	//		Jewelry[4].x = 750;
-	//		Jewelry[4].y = 200;
+			Jewelry[4].On = TRUE;
+			Jewelry[4].x = 750;
+			Jewelry[4].y = 200;
 
-	//		Jewelry[10].On = TRUE;
-	//		Jewelry[10].x = 750;
-	//		Jewelry[10].y = 550;
+			Jewelry[10].On = TRUE;
+			Jewelry[10].x = 750;
+			Jewelry[10].y = 550;
 
-	//		Jewelry[11].On = TRUE;
-	//		Jewelry[11].x = 1050;
-	//		Jewelry[11].y = 450;
+			Jewelry[11].On = TRUE;
+			Jewelry[11].x = 1050;
+			Jewelry[11].y = 450;
 
-	//		Jewelry[12].On = TRUE;
-	//		Jewelry[12].x = 450;
-	//		Jewelry[12].y = 350;
+			Jewelry[12].On = TRUE;
+			Jewelry[12].x = 450;
+			Jewelry[12].y = 350;
 
-	//		Jewelry[13].On = TRUE;
-	//		Jewelry[13].x = 200;
-	//		Jewelry[13].y = 250;
+			Jewelry[13].On = TRUE;
+			Jewelry[13].x = 200;
+			Jewelry[13].y = 250;
 
-	//		Jewelry[14].On = TRUE;
-	//		Jewelry[14].x = 450;
-	//		Jewelry[14].y = 200;
-	//		// 0~19까지 파랑 가운데 20~24 파랑왼 25~29파랑오 30~49 빨강 가운데 50~54~빨강왼 55~59빨강오 60~79초록 가운데 80~84초록왼 85~89초록오
-	//		Trap[0].On = TRUE;
-	//		Trap[0].x = 200;
-	//		Trap[0].y = 730;
+			Jewelry[14].On = TRUE;
+			Jewelry[14].x = 450;
+			Jewelry[14].y = 200;
+			// 0~19까지 파랑 가운데 20~24 파랑왼 25~29파랑오 30~49 빨강 가운데 50~54~빨강왼 55~59빨강오 60~79초록 가운데 80~84초록왼 85~89초록오
+			Trap[0].On = TRUE;
+			Trap[0].x = 200;
+			Trap[0].y = 730;
 
-	//		Trap[20].On = TRUE;
-	//		Trap[20].x = Trap[0].x - 20;
-	//		Trap[20].y = 730;
+			Trap[20].On = TRUE;
+			Trap[20].x = Trap[0].x - 20;
+			Trap[20].y = 730;
 
-	//		Trap[25].On = TRUE;
-	//		Trap[25].x = Trap[0].x + 20;
-	//		Trap[25].y = 730;
+			Trap[25].On = TRUE;
+			Trap[25].x = Trap[0].x + 20;
+			Trap[25].y = 730;
 
-	//		Trap[30].On = TRUE;
-	//		Trap[30].x = 900;
-	//		Trap[30].y = 730;
+			Trap[30].On = TRUE;
+			Trap[30].x = 900;
+			Trap[30].y = 730;
 
-	//		Trap[50].On = TRUE;
-	//		Trap[50].x = Trap[30].x - 20;
-	//		Trap[50].y = 730;
+			Trap[50].On = TRUE;
+			Trap[50].x = Trap[30].x - 20;
+			Trap[50].y = 730;
 
-	//		Trap[55].On = TRUE;
-	//		Trap[55].x = Trap[30].x + 20;
-	//		Trap[55].y = 730;
+			Trap[55].On = TRUE;
+			Trap[55].x = Trap[30].x + 20;
+			Trap[55].y = 730;
 
-	//		Trap[60].On = TRUE;
-	//		Trap[60].x = 600;
-	//		Trap[60].y = 730;
+			Trap[60].On = TRUE;
+			Trap[60].x = 600;
+			Trap[60].y = 730;
 
-	//		Trap[80].On = TRUE;
-	//		Trap[80].x = Trap[60].x - 20;
-	//		Trap[80].y = 730;
+			Trap[80].On = TRUE;
+			Trap[80].x = Trap[60].x - 20;
+			Trap[80].y = 730;
 
-	//		Trap[85].On = TRUE;
-	//		Trap[85].x = Trap[60].x + 20;
-	//		Trap[85].y = 730;
+			Trap[85].On = TRUE;
+			Trap[85].x = Trap[60].x + 20;
+			Trap[85].y = 730;
 
-	//		Ft[0].x = 100, Ft[0].y = 500;
-	//		Ft[1].x = 400, Ft[1].y = 600;
+			Ft[0].x = 100, Ft[0].y = 500;
+			Ft[1].x = 400, Ft[1].y = 600;
 
-	//		Ft[2].x = 380, Ft[2].y = 400, Ft[2].wid = 450;
+			Ft[2].x = 380, Ft[2].y = 400, Ft[2].wid = 450;
 
-	//		Ft[3].x = 700, Ft[3].y = 600;
-	//		Ft[4].x = 1000, Ft[4].y = 500;
-	//		// 1차 
-	//		Ft[5].x = 150, Ft[5].y = 300;
-	//		Ft[6].x = 400, Ft[6].y = 250;
+			Ft[3].x = 700, Ft[3].y = 600;
+			Ft[4].x = 1000, Ft[4].y = 500;
+			// 1차
+			Ft[5].x = 150, Ft[5].y = 300;
+			Ft[6].x = 400, Ft[6].y = 250;
 
-	//		Ft[7].x = 700, Ft[7].y = 250;
-	//		Ft[8].x = 950, Ft[8].y = 300;
-	//	}
+			Ft[7].x = 700, Ft[7].y = 250;
+			Ft[8].x = 950, Ft[8].y = 300;
+		}*/
 }
 
 void Stage::Stage_3() {
+	for (int i = 0; i < jewely.size(); i++)
+		jewely.pop();
+	Ft.clear();
+	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
+
+	players[0].x = 100;
+	players[0].y = 730;
+
+	players[1].x = 1100;
+	players[1].y = 730;
+
+	players[2].x = 500;
+	players[2].y = 730;
+
+	Ft.emplace_back(OBJECT{ 150, 200, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 100, 600, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 380, 400, 450, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 700, 600, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 1000, 500, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 150, 300, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 400, 250, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 700, 250, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 950, 300, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 900, 200, 112, 24, 0, 0, TRUE });
+
+	maxJewelyNum = 8;
+	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 200, 250, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 450, 200, 28, 25, 1160, 29, FALSE });
+
+	block[0] = OBJECT{ 0, 600, 28, 25, 40, 2, FALSE };
+	button[0] = OBJECT{ 600, 730, 20, 20, 0, 0, FALSE };
+	
+	/*Rt.x = 800;
+	Rt.y = 730;*/
+
 	{
 		//	water.x = 100;
 		//	water.y = 730;
@@ -387,75 +431,4 @@ void Stage::Stage_3() {
 		//	}
 		//}
 	}
-}
-
-// Stage 03에 나오는 박스를 양쪽에서 밀었을 때 처리
-void Stage::Push() {
-	//if (water.is_Push == FALSE && fire.is_Push == FALSE) {
-	//	if (water.y == Rt.y && abs(water.x - Rt.x) <= 60) {			// 불과 접촉
-	//		water.is_Push = TRUE;
-	//	}
-	//	if (fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {		// 물과 접촉
-	//		fire.is_Push = TRUE;
-	//	}
-	//}
-	//// 충돌 체크
-	//if (water.is_Push == TRUE && water.y == Rt.y && abs(water.x - Rt.x) <= 60) {
-	//	if (Rt.dic == 0) {
-	//		Rt.dic = water.dic;
-	//	}
-
-	//	if (Rt.dic == water.dic) {
-	//		if (Rt.dic == 1) {
-	//			Rt.x = water.x + 60;
-	//		}
-	//		else if (Rt.dic == -1) {
-	//			Rt.x = water.x - 60;
-	//		}
-	//	}
-	//}
-	//else if (water.is_Push == TRUE && Rt.dic != water.dic) {
-	//	Rt.dic = 0;
-	//	water.is_Push = FALSE;
-	//	return;
-	//}
-
-	//if (fire.is_Push == TRUE && fire.y == Rt.y && abs(fire.x - Rt.x) <= 60) {
-	//	if (Rt.dic == 0) {
-	//		Rt.dic = fire.dic;
-	//	}
-
-	//	if (Rt.dic == fire.dic) {
-	//		if (Rt.dic == 1) {
-	//			Rt.x = fire.x + 60;
-	//		}
-	//		else if (Rt.dic == -1) {
-	//			Rt.x = fire.x - 60;
-	//		}
-	//	}
-	//}
-	//else if (fire.is_Push == TRUE && Rt.dic != fire.dic) {
-	//	Rt.dic = 0;
-	//	fire.is_Push = FALSE;
-	//	return;
-	//}
-
-	//for (int i = 0; i < 20 && Ft[i].x != NULL; ++i) {
-	//	if ((Rt.y == Ft[i].y && Ft[i].x > Rt.x - 60) || (Rt.y == Ft[i].y && Ft[i].x + Ft[i].wid < Rt.x)) {
-	//		Rt.Down = TRUE;
-	//	}
-	//}
-	//if (Rt.Down) {
-	//	if (Rt.y + (Rt.v + Rt.g) >= 730) {
-	//		Rt.v = 0;
-	//		Rt.y = 730;
-	//		Rt.Down = FALSE;
-	//		return;
-	//	}
-	//	if (Rt.y <= 730) {
-	//		Rt.v = Rt.v + Rt.g;
-	//		Rt.y = Rt.y + Rt.v;
-	//		return;
-	//	}
-	//}
 }

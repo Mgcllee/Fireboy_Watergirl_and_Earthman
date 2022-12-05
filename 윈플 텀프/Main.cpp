@@ -279,7 +279,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (currentStage.currentVisibleJewely.GetVisible() && currentStage.currentVisibleJewely.ChangeFrame(1, false))
 				currentStage.currentVisibleJewely.image_x = 0;
-
+			
 			for (OBJECT& t : currentStage.Trap)
 				if (t.GetVisible())
 					t.ChangeFrame(1, true);
@@ -306,9 +306,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			for (PLAYER& pl : players) {
-				for (OBJECT& btn : currentStage.button)
-					if (btn.GetVisible() && btn.Collision(pl))
-						btn.ChangeFrame(1, false);
+				for (OBJECT& btn : currentStage.button) {
+					if (btn.Collision(pl)) {
+						if (btn.image_y < 20.f)
+							btn.image_y += 2.f;
+						else
+							btn.image_y = 20.f;
+					}
+					else if (btn.image_y < 20.f) {
+						btn.image_y -= 2.f;
+					}
+					else {
+						btn.image_y = 0.f;
+					}
+				}
 			}
 
 			for (OBJECT& block : currentStage.block)

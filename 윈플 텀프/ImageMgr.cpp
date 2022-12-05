@@ -139,7 +139,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 
 		break;
-	case STAGE_01:
+	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (OBJECT& ft : stage.Ft)
@@ -165,7 +165,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		break;
-	case STAGE_03:
+	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (OBJECT& ft : stage.Ft)
@@ -175,12 +175,11 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
 
-		block_w.Draw(*memdc, stage.block[0].x + stage.block[0].image_x, stage.block[0].y, 100 + stage.block[0].image_x, 30, -stage.block[0].image_x, 0, 83 + stage.block[0].image_x, 25);
+		block_w.Draw(*memdc, stage.block[0].x + stage.block[0].image_x, stage.block[0].y, 100, 30, 0, 0, 83, 25);
+		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y + stage.button[0].image_y, 42, 16, 0, 0, 42, 16);
 
 		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
-
-		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y - stage.button[0].image_y, 40, stage.button[0].image_y, 0, 0, stage.button[0].image_x, stage.button[0].image_y);
 		break;
 	}
 }
