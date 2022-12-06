@@ -29,7 +29,7 @@ void StageTimerStart();
 
 Timer _timer;
 
-double timeoutSeconds = 60 * 5;
+double timeoutSeconds = 60;
 
 int main(int argv, char** argc)
 {
@@ -502,8 +502,38 @@ void StageTimerStart()
 					}
 				}
 
+				_timer.Reset();
+				isVisibleDoor = false;
+				currentJewelyNum = 0;
+				stageIndex = stageIndex++;
+				StageMgr.getStage(stageIndex);
+				ResetEvent(jewelyEatHandle);
+
+				S2CChangeStagePacket changePacket;
+				changePacket.stageNum = stageIndex;
+				changePacket.type = S2CChangeStage;
+				StageTimerStart();
+
+				for (int i = 0; i < 3; i++) {
+					ResetEvent(threadHandles[i].intDoor);
+					//스테이지 변경 패킷 전송
+					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+
+					//스테이지당 최초위치 할당
+					MovePacket setPosition;
+					setPosition.type = S2CMove_IDLE;
+					setPosition.id = i;
+					setPosition.x = threadHandles[i].x;
+					setPosition.y = threadHandles[i].y;
+					for (int j = 0; j < 3; ++j) {
+						threadHandles[j].onBoard = StageMgr.Ground;
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
+					}
+
+				}
+
 			}
-			if (packet.timePassed >= 60 * 4) {
+			if (packet.timePassed >= 45) {
 				if (!isVisibleDoor) {
 					typePacket visibleDoorPacket;
 					visibleDoorPacket.type = S2CDoorVisible;
