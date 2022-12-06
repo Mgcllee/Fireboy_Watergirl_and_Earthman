@@ -170,11 +170,17 @@ void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
 DWORD WINAPI ClientWorkThread(LPVOID arg)
 {
 	int myIndex = reinterpret_cast<int>(arg);
-	while (true) {
+	while (threadHandles[myIndex].clientSocket != INVALID_SOCKET) {
 		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
 		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
+		/*else if (recvRetVal <= 0) {
+			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				closesocket(threadHandles[myIndex].clientSocket);
+				return 0;
+			}
+		}*/
 		// ¸íÃ¶ ÀÎÁö: ÄÝ¶óÀÌµå º¸¼®, ¹®
 		//¿©±â¿¡ º¸¼® Ã¼Å©? => ºÎÇÏ°¡ ÀÖÀ»±î? => ¾øÀ»°Å °°±äÇÑµ¥ => ¾øÀ¸´Ï º¸¼® ¸Ô´Â°Ç ¿©±â¿¡ µÓ½Ã´Ù.		
 
@@ -219,7 +225,7 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 
 DWORD WINAPI ServerWorkThread(LPVOID arg)
 {
-	while (true) {
+	while (threadHandles[0].clientSocket != INVALID_SOCKET && threadHandles[1].clientSocket != INVALID_SOCKET && threadHandles[1].clientSocket != INVALID_SOCKET) {
 		if (stageIndex == STAGE_ROLE) {
 			bool isFinish = true;
 			for (int i = 0; i < 3; i++) {
@@ -294,7 +300,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					}
 
 				}
-				
+
 				isNextStage = false;
 			}
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
@@ -371,7 +377,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
-							
+
 							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ¾ÈÂø
 								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
 #ifdef _DEBUG
@@ -397,7 +403,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
-						}					
+						}
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
@@ -591,13 +597,14 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SEndout:
 	{
-		S2CEndPacket* packet = reinterpret_cast<S2CEndPacket*>(packetStart);
+		/*S2CEndPacket* packet = reinterpret_cast<S2CEndPacket*>(packetStart);
 		S2CEndPacket sendPacket;
 		sendPacket.type = S2CEndout;
 
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket), 0);
-		}
+		}*/
+		closesocket(clientInfo.clientSocket);
 #ifdef _DEBUG
 		cout << "°­Á¦Á¾·á ½ÇÇà" << endl;
 #endif
