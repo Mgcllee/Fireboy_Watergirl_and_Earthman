@@ -19,6 +19,7 @@ using namespace chrono;
 #define STAGE_01			3
 #define STAGE_02			4
 #define STAGE_03			5
+#define RESULT				6
 
 
 void Display_Err(int Errcode);

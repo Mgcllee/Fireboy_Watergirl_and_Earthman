@@ -396,7 +396,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		oldBitmap = (HBITMAP)SelectObject(backMemDC, hBitmap);
 		PatBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, WHITENESS);
 
-		myImageMgr.DrawMap(&backMemDC, currentStage.stage, currentStage);
+		myImageMgr.DrawMap(&backMemDC, stageIndex, currentStage);
 
 		if (STAGE_ROLE == currentStage.stage) {
 			if (isArrow) {
@@ -407,7 +407,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				isArrow = false;
 			}
 		}
-		else if (STAGE_ROLE < currentStage.stage) {
+		else if (STAGE_ROLE < currentStage.stage && currentStage.stage < RESULT) {
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
 			myImageMgr.DrawScore(&backMemDC);
@@ -436,6 +436,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 			}
 		}
+		else if (currentStage.stage == RESULT) {
+			ShowWindow(btnend, SW_SHOW);
+		}
 
 		BitBlt(backMemDC, 0, 0, WINDOW_WID, WINDOW_HEI, memDC, 0, 0, SRCCOPY);
 		BitBlt(hDC, 0, 0, WINDOW_WID, WINDOW_HEI, backMemDC, 0, 0, SRCCOPY);
@@ -456,6 +459,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
 	while (true) {
+		if (stageIndex == 6) continue;
 		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal != 0 && recvRetVal != -1) {
 			ConstructPacket(recvBuf, recvRetVal);
