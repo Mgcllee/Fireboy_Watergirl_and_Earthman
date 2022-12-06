@@ -36,6 +36,7 @@
 
 #define C2SEndout				23
 #define S2CEndout				24
+#define S2CPlayerOut			25
 
 #define PORT_NUM				9000
 

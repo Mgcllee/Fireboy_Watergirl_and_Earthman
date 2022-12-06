@@ -5,9 +5,10 @@
 
 void Move()
 {
-	if (stageIndex == 6) {
+	if (stageIndex == 6 || !myCharacterOn) {
 		return;
 	}
+	
 	MovePacket move;
 	move.type = C2SMove;
 	move.id = myId;

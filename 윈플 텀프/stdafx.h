@@ -62,7 +62,7 @@ extern HANDLE changeStageEvent;
 extern HANDLE idleStateEvent;
 extern HANDLE jumpEvent;
 extern Stage currentStage;
-
+extern bool myCharacterOn;
 
 
 bool NetworkInit(HWND& hWnd, std::string input_addr);

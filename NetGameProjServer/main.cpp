@@ -463,13 +463,45 @@ void StageTimerStart()
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
-				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = RESULT;
-				changePacket.type = S2CChangeStage;
-				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+				DWORD retValDoor0 = WaitForSingleObject(threadHandles[0].intDoor, 0);
+				DWORD retValDoor1 = WaitForSingleObject(threadHandles[1].intDoor, 0);
+				DWORD retValDoor2 = WaitForSingleObject(threadHandles[2].intDoor, 0);
+
+				if (retValDoor0 != WAIT_OBJECT_0 && retValDoor1 != WAIT_OBJECT_0 && retValDoor2 != WAIT_OBJECT_0) {
+					S2CChangeStagePacket changePacket;
+					changePacket.stageNum = RESULT;
+					changePacket.type = S2CChangeStage;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+					}
 				}
-				
+				else {
+					if (retValDoor0 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 0;
+						playerPacket.type = S2CPlayerOut;						
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor1 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 1;
+						playerPacket.type = S2CPlayerOut;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor2 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 2;
+						playerPacket.type = S2CPlayerOut;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+				}
+
 			}
 			if (packet.timePassed >= 60 * 4) {
 				if (!isVisibleDoor) {
@@ -534,7 +566,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		sendPacket.type = S2CChangeRole;
 		for (int i = 0; i < 3; i++) {
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
-		}
+	}
 	}
 	break;
 	case C2SMove:
@@ -619,8 +651,8 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	default:
 		// Packet Error
 		break;
+		}
 	}
-}
 
 int GetPacketSize(char packetType)
 {
