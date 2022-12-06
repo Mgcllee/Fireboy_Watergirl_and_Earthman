@@ -4,7 +4,7 @@
 
 
 int StageMgr::StageTimepass = 0;
-int StageMgr::EndStageTime = 300;
+int StageMgr::EndStageTime = 50;
 bool StageMgr::IsTimeoutStageEnd = false;
 
 StageMgr::StageMgr()

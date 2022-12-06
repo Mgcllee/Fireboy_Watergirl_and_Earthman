@@ -5,7 +5,7 @@
 
 void Move()
 {
-	if (stageIndex == 6) {
+	if (stageIndex == 6 || !myCharacterOn) {
 		return;
 	}
 	MovePacket move;

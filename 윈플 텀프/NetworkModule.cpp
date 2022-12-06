@@ -257,6 +257,19 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
+	case S2CPlayerOut:
+	{
+		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
+		for (int i = 0; i < 3; i++) {
+			if (players[i].id == packet->id) {
+				players[i].on = false;
+				if (myId == packet->id)
+					myCharacterOn = false;
+				break;
+			}
+		}
+	}
+	break;
 	default:
 		// Packet Error
 		break;
@@ -296,7 +309,7 @@ void SendPacket(void* buf)
 		size = sizeof(C2SEndPacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
-		
+
 		break;
 	default:
 		// Packet Error
@@ -352,6 +365,7 @@ int GetPacketSize(char packetType)
 	case S2CAddPlayer:
 	case S2CIntoDoor:
 	case S2CEatJewely:
+	case S2CPlayerOut:
 		retVal = sizeof(S2CPlayerPacket);
 		break;
 	case S2CChangeRole:

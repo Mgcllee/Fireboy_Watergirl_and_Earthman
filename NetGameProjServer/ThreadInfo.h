@@ -42,7 +42,7 @@ public:
 
 		OBJECT onBoard;
 		bool isJump = false;
-
+		bool isArrive = true;
 		int score = 0;
 };
 

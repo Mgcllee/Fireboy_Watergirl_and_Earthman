@@ -28,8 +28,9 @@ void StageTimerStart();
 
 
 Timer _timer;
-
-double timeoutSeconds = 60 * 5;
+bool isTimeOut = false;
+bool gameEnd = false;
+double timeoutSeconds = 50;
 
 int main(int argv, char** argc)
 {
@@ -263,23 +264,26 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 		else if (stageIndex >= STAGE_01) { // ¾î¶² ÀÎ °ÔÀÓ ½ºÅ×ÀÌÁö°¡ ¿Àµç ÀÌ°Ç °íÁ¤ÀÌ´Ï±î == -> >= À¸·Î ¼öÁ¤
 			bool isNextStage = true;
 			for (int i = 0; i < 3; i++) {
-				DWORD  retValDoor = WaitForSingleObject(threadHandles[i].intDoor, 0);
-				if (retValDoor != WAIT_OBJECT_0) {
-					isNextStage = false;
-					break;
+				if (threadHandles[i].isArrive) {
+					DWORD  retValDoor = WaitForSingleObject(threadHandles[i].intDoor, 0);
+					if (retValDoor != WAIT_OBJECT_0) {
+						isNextStage = false;
+						break;
+					}
 				}
 			}
 
-			if (isNextStage) {
-				_timer.Reset();
+			if (isNextStage || isTimeOut) {
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
-				stageIndex = stageIndex++;
+				if(stageIndex < 6)
+					stageIndex = stageIndex++;
 				StageMgr.getStage(stageIndex);
 				ResetEvent(jewelyEatHandle);
 
 				S2CChangeStagePacket changePacket;
 				changePacket.stageNum = stageIndex;
+				cout << "stage Next: " << changePacket.stageNum << endl;
 				changePacket.type = S2CChangeStage;
 				StageTimerStart();
 
@@ -300,7 +304,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					}
 
 				}
-
+				isTimeOut = false;
+				_timer.Reset();
 				isNextStage = false;
 			}
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
@@ -354,7 +359,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						threadHandles[i].v = 0.f;
 						threadHandles[i].y = threadHandles[i].ground;
-					}
+				}
 
 					auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		// ÀúÀåµÈ Á¡ÇÁ ½ÃÀÛºÎÅÍ °æ°ú½Ã°£
 					auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;	// ÀúÁ¤µÈ Á¡ÇÁ ÇöÀç ½Ã°¢ºÎÅÍ
@@ -396,15 +401,15 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 #endif
 									mPacket.type = S2CMove_IDLE;
 									break;
-								}
 							}
+						}
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
-						}
 					}
+			}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
 							threadHandles[i].x -= 15;
@@ -433,9 +438,9 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						}
 					}
 
-				}
-			}
 		}
+	}
+}
 	}
 	return 0;
 }
@@ -456,22 +461,60 @@ void StageTimerStart()
 				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
 			}
 
-			if (timeoutSeconds <= packet.timePassed)
+			if (timeoutSeconds <= packet.timePassed && !isTimeOut && !gameEnd)
 			{
-				TimeoutStage();
 				typePacket timeoutPacket;
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
-				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = RESULT;
-				changePacket.type = S2CChangeStage;
-				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+				DWORD retValDoor0 = WaitForSingleObject(threadHandles[0].intDoor, 0);
+				DWORD retValDoor1 = WaitForSingleObject(threadHandles[1].intDoor, 0);
+				DWORD retValDoor2 = WaitForSingleObject(threadHandles[2].intDoor, 0);
+
+				if (retValDoor0 != WAIT_OBJECT_0 && retValDoor1 != WAIT_OBJECT_0 && retValDoor2 != WAIT_OBJECT_0) {
+					S2CChangeStagePacket changePacket;
+					changePacket.stageNum = RESULT;
+					changePacket.type = S2CChangeStage;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+					}
+					isTimeOut = false;
+					gameEnd = true;
+					TimeoutStage();
 				}
-				
+				else {
+					if (retValDoor0 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 0;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[0].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor1 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 1;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[1].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor2 != WAIT_OBJECT_0) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = 2;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[2].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					isTimeOut = true;
+				}
+
 			}
-			if (packet.timePassed >= 60 * 4) {
+			if (packet.timePassed >= 35) {
 				if (!isVisibleDoor) {
 					typePacket visibleDoorPacket;
 					visibleDoorPacket.type = S2CDoorVisible;
@@ -550,7 +593,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 #endif
 			SetEvent(clientInfo.jumpEventHandle);
 			packet->type = S2CMove_JUMP;
-		}
+	}
 		else if (packet->y == SHRT_MIN) {
 			clientInfo.direction = DIRECTION::NONE;
 			packet->type = S2CMove_IDLE;
@@ -619,7 +662,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	default:
 		// Packet Error
 		break;
-	}
+}
 }
 
 int GetPacketSize(char packetType)

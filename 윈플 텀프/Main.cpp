@@ -23,7 +23,7 @@ char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
 int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
 bool BTN_down = false;
-
+bool myCharacterOn = true;
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
 HANDLE idleStateEvent = NULL;
