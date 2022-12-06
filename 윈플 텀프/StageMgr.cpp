@@ -19,17 +19,17 @@ StageMgr::StageMgr()
 	myStage[2].stage = STAGE_ROLE;
 
 	// 임시 스테이지
-	myStage[3].Stage_1();
-	myStage[3].stage = STAGE_01;
+	myStage[STAGE_01].Stage_1();
+	myStage[STAGE_01].stage = STAGE_01;
 
-	myStage[4].Stage_2();
-	myStage[4].stage = STAGE_02;
+	myStage[STAGE_02].Stage_2();
+	myStage[STAGE_02].stage = STAGE_02;
 
-	myStage[5].Stage_3();
-	myStage[5].stage = STAGE_03;
+	myStage[STAGE_03].Stage_3();
+	myStage[STAGE_03].stage = STAGE_03;
 
 	myStage[RESULT];
-	myStage[5].stage = RESULT;
+	myStage[RESULT].stage = RESULT;
 	// 아직 구현된 부분만 true
 	isUse[STAGE_TITLE]	= true;
 	isUse[STAGE_LOADING]= true;

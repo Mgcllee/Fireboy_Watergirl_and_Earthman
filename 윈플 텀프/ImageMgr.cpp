@@ -182,18 +182,19 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		for (OBJECT& ft : stage.Ft)
 		{
-			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
+			foot_block.Draw(*memdc, ft.x - (ft.wid / 2), ft.y - ft.hei, ft.wid, ft.hei, 0, 0, 111, 23);
 		}
 		if (currentJewelyNum < currentStage.maxJewelyNum) {
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
 		}
 
+		if (doorVisible)
+			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
 
 		block_w.Draw(*memdc, stage.block.x + stage.block.image_x, stage.block.y, 100, 30, 0, 0, 83, 25);
 		button_img.Draw(*memdc, stage.button.x, stage.button.y + stage.button.image_y, 42, 16, 0, 0, 42, 16);
 
-		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 		break;
 	case RESULT:
