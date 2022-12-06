@@ -3,7 +3,7 @@
 
 #define S2CLoading 0
 #define S2CChangeStage 1
-#define S2CJewelryVisibility 2
+//#define S2CJewelryVisibility 2
 //RolePacket 구분
 #define C2SSelectRole 3// 케릭터 선택시 클라이언트 => 서버 로 역할 전송
 #define S2CSelectRole 4// 서버 => 클라이언트 한테 역할을 전송
