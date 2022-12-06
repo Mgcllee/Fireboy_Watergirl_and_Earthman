@@ -54,6 +54,7 @@ extern int myId;
 extern int stageIndex;
 extern bool doorVisible;
 extern int currentJewelyNum;
+extern bool BTN_down;
 
 extern HANDLE selectMyCharacter;
 extern HANDLE changeStageEvent;

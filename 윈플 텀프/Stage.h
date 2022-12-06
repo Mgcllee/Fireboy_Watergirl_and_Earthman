@@ -43,8 +43,8 @@ public:
 	OBJECT Die;				// 사망시 나오는 연기 (Max x = 7950, move x = 159)
 	OBJECT door;		// (Max x = 1260, move x = 60) // Max = 1296, Move = 54
 	//OBJECT red_door;		// (Max x = 1260, move x = 60) // Max = 1250, Move = 50
-	OBJECT button[5];		// 노랑 버튼(block1.PNG 참고)	(Down BTN Max y = 7, move y = 1) else (Up BTN Max y = 15, move y = 1)
-	OBJECT block[5];		// (Max x = 40, move x = 2)
+	OBJECT button;
+	OBJECT block;
 	OBJECT currentVisibleJewely;
 
 	int maxJewelyNum = 0;

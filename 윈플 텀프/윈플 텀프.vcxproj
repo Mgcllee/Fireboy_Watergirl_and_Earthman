@@ -168,11 +168,11 @@
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\NetGameProjServer\protocol.h" />
     <ClInclude Include="GameSound.h" />
     <ClInclude Include="ImageMgr.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="protocol.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageMgr.h" />
     <ClInclude Include="stdafx.h" />

@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "protocol.h"
+#include "../NetGameProjServer/protocol.h"
 #include "Stage.h"
 
 void Move()

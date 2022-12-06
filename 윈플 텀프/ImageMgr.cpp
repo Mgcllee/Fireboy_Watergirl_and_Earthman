@@ -181,8 +181,8 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
 
-		block_w.Draw(*memdc, stage.block[0].x + stage.block[0].image_x, stage.block[0].y, 100, 30, 0, 0, 83, 25);
-		button_img.Draw(*memdc, stage.button[0].x, stage.button[0].y + stage.button[0].image_y, 42, 16, 0, 0, 42, 16);
+		block_w.Draw(*memdc, stage.block.x + stage.block.image_x, stage.block.y, 100, 30, 0, 0, 83, 25);
+		button_img.Draw(*memdc, stage.button.x, stage.button.y + stage.button.image_y, 42, 16, 0, 0, 42, 16);
 
 		door_red.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
