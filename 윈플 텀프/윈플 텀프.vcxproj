@@ -156,7 +156,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameSound.cpp" />
     <ClCompile Include="ImageMgr.cpp" />
     <ClCompile Include="Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -169,7 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\NetGameProjServer\protocol.h" />
-    <ClInclude Include="GameSound.h" />
     <ClInclude Include="ImageMgr.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />

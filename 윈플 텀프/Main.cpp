@@ -456,7 +456,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
 	while (true) {
-		if (stageIndex == 6) continue;
+		//if (stageIndex == 6) continue;
 		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal != 0 && recvRetVal != -1) {
 			ConstructPacket(recvBuf, recvRetVal);
