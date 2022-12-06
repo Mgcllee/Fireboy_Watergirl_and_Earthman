@@ -265,6 +265,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 
 			if (isNextStage) {
+				_timer.Reset();
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
 				stageIndex = stageIndex++;
@@ -274,6 +275,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				S2CChangeStagePacket changePacket;
 				changePacket.stageNum = stageIndex;
 				changePacket.type = S2CChangeStage;
+				StageTimerStart();
+
 				for (int i = 0; i < 3; i++) {
 					ResetEvent(threadHandles[i].intDoor);
 					//스테이지 변경 패킷 전송
@@ -291,7 +294,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					}
 
 				}
-				StageTimerStart();
+				
 				isNextStage = false;
 			}
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);

@@ -36,7 +36,7 @@ StageMgr::StageMgr()
 	isUse[STAGE_ROLE]	= true;
 	isUse[STAGE_01]		= true;
 	isUse[STAGE_02]		= true;
-	isUse[STAGE_03]		= false;
+	isUse[STAGE_03]		= true;
 	isUse[RESULT]		= true;
 }
 
