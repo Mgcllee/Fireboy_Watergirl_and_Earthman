@@ -27,13 +27,6 @@ void ConstructPacket(ThreadInfo& clientInfo, int ioSize); // 패킷 재조립
 void ProcessPacket(ThreadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
 int GetPacketSize(char packetType);
 
-void ChangeRole(); // mutex 필요 없을듯? => change는 딱히 문제 없다고 생각함
-void SelectRole(); // mutex 필요 => 두 클라이언트가 동시에 같은 케릭터 선택을 해버리면 안됨
-//void MovePacket(); // 움직일 때 마다, 전송
-void CheckJewelryEat();// 쥬얼리 습득 확인
-void CheckOpenDoor(); // 문 열리는 조건 확인
-
-
 extern array<ThreadInfo, 3> threadHandles;
 extern array<char, 3> playerRole;
 extern mutex selectMutex;
