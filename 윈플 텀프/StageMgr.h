@@ -1,7 +1,7 @@
 #pragma once
 #include"Stage.h"
 
-#define MAX_STAGE 6
+#define MAX_STAGE 7
 
 class StageMgr
 {

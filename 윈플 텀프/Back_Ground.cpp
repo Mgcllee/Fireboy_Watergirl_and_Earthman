@@ -5,6 +5,9 @@
 
 void Move()
 {
+	if (stageIndex == 6) {
+		return;
+	}
 	MovePacket move;
 	move.type = C2SMove;
 	move.id = myId;

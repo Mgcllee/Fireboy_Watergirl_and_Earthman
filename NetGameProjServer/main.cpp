@@ -412,6 +412,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								cout << "collide head" << endl;
 
 								threadHandles[i].v = 0.f;
+								threadHandles[i].y += ft.hei;
 								threadHandles[i].Falling = true;
 								break;
 							}
