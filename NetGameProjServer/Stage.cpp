@@ -157,33 +157,6 @@ void Stage::Stage_3() {
 	jewely.emplace(OBJECT{ 200, 250, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 200, 28, 25, 1160, 29, FALSE });
 
-	// Trap[31].x = 200;
-	// Trap[31].y = 730;
-	// Trap[51].x = 180;
-	// Trap[51].y = 730;
-	// Trap[56].x = 220;
-	// Trap[56].y = 730;
-	// Trap[30].x = 900;
-	// Trap[30].y = 730;
-	// Trap[50].x = 980;
-	// Trap[50].y = 730;
-	// Trap[55].x = 920;
-	// Trap[55].y = 730;
-	// Trap[60].x = 600;
-	// Trap[60].y = 730;
-	// Trap[80].x = 580;
-	// Trap[80].y = 730;
-	// Trap[85].x = 620;
-	// Trap[85].y = 730;
-	   
-	// block[0].x = 0;
-	// block[0].y = 600;
-	   
-	// button[0].x = 600;
-	// button[0].y = 730;
-	// button[0].image_x = 42;
-	// button[0].image_y = 15;
-	   
-	// Rt.x = 800;
-	// Rt.y = 730;
+	block[0] = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
+	button[0] = OBJECT{ 600, 700, 10, 5, 0, 0, TRUE };
 }

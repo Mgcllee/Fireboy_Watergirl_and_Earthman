@@ -561,6 +561,19 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			packet->type = S2CMove_LEFT;
 		}
 
+
+		// ÇöÀç ½ºÅ×ÀÌÁö¿¡ ¼³Ä¡µÈ ¹öÆ°µé°ú °Ë»ç
+		for (OBJECT& btn : StageMgr.button) {
+			if (btn.Collision(clientInfo)) {
+				typePacket* btn_packet = new typePacket;
+				btn_packet->type = S2CBTN_DOWN;
+				for (int i = 0; i < 3; i++) {
+					send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
+				}
+				break;
+			}
+		}
+
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;
 

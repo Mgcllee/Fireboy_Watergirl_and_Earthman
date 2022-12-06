@@ -1,7 +1,7 @@
 #pragma once
 #include<WS2tcpip.h>
 #include "stdafx.h"
-#include "protocol.h"
+#include "../NetGameProjServer/protocol.h"
 #include "StageMgr.h"
 
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
@@ -179,6 +179,12 @@ void ProcessPacket(char* buf)
 				break;
 			}
 		}
+	}
+	break;
+	case S2CBTN_DOWN:
+	{
+		typePacket* packet = reinterpret_cast<typePacket*>(buf);
+		BTN_down = true;
 	}
 	break;
 	case S2CEndout:

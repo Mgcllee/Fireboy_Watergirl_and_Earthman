@@ -2,7 +2,7 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include "protocol.h"
+#include "../NetGameProjServer/protocol.h"
 #include <string>
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
@@ -22,6 +22,7 @@ bool doorVisible = false;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
 int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
+bool BTN_down = false;
 
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
@@ -305,28 +306,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			for (PLAYER& pl : players) {
-				for (OBJECT& btn : currentStage.button) {
-					if (btn.Collision(pl)) {
-						if (btn.image_y < 20.f)
-							btn.image_y += 2.f;
-						else
-							btn.image_y = 20.f;
-					}
-					else if (btn.image_y < 20.f) {
-						btn.image_y -= 2.f;
-					}
-					else {
-						btn.image_y = 0.f;
-					}
-				}
+			if (BTN_down) {
+				if (currentStage.button.image_y < 20)
+					currentStage.button.image_y += 2;
+				else
+					currentStage.button.image_y = 20;
 			}
-
-			for (OBJECT& block : currentStage.block)
+			else {
+				if (currentStage.button.image_y > 0)
+					currentStage.button.image_y -= 2;
+				else
+					currentStage.button.image_y = 0;
+			}
+			
+			/*for (OBJECT& block : currentStage.block)
 				if (block.GetVisible())
 					block.ChangeFrame(-1, false);
 				else
-					block.ChangeFrame(1, false);
+					block.ChangeFrame(1, false);*/
 		}
 		break;
 		case 2:				// 캐릭터 프레임

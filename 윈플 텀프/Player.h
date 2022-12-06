@@ -5,7 +5,8 @@ enum DIRECTION {
 	IDLE,
 	JUMP,
 	LEFT,
-	RIGHT
+	RIGHT,
+	BTN_DOWN
 };
 
 class PLAYER {
