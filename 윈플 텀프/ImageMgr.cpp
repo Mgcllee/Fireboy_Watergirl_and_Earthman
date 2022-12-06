@@ -145,7 +145,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 
 		break;
-	case STAGE_03:
+	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (OBJECT& ft : stage.Ft)
@@ -177,12 +177,15 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		//door_blue.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		break;
-	case STAGE_01:
+	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
 
 		for (OBJECT& ft : stage.Ft)
 		{
 			foot_block.Draw(*memdc, ft.x, ft.y, ft.wid, ft.hei, 0, 0, 111, 23);
+		}
+		if (currentJewelyNum < currentStage.maxJewelyNum) {
+			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
 		}
 
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);

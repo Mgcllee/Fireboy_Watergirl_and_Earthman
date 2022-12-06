@@ -84,7 +84,7 @@ public:
 		switch (index)
 		{
 		case STAGE_01:
-			Stage_3();
+			Stage_1();
 			break;
 		case STAGE_02:
 			Stage_2();
