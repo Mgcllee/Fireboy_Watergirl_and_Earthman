@@ -29,7 +29,8 @@ void StageTimerStart();
 
 Timer _timer;
 
-double timeoutSeconds = 60;
+double timeoutSeconds = 5;
+bool timeOut = false;
 
 int main(int argv, char** argc)
 {
@@ -270,7 +271,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 			}
 
-			if (isNextStage) {
+			if (isNextStage || timeOut) {
 				_timer.Reset();
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
@@ -300,7 +301,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					}
 
 				}
-
+				timeOut = false;
 				isNextStage = false;
 			}
 			DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
@@ -501,39 +502,9 @@ void StageTimerStart()
 						}
 					}
 				}
-
-				_timer.Reset();
-				isVisibleDoor = false;
-				currentJewelyNum = 0;
-				stageIndex = stageIndex++;
-				StageMgr.getStage(stageIndex);
-				ResetEvent(jewelyEatHandle);
-
-				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = stageIndex;
-				changePacket.type = S2CChangeStage;
-				StageTimerStart();
-
-				for (int i = 0; i < 3; i++) {
-					ResetEvent(threadHandles[i].intDoor);
-					//스테이지 변경 패킷 전송
-					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-
-					//스테이지당 최초위치 할당
-					MovePacket setPosition;
-					setPosition.type = S2CMove_IDLE;
-					setPosition.id = i;
-					setPosition.x = threadHandles[i].x;
-					setPosition.y = threadHandles[i].y;
-					for (int j = 0; j < 3; ++j) {
-						threadHandles[j].onBoard = StageMgr.Ground;
-						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
-					}
-
-				}
-
+				timeOut = true;
 			}
-			if (packet.timePassed >= 45) {
+			if (packet.timePassed >= 2) {
 				if (!isVisibleDoor) {
 					typePacket visibleDoorPacket;
 					visibleDoorPacket.type = S2CDoorVisible;
