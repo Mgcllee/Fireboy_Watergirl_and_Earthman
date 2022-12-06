@@ -457,6 +457,13 @@ void StageTimerStart()
 				for (int x = 0; x < 3; x++) {
 					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
 				}
+				S2CChangeStagePacket changePacket;
+				changePacket.stageNum = RESULT;
+				changePacket.type = S2CChangeStage;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+				}
+				
 			}
 			if (packet.timePassed >= 60 * 4) {
 				if (!isVisibleDoor) {
