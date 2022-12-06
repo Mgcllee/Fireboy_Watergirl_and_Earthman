@@ -19,7 +19,7 @@ StageMgr::StageMgr()
 	myStage[2].stage = STAGE_ROLE;
 
 	// 임시 스테이지
-	myStage[STAGE_01].Stage_1();
+	myStage[STAGE_01].Stage_3();
 	myStage[STAGE_01].stage = STAGE_01;
 
 	myStage[STAGE_02].Stage_2();

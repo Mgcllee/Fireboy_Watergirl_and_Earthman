@@ -307,13 +307,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-			if (BTN_down) {
+			if (true == BTN_down) {
 				if (currentStage.button.image_y < 20)
 					currentStage.button.image_y += 2;
 				else
 					currentStage.button.image_y = 20;
 			}
-			else {
+			else if (false == BTN_down) {
 				if (currentStage.button.image_y > 0)
 					currentStage.button.image_y -= 2;
 				else

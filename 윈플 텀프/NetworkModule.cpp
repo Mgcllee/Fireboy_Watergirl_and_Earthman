@@ -183,9 +183,14 @@ void ProcessPacket(char* buf)
 	break;
 	case S2CBTN_DOWN:
 	{
-		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		BTN_down = true;
 	}
+	break;
+	case S2CBTN_UP:
+	{
+		BTN_down = false;
+	}
+	break;
 	break;
 	case S2CEndout:
 	{
@@ -395,6 +400,9 @@ int GetPacketSize(char packetType)
 			retVal = sizeof(S2CJewelryVisibilityPacket);
 			break;*/
 	default:
+	case S2CBTN_DOWN: 
+	case S2CBTN_UP:
+		retVal = sizeof(typePacket);
 		break;
 	}
 	return retVal;

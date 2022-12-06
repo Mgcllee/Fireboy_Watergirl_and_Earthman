@@ -133,7 +133,6 @@ void Stage::Stage_3() {
 	threadHandles[2].y = 730;
 	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 
-	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 150, 200, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 100, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 380, 400, 450, 24, 0, 0, TRUE });
@@ -157,6 +156,6 @@ void Stage::Stage_3() {
 	jewely.emplace(OBJECT{ 200, 250, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 200, 28, 25, 1160, 29, FALSE });
 
-	block[0] = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
-	button[0] = OBJECT{ 600, 700, 10, 5, 0, 0, TRUE };
+	block = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
+	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };
 }
