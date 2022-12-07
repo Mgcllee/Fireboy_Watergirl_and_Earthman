@@ -36,7 +36,4 @@ extern mutex selectMutex;
 extern array<char, 3> selectPlayerRole;
 extern HANDLE multiEvenTthreadHadle[3];
 
-extern int stageIndex;
-extern bool use_trap;
-
 //HANDLE loadFlag; =>웨이트포실긍

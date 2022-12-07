@@ -42,8 +42,6 @@ public:
 	// OBJECT Trap[90];		
 	OBJECT Die;				// 사망시 나오는 연기 (Max x = 7950, move x = 159)
 	OBJECT door;		// (Max x = 1260, move x = 60) // Max = 1296, Move = 54
-	OBJECT button;
-	OBJECT block;
 	OBJECT currentVisibleJewely;
 
 	int maxJewelyNum = 0;

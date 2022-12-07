@@ -13,14 +13,9 @@ HANDLE multiEvenTthreadHadle[3];
 HANDLE jewelyEatHandle;
 int stageIndex = -1;
 
-// ÇÔÁ¤ Àü¿ë º¯¼ö
-bool use_trap = false;
-int trap_start_t = -1;
-
 Stage StageMgr;
 
-// ¸íÃ¶ ÀÎÁö ÀÎÀÚµé
-int currentJewelyNum = 0; // ¸ÔÀº º¸¼® ÀÌº¥Æ® ÇÚµé ¹øÈ£
+int currentJewelyNum = 0;	// ¸ÔÀº º¸¼® ÀÌº¥Æ® ÇÚµé ¹øÈ£
 bool isVisibleDoor = false; // ¹® ºñÁöºí => stage ¾È¿¡ ÀÖÀ¸¸é »ó°ü ¾øÀ½
 mutex jewelyMutex;
 
@@ -46,8 +41,6 @@ int main(int argv, char** argc)
 		Display_Err(WSAGetLastError());
 		return 1;
 	}
-
-	//loadFlag= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET) {
@@ -182,16 +175,6 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
-		/*else if (recvRetVal <= 0) {
-			if (WSAGetLastError() != WSAEWOULDBLOCK) {
-				closesocket(threadHandles[myIndex].clientSocket);
-				return 0;
-			}
-		}*/
-		// ¸íÃ¶ ÀÎÁö: ÄÝ¶óÀÌµå º¸¼®, ¹®
-		//¿©±â¿¡ º¸¼® Ã¼Å©? => ºÎÇÏ°¡ ÀÖÀ»±î? => ¾øÀ»°Å °°±äÇÑµ¥ => ¾øÀ¸´Ï º¸¼® ¸Ô´Â°Ç ¿©±â¿¡ µÓ½Ã´Ù.		
-
-		//// ÀÏ´Ü ÀÌ°É·Î ¤¡¤¡
 		if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
 			S2CPlayerPacket jewelyPacket;
 			jewelyPacket.id = -1;
@@ -267,7 +250,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				StageTimerStart();
 			}
 		}
-		else if (stageIndex >= STAGE_01) { // ¾î¶² ÀÎ °ÔÀÓ ½ºÅ×ÀÌÁö°¡ ¿Àµç ÀÌ°Ç °íÁ¤ÀÌ´Ï±î == -> >= À¸·Î ¼öÁ¤
+		else if (stageIndex >= STAGE_01) {
 			bool isNextStage = true;
 			for (int i = 0; i < 3; i++) {
 				if (threadHandles[i].isArrive) {
@@ -393,7 +376,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					mPacket.id = threadHandles[i].clientId;
 					mPacket.type = S2CMove_JUMP;
 
-					// ³»ºÎ °øÅë (º¯¼ö or for¹®)Àº ÇÊ¿ä·Î ³ÖÀº °ÍÀÌ´Ï ¹ÛÀ¸·Î »©Áö ¸»¾ÆÁÖ¼¼¿ë!
 					if (threadHandles[i].Falling || duration_cast<milliseconds>(startDuration).count() > 270) {
 						if (threadHandles[i].v < FLT_EPSILON)
 							threadHandles[i].v = 0.f;
@@ -431,17 +413,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									break;
 								}
 							}
-							if (!use_trap && StageMgr.block.Ft_Collision(threadHandles[i])) {
-								ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
-								threadHandles[i].direction = DIRECTION::NONE;
-								threadHandles[i].v = 0.f;
-								threadHandles[i].isJump = false;
-								threadHandles[i].Falling = false;
-								threadHandles[i].onBoard = StageMgr.block;
-								threadHandles[i].y = threadHandles[i].ground = StageMgr.block.y; //À§Ä¡ Àâ¾ÆÁÖ±â
-								mPacket.type = S2CMove_IDLE;
-							}
-
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
 							for (int j = 0; j < 3; j++) {
@@ -479,12 +450,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								break;
 							}
 						}
-						if (!use_trap && (StageMgr.block.y < threadHandles[i].y) && StageMgr.block.Collision(threadHandles[i])) {
-							threadHandles[i].y -= 1.3f * threadHandles[i].v;
-							threadHandles[i].v = 0.f;
-							threadHandles[i].y += StageMgr.block.hei;
-							threadHandles[i].Falling = true;
-						}
 
 						// °ËÁõµÈ Y°ªÀ» ÆÐÅ¶¿¡ ´ã±â
 						mPacket.y = threadHandles[i].y;
@@ -514,14 +479,6 @@ void StageTimerStart()
 
 			for (int x = 0; x < 3; x++) {
 				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
-			}
-
-			if (use_trap) {
-				int current_time = _timer.GetElapsedTime() / (double)1000;
-				if(trap_start_t == -1)
-					trap_start_t = _timer.GetElapsedTime() / (double)1000;
-				if (current_time - trap_start_t == 20)
-					use_trap = false;
 			}
 
 			if (timeoutSeconds <= packet.timePassed && !isTimeOut && !gameEnd)
@@ -602,7 +559,7 @@ void TimeoutStage()
 	_timer.Stop();
 }
 
-void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â ÇÔ¼ö - recv()ÇÏ¸é¼­ ºÒ·¯ÁÜ
+void ProcessPacket(ThreadInfo& clientInfo, char* packetStart)
 {
 	if (packetStart == nullptr)
 		return;
@@ -611,11 +568,8 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	{
 		C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
 		bool change = true;
-		//already Exist Role Check
-
-		//non exist Role
 		selectMutex.lock();
-		for (int i = 0; i < 3; i++) { // ¼º´ÉÀÌ ±¸¸±·Á³ª? »ó°ü ¾ø³ª?
+		for (int i = 0; i < 3; i++) {
 			if (selectPlayerRole[i] == packet->role) {
 				change = false;
 				break;
@@ -639,8 +593,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	case C2SChangRole:
 	{
 		C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
-		playerRole[clientInfo.clientId] = packet->role; // Ä³¸¯ÅÍ µÑ·¯º¸´Â °Í Á¤µµ´Â »óÈ£¹èÁ¦ ÇÊ¿ä ¾ø´Ù°í »ý°¢µÊ
-		//send changePacekt for all Client
+		playerRole[clientInfo.clientId] = packet->role;
 		S2CRolePacket sendPacket;
 		sendPacket.id = clientInfo.clientId;
 		sendPacket.role = packet->role;
@@ -674,12 +627,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			/*if((clientInfo.x + clientInfo.wid/2 + clientInfo.wid_v < WINDOW_WID)
-				&& (clientInfo.x + clientInfo.wid / 2 + clientInfo.wid_v > 0))
-				clientInfo.x += clientInfo.wid_v;
-			else 
-				clientInfo.x -= clientInfo.wid_v;*/
-			// clientInfo.x += clientInfo.wid_v;
 			ThreadInfo temp = clientInfo;
 			temp.x += temp.wid_v;
 			for (OBJECT& ft : StageMgr.Ft) {
@@ -703,11 +650,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			/*if ((clientInfo.x - clientInfo.wid_v < WINDOW_WID - clientInfo.wid)
-				&& (clientInfo.x - clientInfo.wid_v > clientInfo.wid))
-				clientInfo.x -= clientInfo.wid_v;
-			else 
-				clientInfo.x += clientInfo.wid_v;*/
 			ThreadInfo temp = clientInfo;
 			temp.x -= temp.wid_v;
 			for (OBJECT& ft : StageMgr.Ft) {
@@ -726,22 +668,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			packet->type = S2CMove_LEFT;
 		}
 
-		// ÇöÀç ½ºÅ×ÀÌÁö¿¡ ¼³Ä¡µÈ ¹öÆ°µé°ú °Ë»ç
-		typePacket* btn_packet = new typePacket;
-		if (StageMgr.button.Collision(clientInfo)) {
-			btn_packet->type = S2CBTN_DOWN;
-			use_trap = true;
-			for (int i = 0; i < 3; i++) {
-				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
-			}
-		}
-		else {
-			btn_packet->type = S2CBTN_UP;
-			for (int i = 0; i < 3; i++) {
-				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
-			}
-		}
-		
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;
 
@@ -752,18 +678,10 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SEndout:
 	{
-		/*typePacket* packet = reinterpret_cast<typePacket*>(packetStart);
-		typePacket sendPacket;
-		sendPacket.type = S2CEndout;
-
-		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(typePacket), 0);
-		}*/
 		closesocket(clientInfo.clientSocket);
 	}
 	break;
 	default:
-		// Packet Error
 		break;
 }
 }
