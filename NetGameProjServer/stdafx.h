@@ -13,6 +13,9 @@
 using namespace std;
 using namespace chrono;
 
+#define WINDOW_WID			1200
+#define WINDOW_HEI			800
+
 #define STAGE_TITLE			0
 #define STAGE_LOADING		1
 #define STAGE_ROLE			2

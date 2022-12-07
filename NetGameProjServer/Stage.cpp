@@ -86,42 +86,12 @@ void Stage::Stage_2() {
 	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
-
-	/*
-	Trap[0].x = 200;
-	Trap[0].y = 730;
-
-	Trap[20].x = Trap[0].x - 20;
-	Trap[20].y = 730;
-
-	Trap[25].x = Trap[0].x + 20;
-	Trap[25].y = 730;
-
-	Trap[30].x = 900;
-	Trap[30].y = 730;
-
-	Trap[50].x = Trap[30].x - 20;
-	Trap[50].y = 730;
-
-	Trap[55].x = Trap[30].x + 20;
-	Trap[55].y = 730;
-
-	Trap[60].x = 600;
-	Trap[60].y = 730;
-
-	Trap[80].x = Trap[60].x - 20;
-	Trap[80].y = 730;
-
-	Trap[85].x = Trap[60].x + 20;
-	Trap[85].y = 730;
-	*/
 }
 
 void Stage::Stage_3() {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
-	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 
 	threadHandles[0].x = 100;
 	threadHandles[0].y = 730;
