@@ -374,10 +374,18 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms¸¶´Ù ¶Ç´Â y°¡ À§¿¡ ¶° ÀÖÀ»¶§
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
-								threadHandles[i].x -= 15;
+								if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+									&& (threadHandles[i].x - threadHandles[i].wid_v > threadHandles[i].wid))
+									threadHandles[i].x -= threadHandles[i].wid_v;
+								else
+									threadHandles[i].x += threadHandles[i].wid_v;
 							}
 							else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-								threadHandles[i].x += 15;
+								if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+									&& (threadHandles[i].x + threadHandles[i].wid_v > threadHandles[i].wid))
+									threadHandles[i].x += threadHandles[i].wid_v;
+								else
+									threadHandles[i].x -= threadHandles[i].wid_v;
 							}
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v += threadHandles[i].g;
@@ -412,10 +420,18 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
-							threadHandles[i].x -= 15;
+							if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+								&& (threadHandles[i].x - threadHandles[i].wid_v > threadHandles[i].wid))
+								threadHandles[i].x -= threadHandles[i].wid_v;
+							else
+								threadHandles[i].x += threadHandles[i].wid_v;
 						}
 						else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-							threadHandles[i].x += 15;
+							if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+								&& (threadHandles[i].x + threadHandles[i].wid_v > threadHandles[i].wid))
+								threadHandles[i].x += threadHandles[i].wid_v;
+							else
+								threadHandles[i].x -= threadHandles[i].wid_v;
 						}
 						mPacket.x = threadHandles[i].x;
 						threadHandles[i].v -= threadHandles[i].g;
@@ -606,7 +622,8 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if(clientInfo.x + clientInfo.wid_v < WINDOW_WID && clientInfo.x + clientInfo.wid_v > 0)
+			if((clientInfo.x + clientInfo.wid_v < WINDOW_WID - clientInfo.wid) 
+				&& (clientInfo.x + clientInfo.wid_v > clientInfo.wid))
 				clientInfo.x += clientInfo.wid_v;
 			else 
 				clientInfo.x -= clientInfo.wid_v;
@@ -618,7 +635,8 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if (clientInfo.x - clientInfo.wid_v < WINDOW_WID && clientInfo.x - clientInfo.wid_v> 0)
+			if ((clientInfo.x - clientInfo.wid_v < WINDOW_WID - clientInfo.wid)
+				&& (clientInfo.x - clientInfo.wid_v > clientInfo.wid))
 				clientInfo.x -= clientInfo.wid_v;
 			else 
 				clientInfo.x += clientInfo.wid_v;
