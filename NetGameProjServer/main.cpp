@@ -622,6 +622,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SMove:
 	{
+		short prevPosX = clientInfo.x;
 		MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
 		DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
 		if (retVal == WAIT_OBJECT_0) {
@@ -643,11 +644,15 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if((clientInfo.x + clientInfo.wid/2 + clientInfo.wid_v < WINDOW_WID)
+			/*if((clientInfo.x + clientInfo.wid/2 + clientInfo.wid_v < WINDOW_WID)
 				&& (clientInfo.x + clientInfo.wid / 2 + clientInfo.wid_v > 0))
 				clientInfo.x += clientInfo.wid_v;
 			else 
-				clientInfo.x -= clientInfo.wid_v;
+				clientInfo.x -= clientInfo.wid_v;*/
+			clientInfo.x += clientInfo.wid_v;
+			prevPosX;
+			if(clientInfo.x + 5 >= WINDOW_WID)
+				clientInfo.x = prevPosX;
 			clientInfo.direction = DIRECTION::RIGHT;
 			packet->type = S2CMove_RIGHT;
 		}
@@ -656,11 +661,14 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if ((clientInfo.x - clientInfo.wid_v < WINDOW_WID - clientInfo.wid)
+			/*if ((clientInfo.x - clientInfo.wid_v < WINDOW_WID - clientInfo.wid)
 				&& (clientInfo.x - clientInfo.wid_v > clientInfo.wid))
 				clientInfo.x -= clientInfo.wid_v;
 			else 
-				clientInfo.x += clientInfo.wid_v;
+				clientInfo.x += clientInfo.wid_v;*/
+			clientInfo.x -= clientInfo.wid_v;
+			if (clientInfo.x - 55 < 0)
+				clientInfo.x = prevPosX;
 			clientInfo.direction = DIRECTION::LEFT;
 			packet->type = S2CMove_LEFT;
 		}
