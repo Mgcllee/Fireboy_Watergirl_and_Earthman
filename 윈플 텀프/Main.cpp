@@ -256,7 +256,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case BTN_STOP:
 			PostQuitMessage(0);
-			C2SEndPacket endPacket;
+			typePacket endPacket;
 			endPacket.type = C2SEndout;
 			SendPacket(&endPacket);
 			break;

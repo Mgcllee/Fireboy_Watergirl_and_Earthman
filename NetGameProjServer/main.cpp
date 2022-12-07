@@ -687,12 +687,12 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 	break;
 	case C2SEndout:
 	{
-		/*S2CEndPacket* packet = reinterpret_cast<S2CEndPacket*>(packetStart);
-		S2CEndPacket sendPacket;
+		/*typePacket* packet = reinterpret_cast<typePacket*>(packetStart);
+		typePacket sendPacket;
 		sendPacket.type = S2CEndout;
 
 		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CEndPacket), 0);
+			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(typePacket), 0);
 		}*/
 		closesocket(clientInfo.clientSocket);
 #ifdef _DEBUG
@@ -727,7 +727,7 @@ int GetPacketSize(char packetType)
 		break;
 	case C2SRetry:
 	case C2SEndout:
-		retVal = sizeof(C2SEndPacket);
+		retVal = sizeof(typePacket);
 		break;
 	default:
 		break;

@@ -189,7 +189,7 @@ void ProcessPacket(char* buf)
 	break;
 	case S2CEndout:
 	{
-		C2SEndPacket* packet = reinterpret_cast<C2SEndPacket*>(buf);
+		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		exit(1);
 		break;
 	}
@@ -306,7 +306,7 @@ void SendPacket(void* buf)
 		break;
 
 	case C2SEndout:
-		size = sizeof(C2SEndPacket);
+		size = sizeof(typePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
 
@@ -397,7 +397,7 @@ int GetPacketSize(char packetType)
 			break;*/
 
 	case C2SEndout:
-		retVal = sizeof(S2CEndPacket);
+		retVal = sizeof(typePacket);
 		break;
 	default:
 		break;
