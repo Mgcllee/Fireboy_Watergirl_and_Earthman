@@ -598,21 +598,27 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			clientInfo.direction = DIRECTION::NONE;
 			packet->type = S2CMove_IDLE;
 		}
-		else if (packet->x == 1 && clientInfo.x < WINDOW_WID && clientInfo.x > 0) {
+		else if (packet->x == 1) {
 			if (clientInfo.wid_a <= 10.f)
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			clientInfo.x += clientInfo.wid_v;
+			if(clientInfo.x + clientInfo.wid_v < WINDOW_WID && clientInfo.x + clientInfo.wid_v > 0)
+				clientInfo.x += clientInfo.wid_v;
+			else 
+				clientInfo.x -= clientInfo.wid_v;
 			clientInfo.direction = DIRECTION::RIGHT;
 			packet->type = S2CMove_RIGHT;
 		}
-		else if (packet->x == -1 && clientInfo.x < WINDOW_WID && clientInfo.x > 0) {
+		else if (packet->x == -1) {
 			if (clientInfo.wid_a <= 10.f)
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			clientInfo.x -= clientInfo.wid_v;
+			if (clientInfo.x - clientInfo.wid_v < WINDOW_WID && clientInfo.x - clientInfo.wid_v> 0)
+				clientInfo.x -= clientInfo.wid_v;
+			else 
+				clientInfo.x += clientInfo.wid_v;
 			clientInfo.direction = DIRECTION::LEFT;
 			packet->type = S2CMove_LEFT;
 		}
