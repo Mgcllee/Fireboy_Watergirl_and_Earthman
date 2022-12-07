@@ -89,12 +89,7 @@ struct S2CStageTimePassPacket {
 	int timePassed;
 };
 
-struct C2SEndPacket {
-	char type;
-};
-struct S2CEndPacket {
-	char type ;
-};
+
 
 #pragma pack(pop)
 
