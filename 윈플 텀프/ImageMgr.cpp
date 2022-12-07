@@ -406,11 +406,24 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 
 void ImageMgr::DrawScore(HDC* memdc)
 {
-	players[0].Anim[1].Draw(*memdc, 1000 - 55, 20, 70, 100, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
+
+
+	for (int i = 0; i < 3; i++) {
+		if (players[i].role == 'f') {
+			fireStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
+		}
+		if (players[i].role == 'w') {
+			waterStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
+		}
+		else {
+			earthStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
+		}		
+	}		
+	//players[0].Anim[1].Draw(*memdc, 1000 - 55, 20, 70, 100, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
 	DrawScoreNum(memdc, 1020 - 55, 120, players[0].score);
-	players[1].Anim[1].Draw(*memdc, 1080 - 55, 20, 70, 100, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
+	//players[1].Anim[1].Draw(*memdc, 1080 - 55, 20, 70, 100, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
 	DrawScoreNum(memdc, 1100 - 55, 120, players[1].score);
-	players[2].Anim[1].Draw(*memdc, 1160 - 55, 20, 70, 100, 0, 0, players[2].C_img_X_Size_01, players[2].C_img_Y_Size_01);
+	//players[2].Anim[1].Draw(*memdc, 1160 - 55, 20, 70, 100, 0, 0, players[2].C_img_X_Size_01, players[2].C_img_Y_Size_01);
 	DrawScoreNum(memdc, 1180 - 55, 120, players[2].score);
 }
 
