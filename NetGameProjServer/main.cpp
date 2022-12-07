@@ -276,12 +276,12 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 
 			if (isNextStage || isTimeOut) {
-#ifdef DEBUG
-				cout << "visible Door Off" << endl;
+#ifdef _DEBUG
+				cout << "visible Door Off by Next Stage" << endl;
 #endif // DEBUG
 
-				isVisibleDoor = false;
 				currentJewelyNum = 0;
+				isVisibleDoor = false;
 				if (stageIndex < 6) {
 					switch (stageIndex) {
 					case STAGE_TITLE:
@@ -349,7 +349,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					visibleDoor.type = S2CDoorVisible;
 					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {
 #ifdef  _DEBUG
-						cout << "door visible On" << endl;
+						cout << "door visible On by jewerly" << endl;
 #endif //  _DEBUG
 						for (int i = 0; i < 3; i++)
 							send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
@@ -550,15 +550,15 @@ void StageTimerStart()
 				}
 
 			}
-			if (packet.timePassed >= 35) {
+			if (packet.timePassed >= 35 && !isTimeOut && !gameEnd) {
 				if (!isVisibleDoor) {
 					typePacket visibleDoorPacket;
 					visibleDoorPacket.type = S2CDoorVisible;
 					for (int x = 0; x < 3; x++) {
 						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
 					}
-#ifdef DEBUG
-					cout << "Door Visible True" << endl;
+#ifdef _DEBUG
+					cout << "Door Visible True by Time" << endl;
 #endif // DEBUG
 
 					isVisibleDoor = true;
