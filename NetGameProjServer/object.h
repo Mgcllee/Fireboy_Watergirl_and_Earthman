@@ -1,15 +1,15 @@
 #pragma once
-//#include"ThreadInfo.h"
+
 class ThreadInfo;
 class OBJECT {
-	bool On = false;			// 사용 여부
+	bool On = false;			
 
 public:
-	int x{}, y{};				// 윈도우 기준 좌상단 (x, y) 위치좌표
-	int image_x{}, image_y{};	// 출력할 이미지 프레임 기준점 (스프라이트 이미지)
-	int wid{}, hei{};			// 가로길이, 세로길이
-	int MaxWid{};				// 전체 스프라이트 가로길이
-	int imageMoveWid{};			// 스프라이트 이미지 이동
+	int x{}, y{};				
+	int image_x{}, image_y{};	
+	int wid{}, hei{};			
+	int MaxWid{};				
+	int imageMoveWid{};			
 
 	OBJECT() {};
 	OBJECT(int pos_x, int pos_y, int WID, int HEI, int MAXWID, int IMAGEMOVEWID, bool ON)

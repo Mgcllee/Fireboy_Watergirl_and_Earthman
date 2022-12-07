@@ -23,8 +23,6 @@ void Stage::Stage_1() {
 
 	Die.SetVisible(false);
 
-	//명철 인지
-	//jewely queeue Clear
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 
@@ -34,21 +32,13 @@ void Stage::Stage_1() {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	//명철 인지
-	//queue니까 일단 첫번째 보석은 current 한테 주고
 	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
-	//jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-	//아직 안보여줄 보석은 큐에 저장
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
-	//보석 최대 갯수 정해주고
 	maxJewelyNum = 2;
 
-	/*jewely.emplace_back();
-	jewely.emplace_back();*/
 
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
-	//red_door = OBJECT{ 630, 400, 60, 100, 1260, 60, TRUE };
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 630, 112, 24, 0, 0, TRUE });
@@ -88,14 +78,11 @@ void Stage::Stage_2() {
 	Ft.emplace_back(OBJECT{ 360, 420, 224, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 620, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 840, 520, 112, 24, 0, 0, TRUE });
-	// Ft.emplace_back(OBJECT{ 150, 320, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 350, 270, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
-	// Ft.emplace_back(OBJECT{ 950, 320, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
-	//아직 안보여줄 보석은 큐에 저장
 	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 750, 370, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 840, 570, 28, 25, 1160, 29, TRUE });

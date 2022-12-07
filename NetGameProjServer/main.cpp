@@ -15,8 +15,8 @@ int stageIndex = -1;
 
 Stage StageMgr;
 
-int currentJewelyNum = 0;	// 먹은 보석 이벤트 핸들 번호
-bool isVisibleDoor = false; // 문 비지블 => stage 안에 있으면 상관 없음
+int currentJewelyNum = 0;	
+bool isVisibleDoor = false;
 mutex jewelyMutex;
 
 DWORD WINAPI ClientWorkThread(LPVOID arg);
@@ -92,18 +92,18 @@ int main(int argv, char** argc)
 		threadHandles[i].clientId = i;
 		threadHandles[i].threadHandle = CreateThread(NULL, 0, ClientWorkThread, reinterpret_cast<LPVOID>(i), 0, NULL);
 		multiEvenTthreadHadle[i] = threadHandles[i].threadHandle;
-		send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//loading 패킷을 로그인 패킷으로 생각
+		send(threadHandles[i].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);
 
 		loadPacket.type = S2CAddPlayer;
 		for (int j = 0; j < 3; j++) {
 			if (i != j) {
 				if (threadHandles[j].threadHandle != NULL) {
-					send(threadHandles[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);//다른 Player 정보 패킷으로 생각 // j들한테 i의 정보를
+					send(threadHandles[j].clientSocket, (char*)&loadPacket, sizeof(S2CPlayerPacket), 0);
 
 					S2CPlayerPacket addPlayerPacket;
 					addPlayerPacket.type = S2CAddPlayer;
 					addPlayerPacket.id = j;
-					send(threadHandles[i].clientSocket, (char*)&addPlayerPacket, sizeof(S2CPlayerPacket), 0);//다른 Player 정보 패킷으로 생각 // i한테 j의 정보를
+					send(threadHandles[i].clientSocket, (char*)&addPlayerPacket, sizeof(S2CPlayerPacket), 0);
 				}
 			}
 		}
@@ -185,7 +185,6 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 				SetEvent(jewelyEatHandle);
 				jewelyPacket.id = myIndex;
 			}
-			//mutex 넣을 수 도 있어서
 			if (jewelyPacket.id != -1)
 				for (int j = 0; j < 3; j++)
 					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
@@ -197,15 +196,12 @@ DWORD WINAPI ClientWorkThread(LPVOID arg)
 			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
 				DWORD retValDoor = WaitForSingleObject(threadHandles[myIndex].intDoor, 0);
 				if (retValDoor != WAIT_OBJECT_0) {
-#ifdef DEBUG
-					cout << "into Door" << selectPlayerRole[myIndex] << "stage: " << stageIndex << endl;
-#endif // DEBUG
 					S2CPlayerPacket intoDoorPacket;
 					intoDoorPacket.id = myIndex;
 					intoDoorPacket.type = S2CIntoDoor;
 					SetEvent(threadHandles[myIndex].intDoor);
 					for (int j = 0; j < 3; j++)
-						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);// 문으로 들어가라 명령 => 이거 오면 클라는 문으로 들어가는 애니메이션
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);
 				}
 			}
 		}
@@ -225,10 +221,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 			}
 			if (isFinish) {
-				// Stage 1 의 정보 획득
 				stageIndex = STAGE_01;
 				StageMgr.getStage(stageIndex);
-				// 최초 위치 설정
 				MovePacket setPosition;
 				setPosition.type = S2CMove_IDLE;
 				for (int i = 0; i < 3; ++i) {
@@ -263,9 +257,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 
 			if (isNextStage || isTimeOut) {
-#ifdef _DEBUG
-				cout << "visible Door Off by Next Stage" << endl;
-#endif // DEBUG
 
 				currentJewelyNum = 0;
 				isVisibleDoor = false;
@@ -301,10 +292,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 				for (int i = 0; i < 3; i++) {
 					ResetEvent(threadHandles[i].intDoor);
-					//스테이지 변경 패킷 전송
 					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);					
 					threadHandles[i].ground = 730;
-					//스테이지당 최초위치 할당
 					MovePacket setPosition;
 					setPosition.type = S2CMove_IDLE;
 					setPosition.id = i;
@@ -335,9 +324,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					typePacket visibleDoor;
 					visibleDoor.type = S2CDoorVisible;
 					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {
-#ifdef  _DEBUG
-						cout << "door visible On by jewerly" << endl;
-#endif //  _DEBUG
 						for (int i = 0; i < 3; i++)
 							send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
 						isVisibleDoor = true;
@@ -370,8 +356,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].y = threadHandles[i].ground;
 					}
 
-					auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		// 저장된 점프 시작부터 경과시간
-					auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;	// 저정된 점프 현재 시각부터
+					auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		
+					auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;
 					MovePacket mPacket;
 					mPacket.id = threadHandles[i].clientId;
 					mPacket.type = S2CMove_JUMP;
@@ -380,7 +366,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						if (threadHandles[i].v < FLT_EPSILON)
 							threadHandles[i].v = 0.f;
 
-						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms마다 또는 y가 위에 떠 있을때
+						if (duration_cast<milliseconds>(currentDuration).count() > 30) {
 							int prevPosX = threadHandles[i].x;
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
 								if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
@@ -407,28 +393,28 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
 
-							for (OBJECT& ft : StageMgr.Ft) {// 발판에 안착
-								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // 발판 콜라이드와 충돌 확인 && 위에 걸렸다면
+							for (OBJECT& ft : StageMgr.Ft) {
+								if (ft.Ft_Collision(threadHandles[i]) ) { 
 
-									ResetEvent(threadHandles[i].jumpEventHandle); // 점프는 더 이상하지 않음 - 공중에 있지 않는다
+									ResetEvent(threadHandles[i].jumpEventHandle); 
 									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
 									threadHandles[i].isJump = false;
 									threadHandles[i].Falling = false;
 									threadHandles[i].onBoard = ft;
-									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; //위치 잡아주기
+									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; 
 									mPacket.type = S2CMove_IDLE;
 									break;
 								}
 							}
 							mPacket.y = threadHandles[i].y;
-							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // 다음과 점프시간을 위해 현재 점프한 시간 저장
+							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); 
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
 						}
 					}
-					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //상승
+					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) {
 						int prevPosX = threadHandles[i].x;
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
 							if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
@@ -455,7 +441,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].y += 1.3f * threadHandles[i].v;
 
 						for (OBJECT& ft : StageMgr.Ft) {
-							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//올라가다가 발판에 걸렸다면 떨어져라 머리 충돌
+							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {
 								threadHandles[i].y -= 1.3f * threadHandles[i].v;
 
 								threadHandles[i].v = 0.f;
@@ -465,7 +451,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							}
 						}
 
-						// 검증된 Y값을 패킷에 담기
 						mPacket.y = threadHandles[i].y;
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						for (int j = 0; j < 3; j++) {
@@ -558,10 +543,6 @@ void StageTimerStart()
 					for (int x = 0; x < 3; x++) {
 						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
 					}
-#ifdef _DEBUG
-					cout << "Door Visible True by Time" << endl;
-#endif // DEBUG
-
 					isVisibleDoor = true;
 				}
 			}

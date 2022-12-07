@@ -26,8 +26,8 @@ using namespace chrono;
 
 
 void Display_Err(int Errcode);
-void ConstructPacket(ThreadInfo& clientInfo, int ioSize); // 패킷 재조립
-void ProcessPacket(ThreadInfo& clientInfo, char* packetStart); // 패킷 재조립 후, 명령 해석 후 행동
+void ConstructPacket(ThreadInfo& clientInfo, int ioSize); 
+void ProcessPacket(ThreadInfo& clientInfo, char* packetStart);
 int GetPacketSize(char packetType);
 
 extern array<ThreadInfo, 3> threadHandles;
@@ -35,5 +35,3 @@ extern array<char, 3> playerRole;
 extern mutex selectMutex;
 extern array<char, 3> selectPlayerRole;
 extern HANDLE multiEvenTthreadHadle[3];
-
-//HANDLE loadFlag; =>웨이트포실긍

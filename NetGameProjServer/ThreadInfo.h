@@ -22,9 +22,9 @@ public:
 		int currentSize;
 		int prevSize = 0;
 		char clientId = -1;
-		short x, y;					// 좌표는 캐릭터 중심
+		short x, y;					
 		short ground = 730;
-		short hei = 100, wid = 60;	// 캐릭터 크기 (콜라이더 사용)
+		short hei = 100, wid = 60;	
 
 		bool Falling = false;
 

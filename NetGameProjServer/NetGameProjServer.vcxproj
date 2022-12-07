@@ -142,7 +142,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="Stage.cpp" />
-    <ClCompile Include="ThreadInfo.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

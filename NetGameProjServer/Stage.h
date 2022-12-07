@@ -11,19 +11,19 @@
 
 class PLAYER {
 public:
-	int id;						// 다른 클라이언트 식별 정보 - -1 // 아직 안쓰는 상황에 -1
-	short role;					// 어떤 캐릭터 인지 - f w e => fire water earth
-	int x, y;					// 우하단 좌표
-	int hei = 100, wid = 60;	// 캐릭터 크기
+	int id;					
+	short role;				
+	int x, y;				
+	int hei = 100, wid = 60;
 
-	int direction;				// 이동방향 (애니메이션에서 사용)
+	int direction;			
 	float wid_v{};
 	float wid_a{};
 
-	int ground = 730;		// Stage의 바닥 높이 (상단이 y = 0, 내려갈수록 +)
-	float g = 3.f;			// 중력 조절로 점프 높이 조정
-	float v = 0;			// 속도
-	short Frame = 0;		// 애니메이션 프레임
+	int ground = 730;		
+	float g = 3.f;			
+	float v = 0;			
+	short Frame = 0;		
 
 	int C_img_Frame{};
 	int C_img_x{}, C_img_y{};
@@ -44,14 +44,14 @@ public:
 class Stage
 {
 public:
-	short stage;						// 현재 스테이지
-	bool clear;							// Stage 클리어 여부
+	short stage;					
+	bool clear;						
 	int average;
-	bool time_over;						// 현재 Stage에서 Timer Over 여부
-	int count;							// 애니메이션 프레임 번호
-	int red_total;						// 빨강 보석 총 개수
-	int blue_total;						// 파랑 보석 총 개수
-	bool stair;							// Fire boy와 Water girl 이 문 안 계단을 올라감
+	bool time_over;					
+	int count;						
+	int red_total;					
+	int blue_total;					
+	bool stair;						
 
 	OBJECT Ground{ WINDOW_WID / 2, WINDOW_HEI, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
 	
