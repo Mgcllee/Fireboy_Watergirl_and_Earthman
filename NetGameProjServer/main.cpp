@@ -282,8 +282,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				ResetEvent(jewelyEatHandle);
 
 				S2CChangeStagePacket changePacket;
-				changePacket.stageNum = stageIndex;
-				cout << "stage Next: " << changePacket.stageNum << endl;
+				changePacket.stageNum = stageIndex;				
 				changePacket.type = S2CChangeStage;
 				StageTimerStart();
 
@@ -291,6 +290,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					ResetEvent(threadHandles[i].intDoor);
 					//스테이지 변경 패킷 전송
 					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+					cout << "player to stage " << i << "  ";
+					cout << "stage Next: " << changePacket.stageNum << endl;
 
 					//스테이지당 최초위치 할당
 					MovePacket setPosition;
@@ -498,27 +499,30 @@ void StageTimerStart()
 					TimeoutStage();
 				}
 				else {
-					if (retValDoor0 != WAIT_OBJECT_0) {
+					if (retValDoor0 != WAIT_OBJECT_0 && threadHandles[0].isArrive) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 0;
+						playerPacket.id = threadHandles[0].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[0].isArrive = false;
 						for (int x = 0; x < 3; x++) {
 							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
 						}
 					}
-					if (retValDoor1 != WAIT_OBJECT_0) {
+					if (retValDoor1 != WAIT_OBJECT_0 && threadHandles[1].isArrive) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 1;
+						playerPacket.id = threadHandles[1].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[1].isArrive = false;
 						for (int x = 0; x < 3; x++) {
 							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
 						}
 					}
-					if (retValDoor2 != WAIT_OBJECT_0) {
+					if (retValDoor2 != WAIT_OBJECT_0 && threadHandles[2].isArrive) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 2;
+						playerPacket.id = threadHandles[2].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[2].isArrive = false;
 						for (int x = 0; x < 3; x++) {
