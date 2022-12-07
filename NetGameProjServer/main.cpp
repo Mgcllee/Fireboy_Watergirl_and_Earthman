@@ -709,12 +709,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 #endif
 	}
 	break;
-
-	case C2SRetry:
-	{
-
-	}
-	break;
 	default:
 		// Packet Error
 		break;
@@ -734,7 +728,6 @@ int GetPacketSize(char packetType)
 	case C2SMove:
 		retVal = sizeof(MovePacket);
 		break;
-	case C2SRetry:
 	case C2SEndout:
 		retVal = sizeof(typePacket);
 		break;
