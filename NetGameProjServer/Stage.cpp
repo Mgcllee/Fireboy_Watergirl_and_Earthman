@@ -5,12 +5,18 @@
 void Stage::Stage_1() {
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
+	threadHandles[0].v = 0.f;
+	threadHandles[0].wid_v = 0.f;
 
 	threadHandles[1].x = 700;
 	threadHandles[1].y = 730;
+	threadHandles[1].v = 0.f;
+	threadHandles[1].wid_v = 0.f;
 
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
+	threadHandles[2].v = 0.f;
+	threadHandles[2].wid_v = 0.f;
 
 	Die.SetVisible(false);
 
@@ -58,12 +64,18 @@ void Stage::Stage_2() {
 
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
+	threadHandles[0].v = 0.f;
+	threadHandles[0].wid_v = 0.f;
 
 	threadHandles[1].x = 700;
 	threadHandles[1].y = 730;
+	threadHandles[1].v = 0.f;
+	threadHandles[1].wid_v = 0.f;
 
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
+	threadHandles[2].v = 0.f;
+	threadHandles[2].wid_v = 0.f;
 	door = OBJECT{ 700, 250 - 24, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
@@ -95,12 +107,19 @@ void Stage::Stage_3() {
 
 	threadHandles[0].x = 100;
 	threadHandles[0].y = 730;
+	threadHandles[0].v = 0.f;
+	threadHandles[0].wid_v = 0.f;
 
 	threadHandles[1].x = 1100;
 	threadHandles[1].y = 730;
+	threadHandles[1].v = 0.f;
+	threadHandles[1].wid_v = 0.f;
 
 	threadHandles[2].x = 500;
 	threadHandles[2].y = 730;
+	threadHandles[2].v = 0.f;
+	threadHandles[2].wid_v = 0.f;
+	
 	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);

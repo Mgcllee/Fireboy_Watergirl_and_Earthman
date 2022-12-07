@@ -276,7 +276,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			if (isNextStage || isTimeOut) {
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
-				if(stageIndex < 6)
+				if (stageIndex < 6)
 					stageIndex = stageIndex++;
 				StageMgr.getStage(stageIndex);
 				ResetEvent(jewelyEatHandle);
@@ -359,7 +359,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						threadHandles[i].v = 0.f;
 						threadHandles[i].y = threadHandles[i].ground;
-				}
+					}
 
 					auto startDuration = high_resolution_clock::now() - threadHandles[i].jumpStartTime;		// ÀúÀåµÈ Á¡ÇÁ ½ÃÀÛºÎÅÍ °æ°ú½Ã°£
 					auto currentDuration = high_resolution_clock::now() - threadHandles[i].jumpCurrentTime;	// ÀúÁ¤µÈ Á¡ÇÁ ÇöÀç ½Ã°¢ºÎÅÍ
@@ -381,7 +381,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									threadHandles[i].x += threadHandles[i].wid_v;
 							}
 							else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-								if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+								if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid / 2)
 									&& (threadHandles[i].x + threadHandles[i].wid_v > threadHandles[i].wid))
 									threadHandles[i].x += threadHandles[i].wid_v;
 								else
@@ -409,15 +409,15 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 #endif
 									mPacket.type = S2CMove_IDLE;
 									break;
+								}
 							}
-						}
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
 							for (int j = 0; j < 3; j++) {
 								send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 							}
+						}
 					}
-			}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //»ó½Â
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
 							if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
@@ -427,7 +427,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								threadHandles[i].x += threadHandles[i].wid_v;
 						}
 						else if (threadHandles[i].direction == DIRECTION::RIGHT) {
-							if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
+							if ((threadHandles[i].x + threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid / 2)
 								&& (threadHandles[i].x + threadHandles[i].wid_v > threadHandles[i].wid))
 								threadHandles[i].x += threadHandles[i].wid_v;
 							else
@@ -453,10 +453,9 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 						}
 					}
-
+				}
+			}
 		}
-	}
-}
 	}
 	return 0;
 }
@@ -619,8 +618,8 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if((clientInfo.x + clientInfo.wid_v < WINDOW_WID - clientInfo.wid) 
-				&& (clientInfo.x + clientInfo.wid_v > clientInfo.wid))
+			if((clientInfo.x + clientInfo.wid_v < WINDOW_WID - clientInfo.wid / 2) 
+				&& (clientInfo.x + clientInfo.wid_v > clientInfo.wid / 2))
 				clientInfo.x += clientInfo.wid_v;
 			else 
 				clientInfo.x -= clientInfo.wid_v;
