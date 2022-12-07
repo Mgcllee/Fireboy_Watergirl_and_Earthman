@@ -13,6 +13,10 @@ HANDLE multiEvenTthreadHadle[3];
 HANDLE jewelyEatHandle;
 int stageIndex = -1;
 
+// ÇÔÁ¤ Àü¿ë º¯¼ö
+bool use_trap = false;
+int trap_start_t = -1;
+
 Stage StageMgr;
 
 // ¸íÃ¶ ÀÎÁö ÀÎÀÚµé
@@ -427,14 +431,14 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									break;
 								}
 							}
-							if (StageMgr.block.Ft_Collision(threadHandles[i])) {
+							if (!use_trap && StageMgr.block.Ft_Collision(threadHandles[i])) {
 								ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
 								threadHandles[i].direction = DIRECTION::NONE;
 								threadHandles[i].v = 0.f;
 								threadHandles[i].isJump = false;
 								threadHandles[i].Falling = false;
 								threadHandles[i].onBoard = StageMgr.block;
-								threadHandles[i].y = threadHandles[i].ground = StageMgr.block.y - StageMgr.block.hei; //À§Ä¡ Àâ¾ÆÁÖ±â
+								threadHandles[i].y = threadHandles[i].ground = StageMgr.block.y; //À§Ä¡ Àâ¾ÆÁÖ±â
 								mPacket.type = S2CMove_IDLE;
 							}
 
@@ -475,9 +479,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								break;
 							}
 						}
-						if ((StageMgr.block.Collision(threadHandles[i]))) {
+						if (!use_trap && (StageMgr.block.y < threadHandles[i].y) && StageMgr.block.Collision(threadHandles[i])) {
 							threadHandles[i].y -= 1.3f * threadHandles[i].v;
 							threadHandles[i].v = 0.f;
+							threadHandles[i].y += StageMgr.block.hei;
 							threadHandles[i].Falling = true;
 						}
 
@@ -509,6 +514,14 @@ void StageTimerStart()
 
 			for (int x = 0; x < 3; x++) {
 				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
+			}
+
+			if (use_trap) {
+				int current_time = _timer.GetElapsedTime() / (double)1000;
+				if(trap_start_t == -1)
+					trap_start_t = _timer.GetElapsedTime() / (double)1000;
+				if (current_time - trap_start_t == 20)
+					use_trap = false;
 			}
 
 			if (timeoutSeconds <= packet.timePassed && !isTimeOut && !gameEnd)
@@ -717,6 +730,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 		typePacket* btn_packet = new typePacket;
 		if (StageMgr.button.Collision(clientInfo)) {
 			btn_packet->type = S2CBTN_DOWN;
+			use_trap = true;
 			for (int i = 0; i < 3; i++) {
 				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
 			}

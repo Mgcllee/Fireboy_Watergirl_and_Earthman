@@ -316,7 +316,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				else 
 					currentStage.button.image_y = 20;
 			}
-			else if (false == BTN_down || slide_timer >= 8) {
+			else if (false == BTN_down || slide_timer >= 20) {
 				if (currentStage.button.image_y > 0) {
 					currentStage.button.image_y -= 2;
 				}
@@ -324,7 +324,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					currentStage.button.image_y = 0;
 			}
 
-			if (slide_timer >= 8 && currentStage.block.image_x > 0) {
+			if (slide_timer >= 20 && currentStage.block.image_x > 0) {
 				currentStage.block.image_x -= 8;
 				if (currentStage.block.image_x < 0) {
 					currentStage.block.image_x = 0;
