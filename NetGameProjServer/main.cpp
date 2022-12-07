@@ -461,7 +461,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						mPacket.x = threadHandles[i].x;
 
 						threadHandles[i].v -= threadHandles[i].g;
-						threadHandles[i].y += threadHandles[i].v;
+						threadHandles[i].y += 1.3f * threadHandles[i].v;
 
 						for (OBJECT& ft : StageMgr.Ft) {
 							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó ¸Ó¸® Ãæµ¹
@@ -641,18 +641,20 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 #endif
 			SetEvent(clientInfo.jumpEventHandle);
 			packet->type = S2CMove_JUMP;
+			clientInfo.v = 0.f;
 	}
 		else if (packet->y == SHRT_MIN) {
 			clientInfo.direction = DIRECTION::NONE;
 			packet->type = S2CMove_IDLE;
+			clientInfo.wid_v = 0;
 		}
 		else if (packet->x == 1) {
 			if (clientInfo.wid_a <= 10.f)
 				clientInfo.wid_a += 0.1f;
 			if (clientInfo.wid_v <= 10.f)
 				clientInfo.wid_v += clientInfo.wid_a;
-			if((clientInfo.x + clientInfo.wid_v < WINDOW_WID - clientInfo.wid / 2) 
-				&& (clientInfo.x + clientInfo.wid_v > clientInfo.wid / 2))
+			if((clientInfo.x + clientInfo.wid/2 + clientInfo.wid_v < WINDOW_WID)
+				&& (clientInfo.x + clientInfo.wid / 2 + clientInfo.wid_v > 0))
 				clientInfo.x += clientInfo.wid_v;
 			else 
 				clientInfo.x -= clientInfo.wid_v;

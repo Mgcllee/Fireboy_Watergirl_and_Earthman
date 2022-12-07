@@ -12,15 +12,6 @@ void Stage::SelectCharacter()
 
 // 스테이지 내부 오브젝트 위치 설정
 void Stage::Stage_1() {
-	players[0].x = 600;
-	players[0].y = 730;
-
-	players[1].x = 700;
-	players[1].y = 730;
-
-	players[2].x = 500;
-	players[2].y = 730;
-
 
 	Die.SetVisible(false);
 	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
@@ -47,37 +38,28 @@ void Stage::Stage_2() {
 		jewely.pop();
 	Ft.clear();
 
-	door = OBJECT{ 700, 250 - 24, 60, 100, 0, 0, TRUE };
+	door = OBJECT{ 700, 400 - 4, 60, 100, 0, 0, TRUE };
 
-	maxJewelyNum = 8;
-	players[0].x = 600;
-	players[0].y = 730;
-
-	players[1].x = 700;
-	players[1].y = 730;
-
-	players[2].x = 500;
-	players[2].y = 730;
-
-	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 300, 600, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 380, 400, 224, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 700, 600, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 1000, 500, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 150, 300, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 350, 250, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 700, 250, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 950, 300, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 100, 520, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 300, 620, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 360, 420, 224, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 700, 620, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 840, 520, 112, 24, 0, 0, TRUE });
+	// Ft.emplace_back(OBJECT{ 150, 320, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 350, 270, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
+	// Ft.emplace_back(OBJECT{ 950, 320, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
-	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, TRUE });
+	//아직 안보여줄 보석은 큐에 저장
+	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 370, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 840, 570, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 220, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 750, 570, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 840, 570, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 450, 370, 28, 25, 1160, 29, TRUE });
 }
 
 void Stage::Stage_3() {
@@ -85,25 +67,14 @@ void Stage::Stage_3() {
 		jewely.pop();
 	Ft.clear();
 
-	players[0].x = 100;
-	players[0].y = 730;
-
-	players[1].x = 1100;
-	players[1].y = 730;
-
-	players[2].x = 500;
-	players[2].y = 730;
-
-	Ft.emplace_back(OBJECT{ 150, 200, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 100, 600, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 380, 400, 450, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 700, 600, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 1000, 500, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 150, 300, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 400, 250, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 700, 250, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 950, 300, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 900, 200, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 280, 700, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 700, 650, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 1100, 620, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 330, 650, 450, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 150, 550, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 400, 510, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 700, 510, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 900, 580, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
@@ -119,6 +90,6 @@ void Stage::Stage_3() {
 	
 	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 
-	block = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
+	block = OBJECT{ 0, 625, 28, 25, 0, 0, TRUE };
 	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };
 }

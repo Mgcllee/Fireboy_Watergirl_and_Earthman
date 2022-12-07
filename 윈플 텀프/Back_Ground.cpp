@@ -26,13 +26,15 @@ void Move()
 			ResetEvent(idleStateEvent);		
 		move.x = -1;
 	}
-	if (keybuffer[VK_RIGHT]) {
+	else if (keybuffer[VK_RIGHT]) {
 		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
 		if (WAIT_OBJECT_0 == retVal)
 			ResetEvent(idleStateEvent);		
 		move.x = 1;
 	}
-	if (!keybuffer[VK_UP] && !keybuffer[VK_RIGHT] && !keybuffer[VK_LEFT]) {
+
+	if ((!keybuffer[VK_UP] && !keybuffer[VK_RIGHT] && !keybuffer[VK_LEFT])
+		|| (keybuffer[VK_RIGHT] && keybuffer[VK_LEFT])) {
 		DWORD retVal = WaitForSingleObject(idleStateEvent, 0);
 		if (WAIT_OBJECT_0 == retVal)
 			return;
