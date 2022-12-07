@@ -8,7 +8,9 @@ bool OBJECT::Collision(ThreadInfo& pl) {
 	}*/
 	if (pl.x + 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) { // 사이 안에 있고
 		if (pl.y - 60 < y && pl.y > y) {// 머리가 밑에 닿았을때
+#ifdef _DEBUG
 			std::cout << "collide head" << std::endl;
+#endif
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		Ft_Collision Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
 //			std::cout << "Ft_Collision wid : " << wid << ", " << hei << std::endl;
@@ -26,7 +28,9 @@ bool OBJECT::Ft_Collision(ThreadInfo& pl) {
 	if (pl.x - 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) {// 사이 안에 있고
 		if (pl.y - 60 < y - hei && pl.y > y - hei) // 다리가 위에 닿았을때
 		{
+#ifdef _DEBUG
 			std::cout << "collide foot" << std::endl;
+#endif
 //#ifdef _DEBUG
 //			std::cout << "Player Pos: " << pl.x << ", " << pl.y << "		Ft_Collision Pos: " << x - wid / 2 << "~" << x + wid / 2 << ", " << y - hei << "~" << y << std::endl;
 //			std::cout << "Ft_Collision wid : " << wid << ", " << hei << std::endl;

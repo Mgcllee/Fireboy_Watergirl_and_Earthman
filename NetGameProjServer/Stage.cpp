@@ -3,6 +3,9 @@
 #include "Stage.h"
 
 void Stage::Stage_1() {
+	for (ThreadInfo& pl : threadHandles)
+		pl.isJump = false;
+
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
 	threadHandles[0].v = 0.f;
@@ -62,6 +65,9 @@ void Stage::Stage_2() {
 	//door = OBJECT{ 700, 630, 60, 100, 0, 0, TRUE };
 	maxJewelyNum = 8;
 
+	for (ThreadInfo& pl : threadHandles)
+		pl.isJump = false;
+
 	threadHandles[0].x = 600;
 	threadHandles[0].y = 730;
 	threadHandles[0].v = 0.f;
@@ -80,12 +86,12 @@ void Stage::Stage_2() {
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 400, 600, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 300, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 380, 400, 224, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 1000, 500, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 150, 300, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 400, 250, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 350, 250, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 250, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 950, 300, 112, 24, 0, 0, TRUE });
 
@@ -104,6 +110,10 @@ void Stage::Stage_3() {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
+
+	for (ThreadInfo& pl : threadHandles) {
+		pl.isJump = false;
+	}
 
 	threadHandles[0].x = 100;
 	threadHandles[0].y = 730;

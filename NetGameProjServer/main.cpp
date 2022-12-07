@@ -312,8 +312,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 					ResetEvent(threadHandles[i].intDoor);
 					//스테이지 변경 패킷 전송
 					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+#ifdef DEBUG
 					cout << "player to stage " << i << "  ";
 					cout << "stage Next: " << changePacket.stageNum << endl;
+#endif
 
 					//스테이지당 최초위치 할당
 					MovePacket setPosition;
@@ -457,12 +459,16 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								threadHandles[i].x -= threadHandles[i].wid_v;
 						}
 						mPacket.x = threadHandles[i].x;
+
 						threadHandles[i].v -= threadHandles[i].g;
 						threadHandles[i].y += threadHandles[i].v;
 
 						for (OBJECT& ft : StageMgr.Ft) {
 							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//올라가다가 발판에 걸렸다면 떨어져라 머리 충돌
+#ifdef DEBUG
 								cout << "collide head" << endl;
+#endif
+								threadHandles[i].y -= threadHandles[i].v;
 
 								threadHandles[i].v = 0.f;
 								threadHandles[i].y += ft.hei;
@@ -470,7 +476,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								break;
 							}
 						}
-						mPacket.y = threadHandles[i].y += threadHandles[i].v;
+						// 검증된 Y값을 패킷에 담기
+						mPacket.y = threadHandles[i].y;
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
 						for (int j = 0; j < 3; j++) {
 							send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);

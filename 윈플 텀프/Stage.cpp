@@ -60,12 +60,12 @@ void Stage::Stage_2() {
 	players[2].y = 730;
 
 	Ft.emplace_back(OBJECT{ 100, 500, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 400, 600, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 300, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 380, 400, 224, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 600, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 1000, 500, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 150, 300, 112, 24, 0, 0, TRUE });
-	Ft.emplace_back(OBJECT{ 400, 250, 112, 24, 0, 0, TRUE });
+	Ft.emplace_back(OBJECT{ 350, 250, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 250, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 950, 300, 112, 24, 0, 0, TRUE });
 
