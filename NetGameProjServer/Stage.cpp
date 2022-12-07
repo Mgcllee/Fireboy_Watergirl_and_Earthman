@@ -42,7 +42,7 @@ void Stage::Stage_1() {
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
 	//보석 최대 갯수 정해주고
-	maxJewelyNum = 0;
+	maxJewelyNum = 2;
 
 	/*jewely.emplace_back();
 	jewely.emplace_back();*/
@@ -93,7 +93,7 @@ void Stage::Stage_2() {
 	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
 	// Ft.emplace_back(OBJECT{ 950, 320, 112, 24, 0, 0, TRUE });
 
-	maxJewelyNum = 0;
+	maxJewelyNum = 8;
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
 	//아직 안보여줄 보석은 큐에 저장
 	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
