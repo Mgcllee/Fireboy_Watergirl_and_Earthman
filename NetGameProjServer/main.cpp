@@ -381,6 +381,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							threadHandles[i].v = 0.f;
 
 						if (duration_cast<milliseconds>(currentDuration).count() > 30/* && ((threadHandles[i].y) < threadHandles[i].ground)*/) {//30ms마다 또는 y가 위에 떠 있을때
+							int prevPosX = threadHandles[i].x;
 							if (threadHandles[i].direction == DIRECTION::LEFT) {
 								if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
 									&& (threadHandles[i].x - threadHandles[i].wid_v > threadHandles[i].wid))
@@ -395,6 +396,13 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								else
 									threadHandles[i].x -= threadHandles[i].wid_v;
 							}
+
+							if (threadHandles[i].x + 5 >= WINDOW_WID)
+								threadHandles[i].x = prevPosX;
+							if (threadHandles[i].x - 55 < 0)
+								threadHandles[i].x = prevPosX;
+							mPacket.x = threadHandles[i].x;
+
 							mPacket.x = threadHandles[i].x;
 							threadHandles[i].v += threadHandles[i].g;
 							threadHandles[i].y += threadHandles[i].v;
@@ -421,6 +429,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 						}
 					}
 					else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !threadHandles[i].Falling) { //상승
+						int prevPosX = threadHandles[i].x;
 						if (threadHandles[i].direction == DIRECTION::LEFT) {
 							if ((threadHandles[i].x - threadHandles[i].wid_v < WINDOW_WID - threadHandles[i].wid)
 								&& (threadHandles[i].x - threadHandles[i].wid_v > threadHandles[i].wid))
@@ -435,6 +444,11 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 							else
 								threadHandles[i].x -= threadHandles[i].wid_v;
 						}
+						
+						if (threadHandles[i].x + 5 >= WINDOW_WID)
+							threadHandles[i].x = prevPosX;
+						if (threadHandles[i].x - 55 < 0)
+							threadHandles[i].x = prevPosX;
 						mPacket.x = threadHandles[i].x;
 
 						threadHandles[i].v -= threadHandles[i].g;
@@ -639,7 +653,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart)
 			if (clientInfo.wid_v != 0) {
 				clientInfo.x += clientInfo.wid_v;
 			}
-			prevPosX;
 			if(clientInfo.x + 5 >= WINDOW_WID)
 				clientInfo.x = prevPosX;
 			clientInfo.direction = DIRECTION::RIGHT;
