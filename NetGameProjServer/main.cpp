@@ -427,6 +427,17 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									break;
 								}
 							}
+							if (StageMgr.block.Ft_Collision(threadHandles[i])) {
+								ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
+								threadHandles[i].direction = DIRECTION::NONE;
+								threadHandles[i].v = 0.f;
+								threadHandles[i].isJump = false;
+								threadHandles[i].Falling = false;
+								threadHandles[i].onBoard = StageMgr.block;
+								threadHandles[i].y = threadHandles[i].ground = StageMgr.block.y - StageMgr.block.hei; //À§Ä¡ Àâ¾ÆÁÖ±â
+								mPacket.type = S2CMove_IDLE;
+							}
+
 							mPacket.y = threadHandles[i].y;
 							threadHandles[i].jumpCurrentTime = high_resolution_clock::now(); // ´ÙÀ½°ú Á¡ÇÁ½Ã°£À» À§ÇØ ÇöÀç Á¡ÇÁÇÑ ½Ã°£ ÀúÀå
 							for (int j = 0; j < 3; j++) {
@@ -456,7 +467,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 						for (OBJECT& ft : StageMgr.Ft) {
 							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó ¸Ó¸® Ãæµ¹
-								threadHandles[i].y -= threadHandles[i].v;
+								threadHandles[i].y -= 1.3f * threadHandles[i].v;
 
 								threadHandles[i].v = 0.f;
 								threadHandles[i].y += ft.hei;
@@ -464,6 +475,12 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 								break;
 							}
 						}
+						if ((StageMgr.block.Collision(threadHandles[i]))) {
+							threadHandles[i].y -= 1.3f * threadHandles[i].v;
+							threadHandles[i].v = 0.f;
+							threadHandles[i].Falling = true;
+						}
+
 						// °ËÁõµÈ Y°ªÀ» ÆÐÅ¶¿¡ ´ã±â
 						mPacket.y = threadHandles[i].y;
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
@@ -649,7 +666,19 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.x += clientInfo.wid_v;
 			else 
 				clientInfo.x -= clientInfo.wid_v;*/
-			clientInfo.x += clientInfo.wid_v;
+			// clientInfo.x += clientInfo.wid_v;
+			ThreadInfo temp = clientInfo;
+			temp.x += temp.wid_v;
+			for (OBJECT& ft : StageMgr.Ft) {
+				if (ft.Ft_Collision(temp) && ft.Ft_Collision(clientInfo)) {
+					clientInfo.x -= clientInfo.wid_v;
+					clientInfo.wid_v = 0;
+					break;
+				}
+			}
+			if (clientInfo.wid_v != 0) {
+				clientInfo.x += clientInfo.wid_v;
+			}
 			prevPosX;
 			if(clientInfo.x + 5 >= WINDOW_WID)
 				clientInfo.x = prevPosX;
@@ -666,24 +695,39 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 				clientInfo.x -= clientInfo.wid_v;
 			else 
 				clientInfo.x += clientInfo.wid_v;*/
-			clientInfo.x -= clientInfo.wid_v;
+			ThreadInfo temp = clientInfo;
+			temp.x -= temp.wid_v;
+			for (OBJECT& ft : StageMgr.Ft) {
+				if (ft.Ft_Collision(temp) && ft.Ft_Collision(clientInfo)) {
+					clientInfo.x += clientInfo.wid_v;
+					clientInfo.wid_v = 0;
+					break;
+				}
+			}
+			if (clientInfo.wid_v != 0) {
+				clientInfo.x -= clientInfo.wid_v;
+			}
 			if (clientInfo.x - 55 < 0)
 				clientInfo.x = prevPosX;
 			clientInfo.direction = DIRECTION::LEFT;
 			packet->type = S2CMove_LEFT;
 		}
 
-
 		// ÇöÀç ½ºÅ×ÀÌÁö¿¡ ¼³Ä¡µÈ ¹öÆ°µé°ú °Ë»ç
+		typePacket* btn_packet = new typePacket;
 		if (StageMgr.button.Collision(clientInfo)) {
-			typePacket* btn_packet = new typePacket;
 			btn_packet->type = S2CBTN_DOWN;
 			for (int i = 0; i < 3; i++) {
 				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
 			}
-			break;
 		}
-
+		else {
+			btn_packet->type = S2CBTN_UP;
+			for (int i = 0; i < 3; i++) {
+				send(threadHandles[i].clientSocket, reinterpret_cast<char*>(btn_packet), sizeof(typePacket), 0);
+			}
+		}
+		
 		packet->x = clientInfo.x;
 		packet->y = clientInfo.y;
 
