@@ -120,5 +120,5 @@ void Stage::Stage_3() {
 	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
 
 	block = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
-	button = OBJECT{ 600, 700, 10, 5, 0, 0, TRUE };
+	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };
 }

@@ -30,13 +30,15 @@
 #define S2CMove_LEFT			18
 #define S2CMove_RIGHT			19
 #define S2CBTN_DOWN				20	// 버튼 눌림을 알려주는 패킷타입
+#define S2CBTN_UP				21	// 버튼 눌림을 알려주는 패킷타입
 
-#define S2CEatJewely			21	// 보석을 누군가 먹었으니 다음 보석을 띄우라고 알려주기 위한 패킷
-#define S2CIntoDoor				22	// 문으로 들어가는 애니메이션을 위한 패킷 타입
+#define S2CEatJewely			22	// 보석을 누군가 먹었으니 다음 보석을 띄우라고 알려주기 위한 패킷
+#define S2CIntoDoor				23	// 문으로 들어가는 애니메이션을 위한 패킷 타입
 
-#define C2SEndout				23
-#define S2CEndout				24
-#define S2CPlayerOut			25
+#define C2SEndout				24
+#define S2CEndout				25
+#define S2CPlayerOut			26
+
 #define PORT_NUM				9000
 
 #pragma pack(push, 1)
