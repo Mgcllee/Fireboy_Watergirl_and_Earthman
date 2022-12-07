@@ -276,8 +276,28 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			if (isNextStage || isTimeOut) {
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
-				if (stageIndex < 6)
-					stageIndex = stageIndex++;
+				if (stageIndex < 6) {
+					switch (stageIndex) {
+					case STAGE_TITLE:
+						stageIndex = STAGE_LOADING;
+						break;
+					case STAGE_LOADING:
+						stageIndex = STAGE_ROLE;
+						break;
+					case STAGE_ROLE:
+						stageIndex = STAGE_01;
+						break;
+					case STAGE_01:
+						stageIndex = STAGE_02;
+						break;
+					case STAGE_02:
+						stageIndex = STAGE_03;
+						break;
+					case STAGE_03:
+						stageIndex = RESULT;
+						break;
+					}
+				}
 				StageMgr.getStage(stageIndex);
 				ResetEvent(jewelyEatHandle);
 
