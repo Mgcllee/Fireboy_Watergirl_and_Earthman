@@ -276,6 +276,10 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 			}
 
 			if (isNextStage || isTimeOut) {
+#ifdef DEBUG
+				cout << "visible Door Off" << endl;
+#endif // DEBUG
+
 				isVisibleDoor = false;
 				currentJewelyNum = 0;
 				if (stageIndex < 6) {
@@ -311,12 +315,8 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				for (int i = 0; i < 3; i++) {
 					ResetEvent(threadHandles[i].intDoor);
 					//½ºÅ×ÀÌÁö º¯°æ ÆÐÅ¶ Àü¼Û
-					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-#ifdef DEBUG
-					cout << "player to stage " << i << "  ";
-					cout << "stage Next: " << changePacket.stageNum << endl;
-#endif
-
+					send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);					
+					threadHandles[i].ground = 730;
 					//½ºÅ×ÀÌÁö´ç ÃÖÃÊÀ§Ä¡ ÇÒ´ç
 					MovePacket setPosition;
 					setPosition.type = S2CMove_IDLE;
@@ -342,15 +342,15 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				}
 				currentJewelyNum++;
 			}
-			//¸íÃ¶ ÀÎÁö: ½Ã°£ °ü·ÃÀº ÀÌÇÑÀÌÇüÀÌ¶û ´ëÈ­ÇØ¼­ ÇØº¸°í
-			//º¸¼® ¸ÔÀº °¹¼ö == StageMgr.MaxJewelyNum && °ÔÀÓ ¿À¹ö 1ºÐ ÀÌ»ó ³²¾ÒÀ»¶§ -> ¹® º¸ÀÌ°Ô ÇÏ±â À§ÇÑ
-
+	
 			if (!isVisibleDoor) {
 				if (currentJewelyNum == StageMgr.maxJewelyNum) {
 					typePacket visibleDoor;
 					visibleDoor.type = S2CDoorVisible;
-					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {// ÇÏÁö¸¸ ½Ã°£ÀÌ °ÔÀÓ ¿À¹ö±îÁö 1ºÐ ÀÌ»ó ³²¾Ò´Ù¸é º¸¼®À» ´Ù ¼·Ãë½Ã ¹® À§Ä¡ º¸ÀÌ°Ô ÇÏÀÚ
-						//isVisibleDoor => ¹® ºñÁöºí ÄÑÁÖ°í => ÀÌ°Å Å°¸é ¹® À§Ä¡¸¦ ¾Ë°í µé¾î°¥ ¼ö ÀÖ°Ô ÇÏÀÚ\					
+					if (!isVisibleDoor && currentJewelyNum == StageMgr.maxJewelyNum) {
+#ifdef  _DEBUG
+						cout << "door visible On" << endl;
+#endif //  _DEBUG
 						for (int i = 0; i < 3; i++)
 							send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&visibleDoor), sizeof(typePacket), 0);
 						isVisibleDoor = true;
@@ -376,9 +376,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 				DWORD retVal = WaitForSingleObject(threadHandles[i].jumpEventHandle, 0);
 				if (retVal == WAIT_OBJECT_0) {
 					if (!threadHandles[i].isJump) {
-#ifdef _DEBUG
-						cout << "jump start" << endl;
-#endif
 						threadHandles[i].isJump = true;
 						threadHandles[i].jumpStartTime = high_resolution_clock::now();
 						threadHandles[i].jumpCurrentTime = high_resolution_clock::now();
@@ -418,9 +415,7 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 							for (OBJECT& ft : StageMgr.Ft) {// ¹ßÆÇ¿¡ ¾ÈÂø
 								if (ft.Ft_Collision(threadHandles[i]) /*&& (threadHandles[i].y > ft.y - ft.hei * 2)*/) { // ¹ßÆÇ ÄÝ¶óÀÌµå¿Í Ãæµ¹ È®ÀÎ && À§¿¡ °É·È´Ù¸é
-#ifdef _DEBUG
-									cout << "collide on Board" << endl;
-#endif
+
 									ResetEvent(threadHandles[i].jumpEventHandle); // Á¡ÇÁ´Â ´õ ÀÌ»óÇÏÁö ¾ÊÀ½ - °øÁß¿¡ ÀÖÁö ¾Ê´Â´Ù
 									threadHandles[i].direction = DIRECTION::NONE;
 									threadHandles[i].v = 0.f;
@@ -428,10 +423,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 									threadHandles[i].Falling = false;
 									threadHandles[i].onBoard = ft;
 									threadHandles[i].y = threadHandles[i].ground = ft.y - ft.hei; //À§Ä¡ Àâ¾ÆÁÖ±â
-#ifdef DEBUG
-
-									cout << "resetEvent: jump" << endl;
-#endif
 									mPacket.type = S2CMove_IDLE;
 									break;
 								}
@@ -465,9 +456,6 @@ DWORD WINAPI ServerWorkThread(LPVOID arg)
 
 						for (OBJECT& ft : StageMgr.Ft) {
 							if ((ft.y < threadHandles[i].y) && ft.Collision(threadHandles[i])) {//¿Ã¶ó°¡´Ù°¡ ¹ßÆÇ¿¡ °É·È´Ù¸é ¶³¾îÁ®¶ó ¸Ó¸® Ãæµ¹
-#ifdef DEBUG
-								cout << "collide head" << endl;
-#endif
 								threadHandles[i].y -= threadHandles[i].v;
 
 								threadHandles[i].v = 0.f;
@@ -569,6 +557,10 @@ void StageTimerStart()
 					for (int x = 0; x < 3; x++) {
 						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
 					}
+#ifdef DEBUG
+					cout << "Door Visible True" << endl;
+#endif // DEBUG
+
 					isVisibleDoor = true;
 				}
 			}
@@ -636,9 +628,7 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			return;
 		}
 		if (packet->y == SHRT_MAX) {
-#ifdef _DEBUG
-			cout << "setEvent: jump" << endl;
-#endif
+
 			SetEvent(clientInfo.jumpEventHandle);
 			packet->type = S2CMove_JUMP;
 			clientInfo.v = 0.f;
@@ -704,9 +694,6 @@ void ProcessPacket(ThreadInfo& clientInfo, char* packetStart) // ¾ÆÁ÷ ¾²Áö¾Ê´Â Ç
 			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(typePacket), 0);
 		}*/
 		closesocket(clientInfo.clientSocket);
-#ifdef _DEBUG
-		cout << "°­Á¦Á¾·á ½ÇÇà" << endl;
-#endif
 	}
 	break;
 	default:
