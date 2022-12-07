@@ -42,7 +42,7 @@ void Stage::Stage_1() {
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 
 	//보석 최대 갯수 정해주고
-	maxJewelyNum = 2;
+	maxJewelyNum = 0;
 
 	/*jewely.emplace_back();
 	jewely.emplace_back();*/
@@ -93,7 +93,7 @@ void Stage::Stage_2() {
 	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
 	// Ft.emplace_back(OBJECT{ 950, 320, 112, 24, 0, 0, TRUE });
 
-	maxJewelyNum = 8;
+	maxJewelyNum = 0;
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
 	//아직 안보여줄 보석은 큐에 저장
 	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
@@ -128,8 +128,8 @@ void Stage::Stage_3() {
 	threadHandles[2].y = 730;
 	threadHandles[2].v = 0.f;
 	threadHandles[2].wid_v = 0.f;
-	
-	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
+
+	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
 	Ft.emplace_back(OBJECT{ 280, 700, 112, 24, 0, 0, TRUE });
@@ -145,13 +145,13 @@ void Stage::Stage_3() {
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
 	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 1000, 350, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 750, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 200, 250, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 450, 200, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 200, 450, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
 
 	block = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
 	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };

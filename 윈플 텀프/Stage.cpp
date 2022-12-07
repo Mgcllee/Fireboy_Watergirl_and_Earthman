@@ -67,6 +67,8 @@ void Stage::Stage_3() {
 		jewely.pop();
 	Ft.clear();
 
+	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
+
 	Ft.emplace_back(OBJECT{ 280, 700, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 700, 650, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 1100, 620, 112, 24, 0, 0, TRUE });
@@ -80,15 +82,13 @@ void Stage::Stage_3() {
 	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
 	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 1000, 250, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 750, 200, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 1000, 350, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 750, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 550, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 1050, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 200, 250, 28, 25, 1160, 29, FALSE });
-	jewely.emplace(OBJECT{ 450, 200, 28, 25, 1160, 29, FALSE });
-	
-	door = OBJECT{ 700, 800, 60, 100, 0, 0, TRUE };
+	jewely.emplace(OBJECT{ 200, 450, 28, 25, 1160, 29, FALSE });
+	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
 
 	block = OBJECT{ 0, 625, 28, 25, 0, 0, TRUE };
 	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };
