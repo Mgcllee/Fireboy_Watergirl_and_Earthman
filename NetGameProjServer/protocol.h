@@ -15,9 +15,6 @@
 #define C2SMove					7
 
 //type 구분
-#define C2SExitGame				9	// 클라이언트가 게임 종료를 원할 때, 전송
-#define S2CExitGame				10	// 서버에서 다른 클라이언트에게 정보 알림
-#define C2SRetry				11	// 클라이언트가 서버에게 이번 스테이지 재시도 요청 패킷
 #define S2CDoorVisible			12	// 문열리는걸 알리는 패킷 => 문 보이는걸 알려줌
 #define S2CAddPlayer			13	// 다른 플레이어 정보 받기
 
@@ -51,12 +48,6 @@ struct S2CPlayerPacket { // 다른 클라이언트 기다리기위한 패킷  -> 보석 먹은것도 
 struct S2CChangeStagePacket { // 스테이지를 변경하기 위한 패킷
 	char type;
 	short stageNum; // 스테이지 구분을 위한 정보
-};
-
-struct S2CJewelryVisibilityPacket { // 서버에서 보석을 먹었다고 판단 후, 클라이언트에게 정보를 전달 => 필요 없을듯?
-	char type;
-	char jewelryType; // 어떤 종류의 보석인지
-	int index; // 몇번째 인덱스에 저장된 보석인지
 };
 
 struct C2SRolePacket {
