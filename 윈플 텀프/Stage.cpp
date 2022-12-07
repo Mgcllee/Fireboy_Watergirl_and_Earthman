@@ -10,7 +10,6 @@ void Stage::SelectCharacter()
 {
 }
 
-// 스테이지 내부 오브젝트 위치 설정
 void Stage::Stage_1() {
 
 	Die.SetVisible(false);

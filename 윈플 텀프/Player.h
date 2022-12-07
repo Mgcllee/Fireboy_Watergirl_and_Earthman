@@ -10,19 +10,19 @@ enum DIRECTION {
 
 class PLAYER {
 public:
-	int id;						// 다른 클라이언트 식별 정보 - -1 // 아직 안쓰는 상황에 -1
-	short role;					// 어떤 캐릭터 인지 - f w e => fire water earth
-	int x, y;					// 우하단 좌표
-	int hei = 100, wid = 60;	// 캐릭터 크기
+	int id;						
+	short role;					
+	int x, y;					
+	int hei = 100, wid = 60;	
 
-	int direction = DIRECTION::IDLE;				// 이동방향 (애니메이션에서 사용)
+	int direction = DIRECTION::IDLE;			
 	float wid_v{};
 	float wid_a{};
 
-	int ground = 730;		// Stage의 바닥 높이 (상단이 y = 0, 내려갈수록 +)
-	float g = 3.f;			// 중력 조절로 점프 높이 조정
-	float v = 0;			// 속도
-	short Frame = 0;		// 애니메이션 프레임
+	int ground = 730;		
+	float g = 3.f;			
+	float v = 0;			
+	short Frame = 0;		
 
 	CImage Anim[5];
 	int C_img_Frame{};

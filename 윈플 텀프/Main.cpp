@@ -21,7 +21,7 @@ int myId = -1;
 bool doorVisible = false;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
-int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
+int currentJewelyNum = 0;
 bool myCharacterOn = true;
 
 HANDLE selectMyCharacter = NULL;
@@ -234,24 +234,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DestroyWindow(end_button);
 			PostQuitMessage(0);
 			break;
-			  
-			//case BTN_NEXT_STAGE:
-			//	back = FALSE;
-			//	currentStage.clear = FALSE;
-			//	for (PLAYER& pl : players)
-			//		pl.on = true;
-			//	//time = 300;
-			//	currentStage = myStageMgr.getStage(++stageIndex);
-			//	myStageMgr.ResetStage();
-			//	currentStage.red_total = currentStage.Red_Jewel.size();
-			//	currentStage.blue_total = currentStage.Blue_Jewel.size();
-			//	currentStage.count = 0;
-			//	SetTimer(hWnd, 1, 30, NULL);//애니메이션
-			//	SetTimer(hWnd, 2, 100, NULL);//
-			//	SetTimer(hWnd, 3, 1000, NULL);
-			//	DestroyWindow(next_button);
-			//	break;  
-
 		case BTN_STOP:
 			PostQuitMessage(0);
 			typePacket endPacket;
@@ -264,20 +246,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case 1:
 		{
-			if (STAGE_01 <= currentStage.stage)
-			{
-				for (PLAYER& pl : players) {
-					for (auto& t : currentStage.Trap) {
-						if (t.Collision(pl)) {
-							pl.on = FALSE;
-							currentStage.Die.SetVisible(true);
-							currentStage.Die.x = t.x;
-							currentStage.Die.y = t.y - 100;
-						}
-					}
-				}
-			}
-
 			if (currentStage.currentVisibleJewely.GetVisible() && currentStage.currentVisibleJewely.ChangeFrame(1, false))
 				currentStage.currentVisibleJewely.image_x = 0;
 			
@@ -285,7 +253,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (t.GetVisible())
 					t.ChangeFrame(1, true);
 
-			// Fire bot, Water girl 중 1명이라도 사망 && 현재 Stage가 1 이상인 경우 (Stage 0은 Title 화면)
 			if (currentStage.Die.GetVisible() && STAGE_01 <= currentStage.stage)
 			{
 				if (currentStage.Die.ChangeFrame(1, false))
@@ -389,18 +356,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			myImageMgr.DrawPlayers(&backMemDC, currentStage);
 			myImageMgr.DrawTimer(&backMemDC, StageMgr::EndStageTime - StageMgr::StageTimepass);
 			myImageMgr.DrawScore(&backMemDC);
-
-		/*	if (currentStage.maxJewelyNum > currentJewelyNum)
-				myImageMgr.Jewelry_blue.Draw(backMemDC, currentStage.currentVisibleJewely.x, currentStage.currentVisibleJewely.y, currentStage.currentVisibleJewely.wid, currentStage.currentVisibleJewely.hei, currentStage.currentVisibleJewely.image_x, 0, 28, 24);*/
-
-			// 사망시 연기 Anim
-			if (currentStage.Die.GetVisible())	myImageMgr.die.Draw(backMemDC, currentStage.Die.x, currentStage.Die.y, 100, 100, currentStage.Die.image_x, currentStage.Die.image_y, 159, 89);
 			if (currentStage.clear)	back = TRUE;
 			if (currentStage.time_over) myImageMgr.timeout.Draw(backMemDC, 400, 200, 400, 250, 0, 0, 486, 286);
 			if (currentStage.stair)
 			{
 				myImageMgr.red_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 50, 73);
-				//  myImageMgr.blue_stair.Draw(backMemDC, currentStage.door.x, currentStage.door.y + 30, 50, 80, currentStage.door.image_x, 0, 54, 77);
 				for (PLAYER& pl : players)
 					pl.on = false;
 			}
@@ -438,7 +398,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
 	while (true) {
-		//if (stageIndex == 6) continue;
 		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal != 0 && recvRetVal != -1) {
 			ConstructPacket(recvBuf, recvRetVal);

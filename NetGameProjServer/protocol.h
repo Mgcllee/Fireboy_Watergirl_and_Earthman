@@ -72,10 +72,4 @@ struct S2CStageTimePassPacket {
 	char type = S2CStageTimePass;
 	int timePassed;
 };
-
-
-
 #pragma pack(pop)
-
-
-//TestCommit

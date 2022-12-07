@@ -9,16 +9,15 @@ bool StageMgr::IsTimeoutStageEnd = false;
 
 StageMgr::StageMgr()
 {
-	myStage[0].title();		// start Title 스테이지
+	myStage[0].title();		
 	myStage[0].stage = STAGE_TITLE;
 
-	myStage[1].Loading();	// 로딩 스테이지
+	myStage[1].Loading();	
 	myStage[1].stage = STAGE_LOADING;
 
-	myStage[2].lobby();		// lobby 스테이지 (=캐릭터 선택 스테이지)
+	myStage[2].lobby();		
 	myStage[2].stage = STAGE_ROLE;
 
-	// 임시 스테이지
 	myStage[STAGE_01].Stage_1();
 	myStage[STAGE_01].stage = STAGE_01;
 
@@ -30,7 +29,7 @@ StageMgr::StageMgr()
 
 	myStage[RESULT];
 	myStage[RESULT].stage = RESULT;
-	// 아직 구현된 부분만 true
+
 	isUse[STAGE_TITLE]	= true;
 	isUse[STAGE_LOADING]= true;
 	isUse[STAGE_ROLE]	= true;
@@ -52,6 +51,5 @@ Stage& StageMgr::getStage(int index)
 	if (isUse[index])
 		return myStage[index];
 	else myStage[0];
-	// TODO: 여기에 return 문을 삽입합니다.
 }
 

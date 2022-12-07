@@ -106,9 +106,7 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		lobby.Draw(*memdc, 0, 0, 1190, 770, 0, 0, 640, 480);
 		//me
 		me.Draw(*memdc, 150, 150, 100, 100, 0, 0, 139, 90);
-		//if(나의 캐릭터에 따라서)
 
-		//if(player1의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
 		if (players[0].role == 'f') {
 			fireStopImage.Draw(*memdc, 150, 250, 100, 205, 0, 0, 215, 411);
 		}
@@ -140,10 +138,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		else if (players[2].role == 'e') {
 			earthStopImage.Draw(*memdc, 920, 250, 100, 205, 0, 0, 215, 411);
 		}
-
-
-		//if(player2의 캐릭터에 따라서) => 서버로 부터 받은 데이터에 따라서 캐릭터 달라지게
-
 		break;
 	case STAGE_01:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
@@ -155,7 +149,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 
 		if (doorVisible)
 			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
-		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, stage.blue_door.wid, stage.blue_door.hei, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 		if (currentJewelyNum < currentStage.maxJewelyNum) {
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
 		}
@@ -175,7 +168,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			Jewelry_blue.Draw(*memdc, stage.currentVisibleJewely.x - stage.currentVisibleJewely.wid / 2, stage.currentVisibleJewely.y - stage.currentVisibleJewely.hei, stage.currentVisibleJewely.wid, stage.currentVisibleJewely.hei, stage.currentVisibleJewely.image_x, stage.currentVisibleJewely.image_y, 28, 24);
 		}
 
-		//door_blue.Draw(*memdc, stage.door.x, stage.door.y, 60, 100, stage.door.image_x, stage.door.image_y, 60, 104);
 		break;
 	case STAGE_03:
 		stage1.Draw(*memdc, 0, 0, 1190, 765, 0, 480 - stage.average, 640, 480);
@@ -192,7 +184,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 			door_red.Draw(*memdc, stage.door.x - stage.door.wid / 2, stage.door.y - stage.door.hei, stage.door.wid, stage.door.hei, stage.door.image_x, stage.door.image_y, 60, 104);
 		rect.Draw(*memdc, stage.Rt.x - 50, stage.Rt.y - 50, 50, 50, 0, 0, 40, 40);
 
-		//door_blue.Draw(*memdc, stage.blue_door.x, stage.blue_door.y, 60, 100, stage.blue_door.image_x, stage.blue_door.image_y, 60, 104);
 		break;
 	case RESULT:
 	{
@@ -210,7 +201,6 @@ void ImageMgr::DrawMap(HDC* memdc, short stageNum, Stage& stage)
 		third.Draw(*memdc, 800, 180, 200, 100, 0, 0, 76, 48);
 
 		for (int i = 0; i < 3; i++) {
-			//players[i].Anim[1].Draw(*memdc, 200 + 300 * i, 250, 200, 320, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
 			switch (players[i].role)
 			{
 			case'f':
@@ -370,18 +360,6 @@ void ImageMgr::DrawTimer(HDC* memdc, short time) {
 void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 	for (PLAYER& pl : players) {
 		if (pl.isIntoDoor) {
-			// 스테이스 클리어 후 문으로 들어가는 애니메이션
-			// if (currentStage.red_door.Collision(players[1]) && currentStage.blue_door.Collision(players[0]))
-			//{
-			//	// if (currentStage.red_door.ChangeFrame(1) && currentStage.blue_door.ChangeFrame(1)) {
-			//	if (currentStage.blue_door.ChangeFrame(1)) {
-			//		currentStage.stair = FALSE;
-			//		currentStage.red_door.image_x = 0;
-			//		currentStage.blue_door.image_x = 0;
-			//		next_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 500, 400, 200, 100, hWnd, (HMENU)BTN_NEXT_STAGE, g_hInst, NULL);
-			//		SendMessage(next_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.clear_img));
-			//	}
-			//}
 		}
 		else if (pl.on)
 		{
@@ -403,19 +381,6 @@ void ImageMgr::DrawPlayers(HDC* memdc, Stage& stage) {
 
 void ImageMgr::DrawScore(HDC* memdc)
 {
-
-
-	/*for (int i = 0; i < 3; i++) {
-		if (players[i].role == 'f') {
-			fireStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
-		}
-		else if (players[i].role == 'w') {
-			waterStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
-		}
-		else if (players[i].role == 'e') {
-			earthStopImage.Draw(*memdc, 1000 - 55 + i * 80, 20, 70, 100, 0, 0, players[i].C_img_X_Size_01, players[i].C_img_Y_Size_01);
-		}
-	}*/
 	players[0].Anim[1].Draw(*memdc, 1000 - 55, 20, 70, 100, 0, 0, players[0].C_img_X_Size_01, players[0].C_img_Y_Size_01);
 	DrawScoreNum(memdc, 1020 - 55, 120, players[0].score);
 	players[1].Anim[1].Draw(*memdc, 1080 - 55, 20, 70, 100, 0, 0, players[1].C_img_X_Size_01, players[1].C_img_Y_Size_01);
