@@ -485,7 +485,8 @@ void StageTimerStart()
 				else {
 					if (retValDoor0 != WAIT_OBJECT_0) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 0;
+						playerPacket.id = threadHandles[0].clientId;
+						cout << "out Player: " << playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[0].isArrive = false;
 						for (int x = 0; x < 3; x++) {
@@ -494,7 +495,8 @@ void StageTimerStart()
 					}
 					if (retValDoor1 != WAIT_OBJECT_0) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 1;
+						playerPacket.id = threadHandles[1].clientId;
+						cout << "out Player: " << playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[1].isArrive = false;
 						for (int x = 0; x < 3; x++) {
@@ -503,7 +505,8 @@ void StageTimerStart()
 					}
 					if (retValDoor2 != WAIT_OBJECT_0) {
 						S2CPlayerPacket playerPacket;
-						playerPacket.id = 2;
+						playerPacket.id = threadHandles[2].clientId;
+						cout << "out Player: " << playerPacket.id << endl;
 						playerPacket.type = S2CPlayerOut;
 						threadHandles[2].isArrive = false;
 						for (int x = 0; x < 3; x++) {
