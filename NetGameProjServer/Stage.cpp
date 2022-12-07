@@ -152,7 +152,4 @@ void Stage::Stage_3() {
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 200, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 450, 350, 28, 25, 1160, 29, FALSE });
-
-	block = OBJECT{ 0, 600, 28, 25, 0, 0, TRUE };
-	button = OBJECT{ 600, 717, 30, 30, 0, 0, TRUE };
 }

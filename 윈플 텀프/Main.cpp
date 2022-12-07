@@ -22,9 +22,7 @@ bool doorVisible = false;
 char recvBuf[MAX_BUF_SIZE] = { 0 };
 static BOOL isArrow = true;
 int currentJewelyNum = 0; // 먹은 보석 이벤트 핸들 번호
-bool BTN_down = false;
 bool myCharacterOn = true;
-int slide_timer{};
 
 HANDLE selectMyCharacter = NULL;
 HANDLE changeStageEvent = NULL;
@@ -307,30 +305,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
 				}
 			}
-
-			if (true == BTN_down || currentStage.button.image_y > 0) {
-				if (currentStage.button.image_y < 20) {
-					currentStage.button.image_y += 2;
-					currentStage.block.image_x += 8;
-				}
-				else 
-					currentStage.button.image_y = 20;
-			}
-			else if (false == BTN_down || slide_timer >= 8) {
-				if (currentStage.button.image_y > 0) {
-					currentStage.button.image_y -= 2;
-				}
-				else
-					currentStage.button.image_y = 0;
-			}
-
-			if (slide_timer >= 8 && currentStage.block.image_x > 0) {
-				currentStage.block.image_x -= 8;
-				if (currentStage.block.image_x < 0) {
-					currentStage.block.image_x = 0;
-					slide_timer = 0;
-				}
-			}
 		}
 		break;
 		case 2:				// 캐릭터 프레임
@@ -346,9 +320,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				end_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 700, 500, 200, 100, hWnd, (HMENU)BTN_QUIT, g_hInst, NULL);
 				SendMessage(end_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.endimg));
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
-			}
-			if (false == BTN_down && currentStage.block.image_x > 0) {
-				slide_timer += 1;
 			}
 			break;
 		case 4:

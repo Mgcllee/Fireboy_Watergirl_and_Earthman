@@ -181,12 +181,6 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CBTN_DOWN:
-	{
-		typePacket* packet = reinterpret_cast<typePacket*>(buf);
-		BTN_down = true;
-	}
-	break;
 	case S2CEndout:
 	{
 		typePacket* packet = reinterpret_cast<typePacket*>(buf);
@@ -377,7 +371,7 @@ int GetPacketSize(char packetType)
 	case S2CDoorVisible:
 	case S2CEndout:
 		retVal = sizeof(typePacket);
-		break;		
+		break;
 	default:
 		break;
 	}
