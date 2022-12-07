@@ -74,6 +74,8 @@ int main(int argv, char** argc)
 		threadHandles[i].clientSocket = accept(listenSocket, reinterpret_cast<sockaddr*>(&cl_addr), &addr_size);
 		u_long blockingMode = 1;
 		ioctlsocket(threadHandles[i].clientSocket, FIONBIO, &blockingMode);
+		int option = TRUE;
+		setsockopt(threadHandles[i].clientSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));
 		if (threadHandles[i].clientSocket == INVALID_SOCKET) {
 			Display_Err(WSAGetLastError());
 			closesocket(listenSocket);
