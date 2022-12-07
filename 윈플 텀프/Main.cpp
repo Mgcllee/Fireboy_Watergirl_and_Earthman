@@ -134,9 +134,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		server_addr = CreateWindow(L"edit", L"127.0.0.1", WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 450, 550, 158, 30, hWnd, (HMENU)EDIT_SERVER_ADDR, g_hInst, NULL);
 		SendMessage(server_addr, WM_SETFONT, (WPARAM)s_hFont, (LPARAM)MAKELONG(TRUE, 0));
 
-		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 280, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
-		selectRoleLeftArrow = CreateWindow(L"button", L"Left", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 50, 280, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
-		selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 500, 620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
+		selectRoleRightArrow = CreateWindow(L"button", L"right", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 330, 330, 80, 41, hWnd, (HMENU)BTN_LEFT_ARROW, g_hInst, NULL);
+		selectRoleLeftArrow = CreateWindow(L"button", L"Left", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 50, 330, 80, 41, hWnd, (HMENU)BTN_RIGHT_ARROW, g_hInst, NULL);
+		selectBtn = CreateWindow(L"button", L"RoleSelect", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 550, 620, 120, 45, hWnd, (HMENU)BTN_SELECT, g_hInst, NULL);
 		btnend = CreateWindow(L"button", L"end", WS_CHILD | BS_PUSHBUTTON | BS_BITMAP, 10, 10, 242, 142, hWnd, (HMENU)BTN_STOP, g_hInst, NULL);
 		SendMessage(selectRoleLeftArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.leftArrow));
 		SendMessage(selectRoleRightArrow, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)((HBITMAP)myImageMgr.rightArrow));
