@@ -39,7 +39,6 @@
 Debug/
 Release/
 x64/
-.vs/
 **/Debug/
 **/Release/
 **/x64/
@@ -49,3 +48,5 @@ x64/
 *.suo
 .vs/윈플 텀프/v17
 *.zip
+.vs
+.gitattributes
