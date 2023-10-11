@@ -7,7 +7,4 @@
 ## 개발 환경
 
 * IDE: `Visual Studio 2019`
-
-## 정보
-
-Mgcllee – mgcllee@gmail.com
+* Language: `C++11`
