@@ -1,7 +1,7 @@
 #pragma once
 #include<WS2tcpip.h>
 #include "stdafx.h"
-#include "../NetGameProjServer/protocol.h"
+#include "../FBWG_Server/protocol.h"
 #include "StageMgr.h"
 
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {

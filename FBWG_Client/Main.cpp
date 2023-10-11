@@ -2,7 +2,7 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include "../NetGameProjServer/protocol.h"
+#include "../FBWG_Server/protocol.h"
 #include <string>
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
