@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include<time.h>
 
+#include "NetworkSettings.h"
 
 array<ThreadInfo, 3> threadHandles;
 array<char, 3> playerRole = { 'f', 'f', 'f' };
@@ -31,38 +32,13 @@ bool isTimeOut = false;
 bool gameEnd = false;
 double timeoutSeconds = 50;
 
-int main(int argv, char** argc)
+int main()
 {
-	wcout.imbue(std::locale("korean"));
+  ServerSettings* server_settings = new ServerSettings();
+	NetworkSettings* network_settings
+		= new NetworkSettings(INADDR_ANY, PORT_NUM);
 
-
-	WSADATA WSAData;
-	if (WSAStartup(MAKEWORD(2, 2), &WSAData) != 0) {
-		Display_Err(WSAGetLastError());
-		return 1;
-	}
-
-	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (listenSocket == INVALID_SOCKET) {
-		Display_Err(WSAGetLastError());
-		return 1;
-	}
-
-	SOCKADDR_IN server_addr;
-	memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PORT_NUM);
-	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
-
-	if (::bind(listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
-		Display_Err(WSAGetLastError());
-		return 1;
-	}
-
-	if (listen(listenSocket, 1) == SOCKET_ERROR) { // 연결할 클라이언트는 1개
-		Display_Err(WSAGetLastError());
-		return 1;
-	}
+	
 
 	for (int i = 0; i < 3; i++)
 	{
