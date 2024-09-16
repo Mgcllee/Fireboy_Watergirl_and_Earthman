@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientAccepter.cpp" />
+    <ClCompile Include="GameMaker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkSettings.cpp" />
     <ClCompile Include="object.cpp" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientAccepter.h" />
+    <ClInclude Include="GameMaker.h" />
     <ClInclude Include="NetworkSettings.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="PacketWorker.h" />
