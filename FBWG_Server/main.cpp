@@ -1,12 +1,12 @@
 #pragma once
 
 #include "NetworkSettings.h"
-#include "StageMaker.h"
+#include "GameMaker.h"
 
 int main() {
 	NetworkSettings network_settings(INADDR_ANY, PORT_NUM);
 
-	StageMaker game_maker;
+	GameMaker game_maker;
 	game_maker.run_game();
 	game_maker.cleanup_game();
 

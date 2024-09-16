@@ -11,7 +11,6 @@ public:
 	StageMaker();
 	~StageMaker();
 
-	void run_game();
 	void make_game_stage();
 
 	void cleanup_game();
