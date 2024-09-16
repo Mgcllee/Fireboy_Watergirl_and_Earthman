@@ -10,9 +10,11 @@ class NetworkSettings : public ServerSettings {
 
   override void write_log_message(string message);
 
+  SOCKET& get_listen_socket();
+
  private:
   WSADATA WSAData;
-  SOCKET listenSocket;
+  SOCKET listen_socket;
   SOCKADDR_IN server_addr;
 
 };
