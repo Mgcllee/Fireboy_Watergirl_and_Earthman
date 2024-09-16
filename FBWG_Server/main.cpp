@@ -3,15 +3,12 @@
 #include "NetworkSettings.h"
 #include "StageMaker.h"
 
-int main()
-{
-	NetworkSettings* network_settings
-		= new NetworkSettings(INADDR_ANY, PORT_NUM);
+int main() {
+	NetworkSettings network_settings(INADDR_ANY, PORT_NUM);
 
-	thread stage_maker = thread(
-		StageMaker::make_game_stage, &StageMaker());
-	stage_maker.join();
+	StageMaker game_maker;
+	game_maker.run_game();
+	game_maker.cleanup_game();
 
-	WSACleanup();
 	return 0;
 }
