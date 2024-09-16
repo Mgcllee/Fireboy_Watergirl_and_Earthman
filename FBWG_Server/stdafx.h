@@ -24,8 +24,6 @@ using namespace chrono;
 #define STAGE_03			5
 #define RESULT				6
 
-
-void Display_Err(int Errcode);
 void ConstructPacket(ThreadInfo& clientInfo, int ioSize); 
 void ProcessPacket(ThreadInfo& clientInfo, char* packetStart);
 int GetPacketSize(char packetType);

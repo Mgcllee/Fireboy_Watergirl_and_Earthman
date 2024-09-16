@@ -46,3 +46,45 @@ void Client::set_ready_for_play(int user_ticket)
 		stageIndex = STAGE_ROLE;
 	}
 }
+
+DWORD WINAPI ClientWorkThread(LPVOID arg)
+{
+	int myIndex = reinterpret_cast<int>(arg);
+	while (threadHandles[myIndex].clientSocket != INVALID_SOCKET) {
+		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
+		if (recvRetVal > 0) {
+			ConstructPacket(threadHandles[myIndex], recvRetVal);
+		}
+		if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
+			S2CPlayerPacket jewelyPacket;
+			jewelyPacket.id = -1;
+			jewelyPacket.type = S2CEatJewely;
+			DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
+			if (retVal != WAIT_OBJECT_0) {
+				threadHandles[myIndex].score++;
+				SetEvent(jewelyEatHandle);
+				jewelyPacket.id = myIndex;
+			}
+			if (jewelyPacket.id != -1)
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+
+		}
+
+		//
+		if (isVisibleDoor) {
+			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
+				DWORD retValDoor = WaitForSingleObject(threadHandles[myIndex].intDoor, 0);
+				if (retValDoor != WAIT_OBJECT_0) {
+					S2CPlayerPacket intoDoorPacket;
+					intoDoorPacket.id = myIndex;
+					intoDoorPacket.type = S2CIntoDoor;
+					SetEvent(threadHandles[myIndex].intDoor);
+					for (int j = 0; j < 3; j++)
+						send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);
+				}
+			}
+		}
+	}
+	return 0;
+}

@@ -7,5 +7,5 @@ class ServerSettings {
   ServerSettings();
   ~ServerSettings();
 
-  virtual void write_log_message(string message);
+  virtual void write_log_message(string message) = 0;
 };

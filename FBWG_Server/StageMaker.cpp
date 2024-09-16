@@ -8,11 +8,115 @@ StageMaker::~StageMaker()
 {
 }
 
+void TimeoutStage()
+{
+	_timer.Stop();
+}
+
+
+void StageTimerStart()
+{
+	if (_timer.IsRunning() == true)
+	{
+		return;
+	}
+
+	_timer.Start(std::chrono::milliseconds(1000), [=]
+		{
+			S2CStageTimePassPacket packet;
+			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
+
+			for (int x = 0; x < 3; x++) {
+				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
+			}
+
+			if (timeoutSeconds <= packet.timePassed && !isTimeOut && !gameEnd)
+			{
+				typePacket timeoutPacket;
+				for (int x = 0; x < 3; x++) {
+					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
+				}
+				DWORD retValDoor0 = WaitForSingleObject(threadHandles[0].intDoor, 0);
+				DWORD retValDoor1 = WaitForSingleObject(threadHandles[1].intDoor, 0);
+				DWORD retValDoor2 = WaitForSingleObject(threadHandles[2].intDoor, 0);
+
+				if (retValDoor0 != WAIT_OBJECT_0 && retValDoor1 != WAIT_OBJECT_0 && retValDoor2 != WAIT_OBJECT_0) {
+					S2CChangeStagePacket changePacket;
+					changePacket.stageNum = RESULT;
+					changePacket.type = S2CChangeStage;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
+					}
+					isTimeOut = false;
+					gameEnd = true;
+					TimeoutStage();
+				}
+				else {
+					if (retValDoor0 != WAIT_OBJECT_0 && threadHandles[0].isArrive) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = threadHandles[0].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[0].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor1 != WAIT_OBJECT_0 && threadHandles[1].isArrive) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = threadHandles[1].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[1].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					if (retValDoor2 != WAIT_OBJECT_0 && threadHandles[2].isArrive) {
+						S2CPlayerPacket playerPacket;
+						playerPacket.id = threadHandles[2].clientId;
+						cout << "out Player: " << (int)playerPacket.id << endl;
+						playerPacket.type = S2CPlayerOut;
+						threadHandles[2].isArrive = false;
+						for (int x = 0; x < 3; x++) {
+							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
+						}
+					}
+					isTimeOut = true;
+				}
+
+			}
+			if (packet.timePassed >= 35 && !isTimeOut && !gameEnd) {
+				if (!isVisibleDoor) {
+					typePacket visibleDoorPacket;
+					visibleDoorPacket.type = S2CDoorVisible;
+					for (int x = 0; x < 3; x++) {
+						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
+					}
+					isVisibleDoor = true;
+				}
+			}
+		});
+}
+
 void StageMaker::make_game_stage() {
+	ClientAccepter* client_accepter = new ClientAccepter();
+	client_accepter->accept_all_client(clients);
 
 	jewelyEatHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
 	ResetEvent(jewelyEatHandle);
 
+	while (WSA_WAIT_EVENT_0 + 2
+		!= WSAWaitForMultipleEvents(
+			3, multiEvenTthreadHadle, TRUE, WSA_INFINITE, FALSE)
+		) {
+
+	}
+
+	for (int j = 0; j < 3; j++) {
+		CloseHandle(threadHandles[j].threadHandle);
+	}
+	CloseHandle(serverThread);
 }
 
 //HANDLE serverThread = CreateThread(NULL, 0, ServerWorkThread, reinterpret_cast<LPVOID>(1), 0, NULL);

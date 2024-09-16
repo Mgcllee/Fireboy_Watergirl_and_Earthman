@@ -8,9 +8,11 @@ class NetworkSettings : public ServerSettings {
   NetworkSettings(ULONG open_addr, USHORT open_port);
   ~NetworkSettings();
 
-  override void write_log_message(string message);
+  virtual void write_log_message(string message) override;
 
   SOCKET& get_listen_socket();
+
+  void close_listen_socket();
 
  private:
   WSADATA WSAData;

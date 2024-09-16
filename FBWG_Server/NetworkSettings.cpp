@@ -1,3 +1,5 @@
+#pragma once
+
 #include "NetworkSettings.h"
 
 NetworkSettings::NetworkSettings(ULONG open_addr, USHORT open_port) {
@@ -29,6 +31,15 @@ NetworkSettings::NetworkSettings(ULONG open_addr, USHORT open_port) {
 
 NetworkSettings::~NetworkSettings() {}
 
-override void NetworkSettings::write_log_message(string message) {
+void NetworkSettings::write_log_message(string message) override
+{
 
 }
+
+void NetworkSettings::close_listen_socket()
+{
+    closesocket(listen_socket);
+
+}
+
+
