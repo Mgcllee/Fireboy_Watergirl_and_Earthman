@@ -130,8 +130,10 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientAccepter.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NetworkSettings.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="PacketWorker.cpp" />
+    <ClCompile Include="ServerSettings.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageMaker.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -139,9 +141,11 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientAccepter.h" />
+    <ClInclude Include="NetworkSettings.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="PacketWorker.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="ServerSettings.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageMaker.h" />
     <ClInclude Include="stdafx.h" />
