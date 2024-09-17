@@ -133,6 +133,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkSettings.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="PacketReceiver.cpp" />
     <ClCompile Include="PacketWorker.cpp" />
     <ClCompile Include="ServerSettings.cpp" />
     <ClCompile Include="PacketSender.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="GameMaker.h" />
     <ClInclude Include="NetworkSettings.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="PacketReceiver.h" />
     <ClInclude Include="PacketWorker.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="ServerSettings.h" />
