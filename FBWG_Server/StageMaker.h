@@ -19,7 +19,7 @@ public:
 	void cleanup_game();
 
 private:
-	void run_game_stage_thread(LPVOID arg);
+	void run_game_stage_thread();
 
 private:
 	int stage_index = -1;
