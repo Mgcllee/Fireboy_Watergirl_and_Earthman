@@ -243,8 +243,7 @@ void StageMaker::cleanup_game()
 	WSACleanup();
 }
 
-void StageMaker::run_game_stage_thread()
-{
+void StageMaker::run_game_stage_thread() {
 	while (true) {
 		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
 			show_stage_role();

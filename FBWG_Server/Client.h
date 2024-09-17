@@ -10,7 +10,7 @@ public:
   ~Client();
 
   void set_ready_for_play(int user_ticket);
-  void run_client_thread(LPVOID arg);
+  void run_client_thread();
 
 
   bool have_role();

@@ -1,11 +1,7 @@
 #include "GameMaker.h"
 
 GameMaker::GameMaker()
-	: stage_maker_handle(NULL)
 {
-	for (HANDLE& handle : client_handle) {
-		handle = NULL;
-	}
 }
 
 GameMaker::~GameMaker()
@@ -15,8 +11,6 @@ GameMaker::~GameMaker()
 void GameMaker::run_game() {
 	while (true) {
 		create_game_threads();
-		reset_game();
-		start_game();
 		join_game_threads();
 	}
 }
@@ -31,16 +25,6 @@ void GameMaker::join_game_threads() {
 	for (thread& client_thread : client_threads) {
 		client_thread.join();
 	}
+
 	stage_maker_thread.join();
-}
-
-
-void GameMaker::reset_game()
-{
-
-}
-
-void GameMaker::start_game()
-{
-
 }

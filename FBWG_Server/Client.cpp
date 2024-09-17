@@ -48,14 +48,14 @@ void Client::set_ready_for_play(int user_ticket)
 	}
 }
 
-void Client::run_client_thread(LPVOID arg)
+void Client::run_client_thread()
 {
-	int myIndex = reinterpret_cast<int>(arg);
-	while (threadHandles[myIndex].clientSocket != INVALID_SOCKET) {
-		int recvRetVal = recv(threadHandles[myIndex].clientSocket, threadHandles[myIndex].recvBuf + threadHandles[myIndex].prevSize, MAX_BUF_SIZE - threadHandles[myIndex].prevSize, 0);
+	while (socket != INVALID_SOCKET) {
+		int recvRetVal = recv(socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal > 0) {
 			ConstructPacket(threadHandles[myIndex], recvRetVal);
 		}
+
 		if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
 			S2CPlayerPacket jewelyPacket;
 			jewelyPacket.id = -1;
@@ -87,7 +87,6 @@ void Client::run_client_thread(LPVOID arg)
 			}
 		}
 	}
-	return 0;
 }
 
 bool Client::have_role()

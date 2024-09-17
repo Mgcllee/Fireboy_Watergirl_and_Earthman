@@ -3,29 +3,29 @@
 #define PORT_NUM				9000
 
 enum PACKET_TYPE_S2C {
-	S2CLoading = 0,
-	S2CChangeStage,
-	S2CSelectRole,
-	S2CChangeRole,
-	S2CDoorVisible,
-	S2CAddPlayer,
-	S2CStageTimePass,
-	S2CStageTimeout,
-	S2CMove_IDLE,
-	S2CMove_JUMP,
-	S2CMove_LEFT,
-	S2CMove_RIGHT,
-	S2CEatJewely,
-	S2CIntoDoor,
-	S2CEndout,
-	S2CPlayerOut
+	Loading = 0,
+	ChangeStage,
+	SelectRole,
+	ChangeRole,
+	DoorVisible,
+	AddPlayer,
+	StageTimePass,
+	StageTimeout,
+	Move_IDLE,
+	Move_JUMP,
+	Move_LEFT,
+	Move_RIGHT,
+	EatJewely,
+	IntoDoor,
+	Endout,
+	PlayerOut
 };
 
 enum PACKET_TYPE_C2S {
-	C2SChangRole = 0,
-	C2SSelectRole,
-	C2SMove,
-	C2SEndout
+	ChangRole = 0,
+	SelectRole,
+	Move,
+	Endout
 };
 
 
