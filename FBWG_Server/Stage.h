@@ -68,7 +68,7 @@ public:
 public:
 	void title() {}
 	void lobby() {}
-	void getStage(int index)
+	void reset_stage(int index)
 	{
 		switch (index)
 		{

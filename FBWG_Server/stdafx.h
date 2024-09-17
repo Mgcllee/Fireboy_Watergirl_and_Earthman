@@ -13,7 +13,7 @@ using namespace chrono;
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
 
-enum STAGE_NAME {
+enum STAGE_TYPE {
 	STAGE_TITLE = 0,
 	STAGE_LOADING,
 	STAGE_ROLE,

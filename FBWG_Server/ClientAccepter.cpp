@@ -7,8 +7,7 @@ ClientAccepter::ClientAccepter(SOCKET& in_listen_socket)
 
 ClientAccepter::~ClientAccepter() {}
 
-bool ClientAccepter::accept_all_client(array<Client, 3>& clients) {
-	
+bool ClientAccepter::accept_all_client(array<Client, 3>& clients) {	
 	int user_ticket = 0;
 	for (Client& client : clients) {
 		SOCKADDR_IN client_addr;
@@ -17,19 +16,16 @@ bool ClientAccepter::accept_all_client(array<Client, 3>& clients) {
 			listen_socket, reinterpret_cast<sockaddr*>(&client_addr), &addr_size);
 
 		u_long blockingMode = 1;
-		ioctlsocket(client.clientSocket, FIONBIO, &blockingMode);
+		ioctlsocket(client.socket, FIONBIO, &blockingMode);
 
 		int option = TRUE;
-		setsockopt(client.clientSocket, IPPROTO_TCP, TCP_NODELAY,
+		setsockopt(client.socket, IPPROTO_TCP, TCP_NODELAY,
 			(const char*)&option, sizeof(option));
 
-		if (client.clientSocket == INVALID_SOCKET) {
-			Display_Err(WSAGetLastError());
-			closesocket(listen_socket);
-			WSACleanup();
+		if (client.socket == INVALID_SOCKET) {
+			closesocket(client.socket);
 			return false;
-		}
-		else {
+		} else {
 			client.set_ready_for_play(user_ticket);
 			user_ticket += 1;
 		}

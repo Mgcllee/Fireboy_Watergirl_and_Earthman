@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Client.h"
 
 Client::Client() {}
@@ -6,11 +8,6 @@ Client::~Client() {}
 
 void Client::set_ready_for_play(int user_ticket)
 {
-	jumpEventHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
-	intDoor = CreateEvent(NULL, TRUE, FALSE, NULL);
-	ResetEvent(jumpEventHandle);
-	ResetEvent(intDoor);
-
 	S2CPlayerPacket loadPacket;
 	loadPacket.type = S2CLoading;
 	loadPacket.id = user_ticket;
@@ -47,7 +44,7 @@ void Client::set_ready_for_play(int user_ticket)
 	}
 }
 
-DWORD WINAPI ClientWorkThread(LPVOID arg)
+DWORD WINAPI Client::run_client_thread(LPVOID arg)
 {
 	int myIndex = reinterpret_cast<int>(arg);
 	while (threadHandles[myIndex].clientSocket != INVALID_SOCKET) {

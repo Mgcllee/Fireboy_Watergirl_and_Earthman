@@ -11,11 +11,18 @@ public:
 	StageMaker();
 	~StageMaker();
 
-	void make_game_stage();
+	void reset_game_stage();
+
+	void show_stage_role();
+	void show_stage(int stage_number);
 
 	void cleanup_game();
+
 private:
-	int stageIndex = -1;
+	void run_game_stage_thread(LPVOID arg);
+
+private:
+	int stage_index = -1;
 
 	Stage StageMgr;
 

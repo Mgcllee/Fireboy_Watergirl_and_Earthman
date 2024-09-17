@@ -8,6 +8,7 @@ public:
   ~Client();
 
   void set_ready_for_play(int user_ticket);
+  static DWORD WINAPI run_client_thread(LPVOID arg);
 
 public:
   HANDLE threadHandle = NULL;
