@@ -1,25 +1,29 @@
 #pragma once
-#include "stdafx.h"
+
 #include "Stage.h"
 
-void Stage::Stage_1() {
-	for (ThreadInfo& pl : threadHandles)
+void Stage::Stage_1(array<StagePosition, 3>& positions) {
+	for (StagePosition& pl : positions) {
 		pl.isJump = false;
+	}
 
-	threadHandles[0].x = 600;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	positions[0].x = 600;
+	positions[0].y = 730;
+	positions[0].v = 0.f;
+	positions[0].wid_v = 0.f;
+	positions[0].onBoard = Ground;
 
-	threadHandles[1].x = 700;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	positions[1].x = 700;
+	positions[1].y = 730;
+	positions[1].v = 0.f;
+	positions[1].wid_v = 0.f;
+	positions[1].onBoard = Ground;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	positions[2].x = 500;
+	positions[2].y = 730;
+	positions[2].v = 0.f;
+	positions[2].wid_v = 0.f;
+	positions[2].onBoard = Ground;
 
 	Die.SetVisible(false);
 
@@ -48,28 +52,33 @@ void Stage::Stage_1() {
 	Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
 
 }
-void Stage::Stage_2() {
+
+void Stage::Stage_2(array<StagePosition, 3>& positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : threadHandles)
+	for (ThreadInfo& pl : positions)
 		pl.isJump = false;
 
-	threadHandles[0].x = 600;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	positions[0].x = 600;
+	positions[0].y = 730;
+	positions[0].v = 0.f;
+	positions[0].wid_v = 0.f;
+	positions[0].ground = 730;
 
-	threadHandles[1].x = 700;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	positions[1].x = 700;
+	positions[1].y = 730;
+	positions[1].v = 0.f;
+	positions[1].wid_v = 0.f;
+	positions[1].ground = 730;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	positions[2].x = 500;
+	positions[2].y = 730;
+	positions[2].v = 0.f;
+	positions[2].wid_v = 0.f;
+	positions[2].ground = 730;
+
 	door = OBJECT{ 700, 400 - 4, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
@@ -92,29 +101,29 @@ void Stage::Stage_2() {
 	jewely.emplace(OBJECT{ 450, 370, 28, 25, 1160, 29, TRUE });
 }
 
-void Stage::Stage_3() {
+void Stage::Stage_3(array<StagePosition, 3>& positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : threadHandles) {
+	for (ThreadInfo& pl : positions) {
 		pl.isJump = false;
 	}
 
-	threadHandles[0].x = 550;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	positions[0].x = 550;
+	positions[0].y = 730;
+	positions[0].v = 0.f;
+	positions[0].wid_v = 0.f;
 
-	threadHandles[1].x = 600;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	positions[1].x = 600;
+	positions[1].y = 730;
+	positions[1].v = 0.f;
+	positions[1].wid_v = 0.f;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	positions[2].x = 500;
+	positions[2].y = 730;
+	positions[2].v = 0.f;
+	positions[2].wid_v = 0.f;
 
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 

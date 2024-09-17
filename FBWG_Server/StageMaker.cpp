@@ -1,6 +1,7 @@
 #include "StageMaker.h"
 
 StageMaker::StageMaker()
+	: stage_index(STAGE_TYPE::STAGE_ROLE)
 {
 }
 
@@ -13,211 +14,70 @@ void TimeoutStage()
 	_timer.Stop();
 }
 
-void StageTimerStart()
-{
-	if (_timer.IsRunning() == true)
-	{
-		return;
-	}
-
-	_timer.Start(std::chrono::milliseconds(1000), [=]
-		{
-			S2CStageTimePassPacket packet;
-			packet.timePassed = _timer.GetElapsedTime() / (double)1000;
-
-			for (int x = 0; x < 3; x++) {
-				send(threadHandles[x].clientSocket, (char*)&packet, sizeof(S2CStageTimePassPacket), 0);
-			}
-
-			if (timeoutSeconds <= packet.timePassed && !isTimeOut && !gameEnd)
-			{
-				typePacket timeoutPacket;
-				for (int x = 0; x < 3; x++) {
-					send(threadHandles[x].clientSocket, (char*)&timeoutPacket, sizeof(typePacket), 0);
-				}
-				DWORD retValDoor0 = WaitForSingleObject(threadHandles[0].intDoor, 0);
-				DWORD retValDoor1 = WaitForSingleObject(threadHandles[1].intDoor, 0);
-				DWORD retValDoor2 = WaitForSingleObject(threadHandles[2].intDoor, 0);
-
-				if (retValDoor0 != WAIT_OBJECT_0 && retValDoor1 != WAIT_OBJECT_0 && retValDoor2 != WAIT_OBJECT_0) {
-					S2CChangeStagePacket changePacket;
-					changePacket.stageNum = RESULT;
-					changePacket.type = S2CChangeStage;
-					for (int x = 0; x < 3; x++) {
-						send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-					}
-					isTimeOut = false;
-					gameEnd = true;
-					TimeoutStage();
-				}
-				else {
-					if (retValDoor0 != WAIT_OBJECT_0 && threadHandles[0].isArrive) {
-						S2CPlayerPacket playerPacket;
-						playerPacket.id = threadHandles[0].clientId;
-						cout << "out Player: " << (int)playerPacket.id << endl;
-						playerPacket.type = S2CPlayerOut;
-						threadHandles[0].isArrive = false;
-						for (int x = 0; x < 3; x++) {
-							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
-						}
-					}
-					if (retValDoor1 != WAIT_OBJECT_0 && threadHandles[1].isArrive) {
-						S2CPlayerPacket playerPacket;
-						playerPacket.id = threadHandles[1].clientId;
-						cout << "out Player: " << (int)playerPacket.id << endl;
-						playerPacket.type = S2CPlayerOut;
-						threadHandles[1].isArrive = false;
-						for (int x = 0; x < 3; x++) {
-							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
-						}
-					}
-					if (retValDoor2 != WAIT_OBJECT_0 && threadHandles[2].isArrive) {
-						S2CPlayerPacket playerPacket;
-						playerPacket.id = threadHandles[2].clientId;
-						cout << "out Player: " << (int)playerPacket.id << endl;
-						playerPacket.type = S2CPlayerOut;
-						threadHandles[2].isArrive = false;
-						for (int x = 0; x < 3; x++) {
-							send(threadHandles[x].clientSocket, (char*)&playerPacket, sizeof(S2CPlayerPacket), 0);
-						}
-					}
-					isTimeOut = true;
-				}
-
-			}
-			if (packet.timePassed >= 35 && !isTimeOut && !gameEnd) {
-				if (!isVisibleDoor) {
-					typePacket visibleDoorPacket;
-					visibleDoorPacket.type = S2CDoorVisible;
-					for (int x = 0; x < 3; x++) {
-						send(threadHandles[x].clientSocket, (char*)&visibleDoorPacket, sizeof(typePacket), 0);
-					}
-					isVisibleDoor = true;
-				}
-			}
-		});
-}
-
 void StageMaker::reset_game_stage() {
 	ClientAccepter* client_accepter = new ClientAccepter();
 	client_accepter->accept_all_client(clients);
 
-	jewelyEatHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
-	ResetEvent(jewelyEatHandle);
-
-	
+	// checking every time jewel count
+	// checking every time door open
 }
 
 void StageMaker::show_stage_role()
 {
-	bool isFinish = true;
-	for (char choice : selectPlayerRole) {
-		if ('n' == choice) {
+	select_mutex.lock();
+	for (Client& client : clients) {
+		if (client.have_role()) {
+			select_mutex.unlock();
 			return;
 		}
 	}
+	select_mutex.unlock();
 
-	stage_index = STAGE_TYPE::STAGE_01;
-	StageMgr.reset_stage(stage_index);
-
-	MovePacket setPosition;
-	setPosition.type = S2CMove_IDLE;
-	for (int i = 0; i < 3; ++i) {
-		setPosition.id = i;
-		setPosition.x = threadHandles[i].x;
-		setPosition.y = threadHandles[i].y;
-		for (int j = 0; j < 3; ++j) {
-			threadHandles[j].onBoard = StageMgr.Ground;
-			send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
-		}
-	}
-
-	S2CChangeStagePacket changePacket;
-	changePacket.stageNum = stageIndex;
-	changePacket.type = S2CChangeStage;
-	for (int x = 0; x < 3; x++) {
-		send(threadHandles[x].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-	}
-
-	StageTimerStart();
+	show_stage(STAGE_TYPE::STAGE_01);
 }
 
 void StageMaker::show_stage(int stage_number)
 {
-	bool isNextStage = true;
-	for (int i = 0; i < 3; i++) {
-		if (threadHandles[i].isArrive) {
-			DWORD  retValDoor = WaitForSingleObject(threadHandles[i].intDoor, 0);
-			if (retValDoor != WAIT_OBJECT_0) {
-				isNextStage = false;
-				break;
-			}
+	bool next_stage = true;
+	select_mutex.lock();
+	for (Client& client : clients) {
+		if (stage_index == client.get_curr_stage()) {
+			next_stage = false;
+			select_mutex.unlock();
+			break;
 		}
 	}
+	select_mutex.unlock();
 
-	if (isNextStage || isTimeOut) {
+	if (next_stage) {
 
 		currentJewelyNum = 0;
 		isVisibleDoor = false;
-		if (stageIndex < 6) {
-			switch (stageIndex) {
-			case STAGE_TITLE:
-				stageIndex = STAGE_LOADING;
-				break;
-			case STAGE_LOADING:
-				stageIndex = STAGE_ROLE;
-				break;
-			case STAGE_ROLE:
-				stageIndex = STAGE_01;
-				break;
-			case STAGE_01:
-				stageIndex = STAGE_02;
-				break;
-			case STAGE_02:
-				stageIndex = STAGE_03;
-				break;
-			case STAGE_03:
-				stageIndex = RESULT;
-				break;
+
+		stage_index += 1;
+
+		array<StagePosition, 3> positions;
+		stage_position.reset_position(stage_index, positions);
+
+		_timer.start_timer();
+
+		for(int client = 0; client < 3; ++client) {
+			StageUpdatePacket::send_packet(clients[client].socket, stage_index);
+
+			for (int other_client = 0; other_client < 3; ++other_client) {
+				if (client == other_client) {
+					continue;
+				}
+				ClientMovePacket::send_packet(clients[client].socoet, positions[other_client])
 			}
 		}
-		StageMgr.getStage(stageIndex);
-		ResetEvent(jewelyEatHandle);
 
-		S2CChangeStagePacket changePacket;
-		changePacket.stageNum = stageIndex;
-		changePacket.type = S2CChangeStage;
-		StageTimerStart();
-
-		for (int i = 0; i < 3; i++) {
-			ResetEvent(threadHandles[i].intDoor);
-			send(threadHandles[i].clientSocket, (char*)&changePacket, sizeof(S2CChangeStagePacket), 0);
-			threadHandles[i].ground = 730;
-			MovePacket setPosition;
-			setPosition.type = S2CMove_IDLE;
-			setPosition.id = i;
-			setPosition.x = threadHandles[i].x;
-			setPosition.y = threadHandles[i].y;
-			for (int j = 0; j < 3; ++j) {
-				threadHandles[j].onBoard = StageMgr.Ground;
-				send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&setPosition), sizeof(MovePacket), 0);
-			}
-
-		}
-		isTimeOut = false;
 		_timer.Reset();
-		isNextStage = false;
 	}
-	DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
-	if (jewelyRetVal == WAIT_OBJECT_0) {
-		if (!StageMgr.jewely.empty()) {
-			StageMgr.currentVisibleJewely = StageMgr.jewely.front();
-			StageMgr.jewely.pop();
-			ResetEvent(jewelyEatHandle);
-		}
-		currentJewelyNum++;
-	}
+}
 
+bool StageMaker::check_door()
+{
 	if (!isVisibleDoor) {
 		if (currentJewelyNum == StageMgr.maxJewelyNum) {
 			typePacket visibleDoor;
@@ -229,8 +89,26 @@ void StageMaker::show_stage(int stage_number)
 			}
 		}
 	}
+	return false;
+}
 
+bool StageMaker::check_jewely()
+{
+	DWORD jewelyRetVal = WaitForSingleObject(jewelyEatHandle, 0);
+	if (jewelyRetVal == WAIT_OBJECT_0) {
+		if (!stage.jewely.empty()) {
+			StageMgr.currentVisibleJewely = StageMgr.jewely.front();
+			StageMgr.jewely.pop();
+			ResetEvent(jewelyEatHandle);
+		}
+		currentJewelyNum++;
+	}
 
+	return false;
+}
+
+void StageMaker::move_interpolation()
+{
 	for (int i = 0; i < 3; i++) {
 		if (!threadHandles[i].Falling) {
 			if (threadHandles[i].onBoard.FT_Collide_Fall(threadHandles[i])) {
@@ -367,16 +245,11 @@ void StageMaker::cleanup_game()
 
 void StageMaker::run_game_stage_thread()
 {
-	while (threadHandles[0].clientSocket != INVALID_SOCKET 
-		&& threadHandles[1].clientSocket != INVALID_SOCKET 
-		&& threadHandles[1].clientSocket != INVALID_SOCKET) 
-	{
+	while (true) {
 		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
 			show_stage_role();
 		} esle{
 			show_stage(stage_index);
 		}
 	}
-
-	return 0;
 }

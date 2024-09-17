@@ -2,7 +2,11 @@
 
 #include "Client.h"
 
-Client::Client() {}
+Client::Client() 
+	: role(false)
+{
+
+}
 
 Client::~Client() {}
 
@@ -44,7 +48,7 @@ void Client::set_ready_for_play(int user_ticket)
 	}
 }
 
-DWORD WINAPI Client::run_client_thread(LPVOID arg)
+void Client::run_client_thread(LPVOID arg)
 {
 	int myIndex = reinterpret_cast<int>(arg);
 	while (threadHandles[myIndex].clientSocket != INVALID_SOCKET) {
@@ -84,4 +88,14 @@ DWORD WINAPI Client::run_client_thread(LPVOID arg)
 		}
 	}
 	return 0;
+}
+
+bool Client::have_role()
+{
+	return role;
+}
+
+STAGE_TYPE Client::get_curr_stage()
+{
+	return curr_stage_type;
 }

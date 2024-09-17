@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include "Stage.h"
 #include "ClientAccepter.h"
+#include "StagePosition.h"
 
 class StageMaker
 {
@@ -15,6 +16,10 @@ public:
 
 	void show_stage_role();
 	void show_stage(int stage_number);
+	
+	bool check_door();
+	bool check_jewely();
+	void move_interpolation();
 
 	void cleanup_game();
 
@@ -22,25 +27,25 @@ private:
 	void run_game_stage_thread();
 
 private:
-	int stage_index = -1;
+	int stage_index;
 
-	Stage StageMgr;
+	mutex select_mutex;
+
+
 
 	int currentJewelyNum = 0;
 	bool isVisibleDoor = false;
 	mutex jewelyMutex;
 
 	Timer _timer;
-	bool isTimeOut = false;
 	bool gameEnd = false;
 	double timeoutSeconds = 50;
 
 
-	mutex selectMutex;
 	array<char, 3> playerRole = { 'f', 'f', 'f' };
 	array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
 
 	array<Client, 3> clients;
 
+	Stage stage_position;
 };
-

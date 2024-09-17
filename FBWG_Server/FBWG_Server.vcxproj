@@ -135,6 +135,7 @@
     <ClCompile Include="object.cpp" />
     <ClCompile Include="PacketWorker.cpp" />
     <ClCompile Include="ServerSettings.cpp" />
+    <ClCompile Include="PacketSender.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageMaker.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -148,10 +149,11 @@
     <ClInclude Include="PacketWorker.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="ServerSettings.h" />
+    <ClInclude Include="PacketSender.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageMaker.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="ThreadInfo.h" />
+    <ClInclude Include="StagePosition.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

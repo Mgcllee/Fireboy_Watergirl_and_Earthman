@@ -17,6 +17,8 @@ public :
 	bool IsRunning();
 	long long GetElapsedTime();
 	void Reset();
+	void start_timer();
+	bool time_out = false;
 private:
 	std::thread woker;
 	std::atomic_bool isRunning;

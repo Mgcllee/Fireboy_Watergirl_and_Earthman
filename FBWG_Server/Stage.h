@@ -1,9 +1,8 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <utility>
+
+#include "stdafx.h"
 #include "object.h"
+#include "StagePosition.h"
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
@@ -65,30 +64,30 @@ public:
 
 	int maxJewelyNum = 0;
 
+	;
+
 public:
 	void title() {}
 	void lobby() {}
-	void reset_stage(int index)
+	void reset_position(int index, array<StagePosition, 3>& positions)
 	{
 		switch (index)
 		{
 		case STAGE_01:
-			Stage_1();
+			Stage_1(positions);
 			break;
 		case STAGE_02:
-			Stage_2();
+			Stage_2(positions);
 			break;
 		case STAGE_03:
-			Stage_3();
+			Stage_3(positions);
 			break;
 		default:
 			break;
 		}
 	}
 private:
-	void Stage_1();
-	void Stage_2();
-	void Stage_3();
+	void Stage_1(array<StagePosition, 3>& positions);
+	void Stage_2(array<StagePosition, 3>& positions);
+	void Stage_3(array<StagePosition, 3>& positions);
 };
-
-extern Stage currentStage;
