@@ -9,17 +9,17 @@ StageMaker::~StageMaker()
 {
 }
 
-void TimeoutStage()
-{
-	_timer.Stop();
-}
+void StageMaker::run_game_stage_thread() {
+	
+	reset_game_stage();
 
-void StageMaker::reset_game_stage() {
-	ClientAccepter* client_accepter = new ClientAccepter();
-	client_accepter->accept_all_client(clients);
-
-	// checking every time jewel count
-	// checking every time door open
+	while (true) {
+		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
+			show_stage_role();
+		} esle{
+			show_stage(stage_index);
+		}
+	}
 }
 
 void StageMaker::show_stage_role()
@@ -51,14 +51,17 @@ void StageMaker::show_stage(int stage_number)
 
 	if (next_stage) {
 
+		reset_game_stage();
+
 		currentJewelyNum = 0;
 		isVisibleDoor = false;
 
 		stage_index += 1;
 
-		array<StagePosition, 3> positions;
-		stage_position.reset_position(stage_index, positions);
+		array<StagePosition, 3> next_stage_positions;
+		stage_position.reset_position(stage_index, next_stage_positions);
 
+		_timer.Reset();
 		_timer.start_timer();
 
 		for(int client = 0; client < 3; ++client) {
@@ -68,12 +71,26 @@ void StageMaker::show_stage(int stage_number)
 				if (client == other_client) {
 					continue;
 				}
-				ClientMovePacket::send_packet(clients[client].socoet, positions[other_client])
+				ClientMovePacket::send_packet(
+					clients[client].socoet, next_stage_positions[other_client])
 			}
 		}
-
-		_timer.Reset();
 	}
+}
+
+void StageMaker::reset_game_stage() {
+	ClientAccepter* client_accepter = new ClientAccepter();
+	client_accepter->accept_all_client(clients);
+
+	// checking every time jewel count
+	// checking every time door open
+}
+
+
+
+void TimeoutStage()
+{
+	_timer.Stop();
 }
 
 bool StageMaker::check_door()
@@ -241,14 +258,4 @@ void StageMaker::move_interpolation()
 void StageMaker::cleanup_game()
 {
 	WSACleanup();
-}
-
-void StageMaker::run_game_stage_thread() {
-	while (true) {
-		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
-			show_stage_role();
-		} esle{
-			show_stage(stage_index);
-		}
-	}
 }

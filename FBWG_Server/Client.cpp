@@ -5,7 +5,6 @@
 Client::Client() 
 	: role(false)
 {
-
 }
 
 Client::~Client() {}
@@ -72,7 +71,6 @@ void Client::run_client_thread()
 
 		}
 
-		//
 		if (isVisibleDoor) {
 			if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
 				DWORD retValDoor = WaitForSingleObject(threadHandles[myIndex].intDoor, 0);
