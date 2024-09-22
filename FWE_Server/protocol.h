@@ -2,7 +2,7 @@
 
 #define PORT_NUM				9000
 
-enum PACKET_TYPE_S2C {
+enum class PACKET_TYPE_S2C {
 	Loading = 0,
 	ChangeStage,
 	SelectRole,
@@ -21,7 +21,7 @@ enum PACKET_TYPE_S2C {
 	PlayerOut
 };
 
-enum PACKET_TYPE_C2S {
+enum class PACKET_TYPE_C2S {
 	ChangRole = 0,
 	SelectRole,
 	Move,
@@ -63,7 +63,7 @@ struct typePacket {
 };
 
 struct S2CStageTimePassPacket {
-	char type = S2CStageTimePass;
+	char type;
 	int timePassed;
 };
 

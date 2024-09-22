@@ -2,7 +2,7 @@
 #include"stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include "../FBWG_Server/protocol.h"
+#include "../FWE_Server/protocol.h"
 #include <string>
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
@@ -96,7 +96,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 		TranslateMessage(&Message);
 		DispatchMessage(&Message);
 	}
-	return Message.wParam;
+	return static_cast<int>(Message.wParam);
 }
 
 HWND start_button, retry_button, end_button, next_button, server_addr;
@@ -185,7 +185,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case BTN_LEFT_ARROW:
 		{
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangRole;
+			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::ChangRole);
 			//f w e
 			if (players[0].role == 'e') {
 				players[0].role = 'w';
@@ -196,7 +196,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else if (players[0].role == 'f') {
 				players[0].role = 'e';
 			}
-			makePacket.role = players[0].role;
+			makePacket.role = static_cast<char>(players[0].role);
 			SendPacket(&makePacket);
 		}
 		break;
@@ -204,7 +204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			//fwe
 			C2SRolePacket makePacket;
-			makePacket.type = C2SChangRole;
+			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::ChangRole);
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
 			}
@@ -214,15 +214,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else if (players[0].role == 'f') {
 				players[0].role = 'w';
 			}
-			makePacket.role = players[0].role;
+			makePacket.role = static_cast<char>(players[0].role);
 			SendPacket(&makePacket);
 		}
 		break;
 		case BTN_SELECT:
 		{
 			C2SRolePacket makePacket;
-			makePacket.type = C2SSelectRole;
-			makePacket.role = players[0].role;
+			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::SelectRole);
+			makePacket.role = static_cast<char>(players[0].role);
 			SendPacket(&makePacket);
 
 		}
@@ -237,7 +237,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case BTN_STOP:
 			PostQuitMessage(0);
 			typePacket endPacket;
-			endPacket.type = C2SEndout;
+			endPacket.type = static_cast<int>(PACKET_TYPE_C2S::Endout);
 			SendPacket(&endPacket);
 			break;
 		}
@@ -294,7 +294,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DWORD retVal = WaitForSingleObject(selectMyCharacter, 0);
 			if (retVal == WAIT_OBJECT_0) {
 
-				char buf[10] = { myId + '0' };
+				char buf[10] = { static_cast<char>(myId) + '0' };
 				SetWindowTextA(hWnd, buf);
 
 				ResetEvent(selectMyCharacter);

@@ -50,6 +50,6 @@ Stage& StageMgr::getStage(int index)
 {
 	if (isUse[index])
 		return myStage[index];
-	else myStage[0];
+	return myStage[0];
 }
 
