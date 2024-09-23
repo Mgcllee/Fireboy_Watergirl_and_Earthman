@@ -9,7 +9,9 @@ void StageMaker::run_game_stage_thread() {
 	client_accepter.accept_all_client(clients);
 	
 	stage_index = STAGE_TYPE::STAGE_ROLE;
-	show_character_select_stage();
+	check_all_client_role();
+
+	refactoring_board();
 
 	while (true) {
 		// TODO: add [exit condition]
@@ -19,15 +21,19 @@ void StageMaker::run_game_stage_thread() {
 			reset_game_stage();
 		}
 
+		move_interpolation();
+		
 		check_jewely();
 		check_door();
 	}
+
+	cleanup_game();
 }
 
-void StageMaker::show_character_select_stage() {
+void StageMaker::check_all_client_role() {
 	select_mutex.lock();
 	for (Client& client : clients) {
-		if (client.have_role()) {
+		if (false == client.have_role()) {
 			select_mutex.unlock();
 			return;
 		}
@@ -36,6 +42,18 @@ void StageMaker::show_character_select_stage() {
 
 	stage_index = STAGE_TYPE::STAGE_01;
 	show_game_stage(stage_index);
+}
+
+bool StageMaker::check_next_stage_condition() {
+	select_mutex.lock();
+	for (Client& client : clients) {
+		if (stage_index == client.get_curr_stage()) {
+			select_mutex.unlock();
+			return false;
+		}
+	}
+	select_mutex.unlock();
+	return true;
 }
 
 void StageMaker::show_game_stage(int stage_number) {
@@ -267,17 +285,4 @@ void StageMaker::cleanup_game() {
 		closesocket(client.socket);
 	}
 	WSACleanup();
-}
-
-bool StageMaker::check_next_stage_condition() {
-	select_mutex.lock();
-	for (Client& client : clients) {
-		if (stage_index == client.get_curr_stage()) {
-			return false;
-			select_mutex.unlock();
-			break;
-		}
-	}
-	select_mutex.unlock();
-	return true;
 }

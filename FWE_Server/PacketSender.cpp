@@ -3,7 +3,15 @@
 #include "PacketSender.h"
 
 
-void StageUpdatePacket::sync_send_packet(array<Client, 3>& clients, void* stage_index) override {
+void PacketSender::send_packet(Client& client, void* packet)
+{
+}
+
+void PacketSender::sync_send_packet(array<Client, 3>& clients, void* packet)
+{
+}
+
+void StageUpdatePacket::sync_send_packet(array<Client, 3>& clients, void* stage_index) {
 	S2CChangeStagePacket changePacket;
 	changePacket.stageNum = static_cast<int>(stage_index);
 	changePacket.type = PACKET_TYPE_S2C::ChangeStage;
@@ -13,9 +21,9 @@ void StageUpdatePacket::sync_send_packet(array<Client, 3>& clients, void* stage_
 	}
 }
 
-void ClientMovePacket::sync_send_packet(array<Client, 3>& clients, void* new_position)
+void ClientMovePacket::sync_send_packet(array<Client, 3>& clients, void* next_position)
 {
-	StagePosition position = static_cast<StagePosition>(new_position);
+	StagePosition position = static_cast<StagePosition>(next_position);
 	
 	MovePacket setPosition;
 	setPosition.type = PACKET_TYPE_S2C::Move_IDLE;
@@ -27,7 +35,7 @@ void ClientMovePacket::sync_send_packet(array<Client, 3>& clients, void* new_pos
 	}
 }
 
-void ClientAcceptSyncPacket::sync_send_packet(array<Client, 3>& clients, void* request_client_ticket) override {
+void ClientAcceptSyncPacket::sync_send_packet(array<Client, 3>& clients, void* request_client_ticket) {
 	int player_ready_counter = 0;
 	for (Client& client : clinets) {
 		if (PLAYER_STATE::PLAYER_ACCEPT == clinet.player_state) {

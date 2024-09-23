@@ -13,7 +13,7 @@ public:
 
 	void reset_game_stage();
 
-	void show_character_select_stage();
+	void check_all_client_role();
 	void show_game_stage(int stage_number);
 	
 	bool check_door();

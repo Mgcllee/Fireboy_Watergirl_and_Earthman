@@ -36,5 +36,4 @@ public:
 
 private:
 	PacketReceiver packet_receiver;
-	PacketSender packet_sender;
 };
