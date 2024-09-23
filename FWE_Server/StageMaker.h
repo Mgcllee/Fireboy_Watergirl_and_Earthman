@@ -22,6 +22,8 @@ public:
 
 	void cleanup_game();
 
+	bool check_next_stage_condition();
+
 private:
 	void run_game_stage_thread();
 
