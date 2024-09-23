@@ -44,6 +44,7 @@ private:
 	array<char, 3> playerRole = { 'f', 'f', 'f' };
 	array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
 
+	ClientAccepter client_accepter;
 	array<Client, 3> clients;
 
 	Stage stage_position;

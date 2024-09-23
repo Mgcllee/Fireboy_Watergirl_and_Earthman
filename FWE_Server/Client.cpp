@@ -19,14 +19,15 @@ void Client::run_client_thread() {
 	}
 }
 
-void Client::set_ready_for_play(int user_ticket) {
-	ClientServerIDPacket::send_packet(this, user_ticket);
-}
-
 bool Client::have_role() {
 	return role;
 }
 
 STAGE_TYPE Client::get_curr_stage() {
 	return curr_stage_type;
+}
+
+PLAYER_STATE Client::get_player_state()
+{
+	return player_state;
 }

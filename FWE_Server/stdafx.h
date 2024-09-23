@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <WS2tcpip.h>
+#include <WinSock2.h>
 #pragma comment(lib, "ws2_32")
 
 using namespace std;
@@ -19,6 +20,12 @@ using namespace chrono;
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
+
+enum PLAYER_STATE {
+	PLAYER_ACCEPT = 0,
+	PLAYER_GAME_READY,
+	PLAYER_SET_ROLE
+};
 
 enum STAGE_TYPE {
 	STAGE_TITLE = 0,

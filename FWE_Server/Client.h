@@ -9,14 +9,16 @@ class Client : public StagePosition {
 public:
   Client();
 
-  void set_ready_for_play(int user_ticket);
   void run_client_thread();
 
 
   bool have_role();
   STAGE_TYPE get_curr_stage();
 
-  SOCKET socket;
+  SOCKET network_socket;
+
+  PLAYER_STATE player_state;
+
 public:
   bool role;
 
@@ -24,7 +26,7 @@ public:
   int currentSize;
   int rest_packet_size = 0;
 
-  char clientId = -1;
+  char user_ticket = -1;
 
   high_resolution_clock::time_point jumpStartTime;
   high_resolution_clock::time_point jumpCurrentTime;

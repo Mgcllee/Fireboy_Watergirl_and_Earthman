@@ -26,7 +26,8 @@ bool ClientAccepter::accept_all_client(array<Client, 3>& clients) {
 			closesocket(client.socket);
 			return false;
 		} else {
-			client.set_ready_for_play(user_ticket);
+			client.player_state = PLAYER_STATE::PLAYER_ACCEPT;
+			ClientAcceptSyncPacket::sync_send_packet(clients, user_ticket);
 			user_ticket += 1;
 		}
 	}

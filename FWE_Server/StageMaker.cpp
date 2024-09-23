@@ -1,34 +1,21 @@
 #include "StageMaker.h"
 
 StageMaker::StageMaker()
-	: stage_index(STAGE_TYPE::STAGE_ROLE)
+	: stage_index(STAGE_TYPE::STAGE_TITLE)
 {
 }
 
 void StageMaker::run_game_stage_thread() {
-	
-	reset_game_stage();
+	client_accepter.accept_all_client(clients);
+	stage_index = STAGE_TYPE::STAGE_ROLE;
 
 	while (true) {
-
-
 		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
 			show_character_select_stage();
 		} esle{
 			show_game_stage(stage_index);
 		}
 	}
-}
-
-void StageMaker::reset_game_stage() {
-	ClientAccepter* client_accepter = new ClientAccepter();
-	client_accepter->accept_all_client(clients);
-
-	_timer.Reset();
-	_timer.start_timer();
-
-	// checking every time jewel count
-	// checking every time door open
 }
 
 void StageMaker::show_character_select_stage() {
@@ -41,7 +28,8 @@ void StageMaker::show_character_select_stage() {
 	}
 	select_mutex.unlock();
 
-	show_game_stage(STAGE_TYPE::STAGE_01);
+	stage_index = STAGE_TYPE::STAGE_01;
+	show_game_stage(stage_index);
 }
 
 void StageMaker::show_game_stage(int stage_number) {
@@ -60,23 +48,26 @@ void StageMaker::show_game_stage(int stage_number) {
 
 		reset_game_stage();
 
-		stage_index += 1;
+		if (stage_index != STAGE_TYPE::RESULT) {
+			stage_index += 1;
+		}
 
+		StageUpdatePacket::sync_send_packet(clients, stage_index);
+		
 		array<StagePosition, 3> next_stage_positions;
 		stage_position.reset_position(stage_index, next_stage_positions);
-
-		for(int client = 0; client < 3; ++client) {
-			StageUpdatePacket::send_packet(clients[client].socket, stage_index);
-
-			for (int other_client = 0; other_client < 3; ++other_client) {
-				if (client == other_client) {
-					continue;
-				}
-				ClientMovePacket::send_packet(
-					clients[client].socoet, next_stage_positions[other_client])
-			}
+		for (StagePosition position : next_stage_positions) {
+			ClientMovePacket::sync_send_packet(clients, position);
 		}
 	}
+}
+
+void StageMaker::reset_game_stage() {
+	_timer.Reset();
+	_timer.start_timer();
+
+	// checking every time jewel count
+	// checking every time door open
 }
 
 bool StageMaker::check_door() {

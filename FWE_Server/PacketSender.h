@@ -8,20 +8,20 @@
 class PacketSender {
 public:
 	virtual void send_packet(Clinet& client, void* packet);
-	virtual void sync_send_packet(void* packet);
+	virtual void sync_send_packet(array<Client, 3>& clients, void* packet);
 };
 
 class StageUpdatePacket : public PacketSender {
 public:
-	void send_packet(Clinet& socket, void* stage_index) override;
+	void sync_send_packet(array<Client, 3>& clients, void* packet) override;
 };
 
 class ClientMovePacket : public PacketSender {
 public:
-	void send_packet(Clinet& socket, void* new_position) override;
+	void sync_send_packet(array<Client, 3>& clients, void* new_positions) override;
 };
 
-class ClientServerIDPacket : public PacketSender {
+class ClientAcceptSyncPacket : public PacketSender {
 public:
-	void send_packet(Clinet& socket, void* user_ticket) override;
+	void sync_send_packet(array<Client, 3>& clients, void* packet) override;
 }; 
