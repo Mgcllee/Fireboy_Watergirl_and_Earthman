@@ -64,8 +64,6 @@ public:
 
 	int maxJewelyNum = 0;
 
-	;
-
 public:
 	void title() {}
 	void lobby() {}

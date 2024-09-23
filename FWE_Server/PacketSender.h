@@ -27,3 +27,8 @@ class ClientAcceptSyncPacket : public PacketSender {
 public:
 	void sync_send_packet(array<Client, 3>& clients, void* packet) override;
 };
+
+class StageDoorOpenSyncPacket : public PacketSender {
+public:
+	void sync_send_packet(array<Client, 3>& clients, void* packet) override;
+};

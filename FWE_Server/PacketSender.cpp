@@ -68,3 +68,11 @@ void ClientAcceptSyncPacket::sync_send_packet(array<Client, 3>& clients, void* r
 		}
 	}
 }
+
+void StageDoorOpenSyncPacket::sync_send_packet(array<Client, 3>& clients, void* packet) {
+	typePacket packet;
+	packet.type = PACKET_TYPE_S2C::DoorVisible;
+	for (Client& client : clients) {
+		send(client.socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
+	}
+}

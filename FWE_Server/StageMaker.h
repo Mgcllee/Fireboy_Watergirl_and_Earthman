@@ -24,6 +24,8 @@ public:
 
 	bool check_next_stage_condition();
 
+	void show_player_score();
+
 private:
 	void run_game_stage_thread();
 
@@ -31,8 +33,6 @@ private:
 	int stage_index;
 
 	mutex select_mutex;
-
-
 
 	int currentJewelyNum = 0;
 	bool isVisibleDoor = false;
@@ -49,5 +49,5 @@ private:
 	ClientAccepter client_accepter;
 	array<Client, 3> clients;
 
-	Stage stage_position;
+	Stage stage_item;
 };
