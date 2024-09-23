@@ -5,25 +5,33 @@ StageMaker::StageMaker()
 {
 }
 
-StageMaker::~StageMaker()
-{
-}
-
 void StageMaker::run_game_stage_thread() {
 	
 	reset_game_stage();
 
 	while (true) {
+
+
 		if (STAGE_TYPE::STAGE_ROLE == stage_index) {
-			show_stage_role();
+			show_character_select_stage();
 		} esle{
-			show_stage(stage_index);
+			show_game_stage(stage_index);
 		}
 	}
 }
 
-void StageMaker::show_stage_role()
-{
+void StageMaker::reset_game_stage() {
+	ClientAccepter* client_accepter = new ClientAccepter();
+	client_accepter->accept_all_client(clients);
+
+	_timer.Reset();
+	_timer.start_timer();
+
+	// checking every time jewel count
+	// checking every time door open
+}
+
+void StageMaker::show_character_select_stage() {
 	select_mutex.lock();
 	for (Client& client : clients) {
 		if (client.have_role()) {
@@ -33,11 +41,10 @@ void StageMaker::show_stage_role()
 	}
 	select_mutex.unlock();
 
-	show_stage(STAGE_TYPE::STAGE_01);
+	show_game_stage(STAGE_TYPE::STAGE_01);
 }
 
-void StageMaker::show_stage(int stage_number)
-{
+void StageMaker::show_game_stage(int stage_number) {
 	bool next_stage = true;
 	select_mutex.lock();
 	for (Client& client : clients) {
@@ -53,16 +60,10 @@ void StageMaker::show_stage(int stage_number)
 
 		reset_game_stage();
 
-		currentJewelyNum = 0;
-		isVisibleDoor = false;
-
 		stage_index += 1;
 
 		array<StagePosition, 3> next_stage_positions;
 		stage_position.reset_position(stage_index, next_stage_positions);
-
-		_timer.Reset();
-		_timer.start_timer();
 
 		for(int client = 0; client < 3; ++client) {
 			StageUpdatePacket::send_packet(clients[client].socket, stage_index);
@@ -78,23 +79,7 @@ void StageMaker::show_stage(int stage_number)
 	}
 }
 
-void StageMaker::reset_game_stage() {
-	ClientAccepter* client_accepter = new ClientAccepter();
-	client_accepter->accept_all_client(clients);
-
-	// checking every time jewel count
-	// checking every time door open
-}
-
-
-
-void TimeoutStage()
-{
-	_timer.Stop();
-}
-
-bool StageMaker::check_door()
-{
+bool StageMaker::check_door() {
 	if (!isVisibleDoor) {
 		if (currentJewelyNum == StageMgr.maxJewelyNum) {
 			typePacket visibleDoor;
@@ -107,6 +92,42 @@ bool StageMaker::check_door()
 		}
 	}
 	return false;
+}
+
+void refactoring_board() {
+
+
+	if (StageMgr.currentVisibleJewely.OBJECT_Collide(threadHandles[myIndex])) {
+		S2CPlayerPacket jewelyPacket;
+		jewelyPacket.id = -1;
+		jewelyPacket.type = S2CEatJewely;
+		DWORD retVal = WaitForSingleObject(jewelyEatHandle, 0);
+		if (retVal != WAIT_OBJECT_0) {
+			threadHandles[myIndex].score++;
+			SetEvent(jewelyEatHandle);
+			jewelyPacket.id = myIndex;
+		}
+		if (jewelyPacket.id != -1)
+			for (int j = 0; j < 3; j++)
+				send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+
+	}
+
+	if (isVisibleDoor) {
+		if (StageMgr.door.OBJECT_Collide(threadHandles[myIndex])) {
+			DWORD retValDoor = WaitForSingleObject(threadHandles[myIndex].intDoor, 0);
+			if (retValDoor != WAIT_OBJECT_0) {
+				S2CPlayerPacket intoDoorPacket;
+				intoDoorPacket.id = myIndex;
+				intoDoorPacket.type = S2CIntoDoor;
+				SetEvent(threadHandles[myIndex].intDoor);
+				for (int j = 0; j < 3; j++)
+					send(threadHandles[j].clientSocket, reinterpret_cast<char*>(&intoDoorPacket), sizeof(S2CPlayerPacket), 0);
+			}
+		}
+	}
+
+
 }
 
 bool StageMaker::check_jewely()
@@ -255,7 +276,9 @@ void StageMaker::move_interpolation()
 	}
 }
 
-void StageMaker::cleanup_game()
-{
+void StageMaker::cleanup_game() {
+	for (Client& client : clients) {
+		closesocket(client.socket);
+	}
 	WSACleanup();
 }

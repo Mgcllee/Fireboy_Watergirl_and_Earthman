@@ -2,12 +2,12 @@
 
 #include "stdafx.h"
 #include "PacketSender.h"
+#include "PacketReceiver.h"
 #include "StagePosition.h"
 
 class Client : public StagePosition {
 public:
   Client();
-  ~Client();
 
   void set_ready_for_play(int user_ticket);
   void run_client_thread();
@@ -20,9 +20,9 @@ public:
 public:
   bool role;
 
-  char recvBuf[MAX_BUF_SIZE] = {0};
+  char recv_buffer[MAX_BUF_SIZE] = {0};
   int currentSize;
-  int prevSize = 0;
+  int rest_packet_size = 0;
 
   char clientId = -1;
 
@@ -32,4 +32,7 @@ public:
   STAGE_TYPE curr_stage_type;
   int score = 0;
 
+private:
+	PacketReceiver packet_receiver;
+	PacketSender packet_sender;
 };

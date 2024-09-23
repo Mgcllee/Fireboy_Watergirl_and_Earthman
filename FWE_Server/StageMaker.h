@@ -10,12 +10,11 @@ class StageMaker
 {
 public:
 	StageMaker();
-	~StageMaker();
 
 	void reset_game_stage();
 
-	void show_stage_role();
-	void show_stage(int stage_number);
+	void show_character_select_stage();
+	void show_game_stage(int stage_number);
 	
 	bool check_door();
 	bool check_jewely();

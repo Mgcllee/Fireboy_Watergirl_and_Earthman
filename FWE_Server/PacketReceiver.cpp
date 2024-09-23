@@ -1,25 +1,24 @@
 #include "PacketReceiver.h"
 
-void ConstructPacket(ThreadInfo& clientInfo, int ioSize)
-{
-	int restSize = ioSize + clientInfo.prevSize;
-	int needSize = 0;
-	char* buf = clientInfo.recvBuf;
-	while (restSize != 0) {
-		needSize = GetPacketSize(reinterpret_cast<char*>(buf)[0]);
-		if (restSize < needSize) {
-			clientInfo.prevSize = restSize;
+void PacketReceiver::construct_packet(Client& clientInfo, int recv_packet_size) {
+	int rest_size = recv_packet_size + clientInfo.rest_packet_size;
+	int curr_packet_size = 0;
+
+	char* recv_buufer = reinterpret_cast<char*>(clientInfo.recv_buffer);
+	while (rest_size != 0) {
+		curr_packet_size = GetPacketSize(recv_buufer[0]);
+		if (rest_size < curr_packet_size) {
+			clientInfo.rest_packet_size = rest_size;
 			return;
-		}
-		else {
-			ProcessPacket(clientInfo, reinterpret_cast<char*>(buf));
-			memcpy(buf, reinterpret_cast<char*>(buf) + needSize, restSize - needSize);
-			restSize -= needSize;
+		} else {
+			ProcessPacket(clientInfo, recv_buufer);
+			memcpy(recv_buufer, recv_buufer + curr_packet_size, rest_size - curr_packet_size);
+			rest_size -= curr_packet_size;
 		}
 	}
 }
 
-void ProcessPacket(Client& client, char* packet)
+void PacketReceiver::process_packet(Client& client, char* packet)
 {
 	switch (packet[0]) {
 	case PACKET_TYPE_C2S::SelectRole: {

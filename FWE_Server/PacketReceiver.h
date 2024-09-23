@@ -7,20 +7,24 @@
 
 class PacketReceiver {
 public:
+	void construct_packet(Client& client, int recv_packet_size);
+	void process_packet(Client& clinet, char* packet);
+	
+protected:
 	virtual void recv_packet(Client& client, void* packet);
 };
 
-class ClientSelectRole : public PacketReceiver {
-public:
+class ClientSelectRole : protected PacketReceiver {
+protected:
 	void recv_packet(Client& client, void* packet) override;
 };
 
-class C2SChangRole : public PacketReceiver {
-public:
+class C2SChangRole : protected PacketReceiver {
+protected:
 	void recv_packet(Client& client, void* packet) override;
 };
 
-class C2SMove : public PacketReceiver {
-public:
+class C2SMove : protected PacketReceiver {
+protected:
 	void recv_packet(Client& client, void* packet) override;
 };
