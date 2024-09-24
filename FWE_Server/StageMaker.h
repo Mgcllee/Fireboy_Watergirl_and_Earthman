@@ -9,7 +9,7 @@
 class StageMaker
 {
 public:
-	StageMaker(SOCKET* listen_socket);
+	StageMaker();
 
 	void run_game_stage_thread(array<Client, 3>* game_member, Stage* game_stage);
 	void reset_game_stage();

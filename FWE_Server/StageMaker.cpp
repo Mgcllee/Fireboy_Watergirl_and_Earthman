@@ -1,6 +1,6 @@
 #include "StageMaker.h"
 
-StageMaker::StageMaker(SOCKET* listen_socket)
+StageMaker::StageMaker()
 	: stage_index(STAGE_TYPE::STAGE_TITLE)
 {
 }

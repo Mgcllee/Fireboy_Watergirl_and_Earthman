@@ -2,12 +2,6 @@
 
 #include "GameMaker.h"
 
-GameMaker::GameMaker(SOCKET* server_socket)
-	: StageMaker(server_socket)
-	, listen_socket(server_socket)
-{
-
-}
 
 void GameMaker::run_game() {
 	while (true) {
@@ -17,13 +11,8 @@ void GameMaker::run_game() {
 }
 
 void GameMaker::create_game_threads() {
-	ClientAccepter client_accepter(listen_socket);
-	while (false == client_accepter.accept_all_client(&clients)) {
-		// TODO: write log
-	}
-
 	stage_maker_thread = thread(&StageMaker::run_game_stage_thread, 
-		new StageMaker(listen_socket), &clients, &game_stage);
+		new StageMaker, &clients, &game_stage);
 
 	for (thread& client_thread : client_threads) {
 		client_thread = thread(&Client::run_client_thread, 
@@ -37,4 +26,8 @@ void GameMaker::join_game_threads() {
 	}
 
 	stage_maker_thread.join();
+}
+
+array<Client, 3>* GameMaker::get_clients() {
+	return &clients;
 }
