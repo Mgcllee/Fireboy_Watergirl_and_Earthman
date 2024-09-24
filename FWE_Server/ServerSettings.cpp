@@ -5,3 +5,7 @@ ServerSettings::ServerSettings() {
 }
 
 ServerSettings::~ServerSettings() {}
+
+void ServerSettings::write_log_message(string message)
+{
+}

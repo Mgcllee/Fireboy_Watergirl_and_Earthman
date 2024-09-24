@@ -3,14 +3,11 @@
 StageMaker::StageMaker(SOCKET* listen_socket)
 	: stage_index(STAGE_TYPE::STAGE_TITLE)
 {
-	client_accepter = new ClientAccepter(listen_socket);
 }
 
 void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* game_stage) {
 	clients = game_member;
 	stage_item = game_stage;
-
-	client_accepter->accept_all_client(clients);
 	
 	stage_index = STAGE_TYPE::STAGE_ROLE;
 	while (stage_index == STAGE_TYPE::STAGE_ROLE) {

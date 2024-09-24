@@ -17,6 +17,11 @@ void GameMaker::run_game() {
 }
 
 void GameMaker::create_game_threads() {
+	ClientAccepter client_accepter(listen_socket);
+	while (false == client_accepter.accept_all_client(&clients)) {
+		// TODO: write log
+	}
+
 	stage_maker_thread = thread(&StageMaker::run_game_stage_thread, 
 		new StageMaker(listen_socket), &clients, &game_stage);
 
