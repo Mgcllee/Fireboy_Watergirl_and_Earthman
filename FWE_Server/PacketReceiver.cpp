@@ -1,174 +1,202 @@
-#include "PacketReceiver.h"
+#pragma once
 
-void PacketReceiver::construct_packet(Client& clientInfo, int recv_packet_size) {
-	int rest_size = recv_packet_size + clientInfo.rest_packet_size;
+#include "PacketReceiver.h"
+#include "Client.h"
+
+
+PacketReceiver::PacketReceiver(array<Client, 3>* member, Stage* game_stage)
+	: clients(member)
+	, stage_item(game_stage)
+{
+}
+
+void PacketReceiver::construct_packet(Client* client, int recv_packet_size) {
+	int rest_size = recv_packet_size + client->rest_packet_size;
 	int curr_packet_size = 0;
 
-	char* recv_buufer = reinterpret_cast<char*>(clientInfo.recv_buffer);
+	char* recv_buufer = reinterpret_cast<char*>(client->recv_buffer);
 	while (rest_size != 0) {
-		curr_packet_size = GetPacketSize(recv_buufer[0]);
+		curr_packet_size = (recv_buufer[1]);
 		if (rest_size < curr_packet_size) {
-			clientInfo.rest_packet_size = rest_size;
+			client->rest_packet_size = rest_size;
 			return;
 		} else {
-			ProcessPacket(clientInfo, recv_buufer);
+			process_packet(recv_buufer);
 			memcpy(recv_buufer, recv_buufer + curr_packet_size, rest_size - curr_packet_size);
 			rest_size -= curr_packet_size;
 		}
 	}
 }
 
-void PacketReceiver::process_packet(Client& client, char* packet)
-{
-	switch (packet[0]) {
+void PacketReceiver::process_packet(char* packet) {
+	switch (static_cast<PACKET_TYPE_C2S>(packet[0])) {
 	case PACKET_TYPE_C2S::SelectRole: {
-		ClientSelectRole::recv_packet(client, packet);
+		ClientSelectRole select_role(clients, stage_item);
+		select_role.recv_sync_packet(packet);
 		break;
 		}
 	case PACKET_TYPE_C2S::ChangRole: {
-		C2SChangRole::recv_packet(client, packet);
+		C2SChangRole change_role(clients, stage_item);
+		change_role.recv_sync_packet(packet);
 		break;
 		}
 	case PACKET_TYPE_C2S::Move: {
-		C2SMove::recv_packet(client, packet);
+		C2SMove move(clients, stage_item);
+		move.recv_sync_packet(packet);
 		break;
 		}
 	case PACKET_TYPE_C2S::Endout: {
-		closesocket(clientInfo.clientSocket);
+		for (Client& client : *clients) {
+			closesocket(client.network_socket);
+		}
 		break;
 		}
 	}
 }
 
-int GetPacketSize(char packetType)
+void PacketReceiver::recv_packet(void* packet)
 {
-	int retVal = -1;
-	int exit = 1;
-	switch (packetType)
-	{
-	case C2SChangRole:
-	case C2SSelectRole:
-		retVal = sizeof(C2SRolePacket);
-		break;
-	case C2SMove:
-		retVal = sizeof(MovePacket);
-		break;
-	case C2SEndout:
-		retVal = sizeof(typePacket);
-		break;
-	default:
-		break;
-	}
-	return retVal;
 }
 
-void ClientSelectRole::recv_packet(Client& client, void* packet)
+void PacketReceiver::recv_sync_packet(void* packet)
 {
-	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packet);
+}
+
+ClientSelectRole::ClientSelectRole(array<Client, 3>* member, Stage* game_stage)
+	: PacketReceiver(member, game_stage)
+{
+}
+
+void ClientSelectRole::recv_sync_packet(void* recv_packet)
+{
+	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(recv_packet);
+	int user_ticket = static_cast<int>(packet->id);
+	Client select_client = (*clients)[user_ticket];
+
+	// TODO: update select palyer role varialbe logic
 	bool change = true;
-	selectMutex.lock();
-	for (int i = 0; i < 3; i++) {
-		if (selectPlayerRole[i] == packet->role) {
+	/*for (int i = 0; i < 3; i++) {
+		if (selectPlayerRole[i].load() == packet->role) {
 			change = false;
+			selectPlayerRole[select_client.user_ticket].store(packet->role);
 			break;
 		}
-	}
-	if (change)
-		selectPlayerRole[clientInfo.clientId] = packet->role;
-	selectMutex.unlock();
+	}*/
+	
 	if (change) {
-		//send SelectPacket for all Client
 		S2CRolePacket sendPacket;
-		sendPacket.id = clientInfo.clientId;
+		sendPacket.id = select_client.user_ticket;
 		sendPacket.role = packet->role;
-		sendPacket.type = S2CSelectRole;
-		for (int i = 0; i < 3; i++) {
-			send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+		sendPacket.type = static_cast<int>(PACKET_TYPE_S2C::SelectRole);
+
+		for (Client& client : *clients) {
+			send(client.network_socket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
 		}
 	}
 }
 
-void C2SChangRole::recv_packet(Client& client, void* packet)
+C2SChangRole::C2SChangRole(array<Client, 3>* member, Stage* game_stage)
+	: PacketReceiver(member, game_stage)
+{
+}
+
+void C2SChangRole::recv_sync_packet(void* packetStart)
 {
 	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
-	playerRole[clientInfo.clientId] = packet->role;
+	int user_ticket = static_cast<int>(((*clients)[packet->id]).user_ticket);
+
+	// TODO: playerRole update
+	// playerRole[user_ticket].store(packet->role);
+
 	S2CRolePacket sendPacket;
-	sendPacket.id = clientInfo.clientId;
+	sendPacket.id = user_ticket;
 	sendPacket.role = packet->role;
-	sendPacket.type = S2CChangeRole;
-	for (int i = 0; i < 3; i++) {
-		send(threadHandles[i].clientSocket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);
+	sendPacket.type = static_cast<int>(PACKET_TYPE_S2C::ChangeRole);
+
+	for (Client& client : *clients) {
+		send(client.network_socket, reinterpret_cast<char*>(&sendPacket), sizeof(sendPacket), 0);
 	}
 }
 
-void C2SMove::recv_packet(Client& client, void* packet)
+C2SMove::C2SMove(array<Client, 3>* member, Stage* game_stage)
+	: PacketReceiver(member, game_stage)
 {
-	short prevPosX = clientInfo.x;
-	MovePacket* packet = reinterpret_cast<MovePacket*>(packetStart);
-	DWORD retVal = WaitForSingleObject(clientInfo.jumpEventHandle, 0);
-	if (retVal == WAIT_OBJECT_0) {
-		return;
-	}
-	if (packet->y == SHRT_MAX) {
+}
 
-		SetEvent(clientInfo.jumpEventHandle);
-		packet->type = S2CMove_JUMP;
-		clientInfo.v = 0.f;
+void C2SMove::recv_sync_packet(void* position_packet)
+{
+	MovePacket* packet = reinterpret_cast<MovePacket*>(position_packet);
+	Client& client_pos = (*clients)[packet->id];
+	short prevPosX = client_pos.x;
+	
+	if (packet->y == SHRT_MAX) {
+		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
+		client_pos.v = 0.f;
 	}
 	else if (packet->y == SHRT_MIN) {
-		clientInfo.direction = DIRECTION::NONE;
-		packet->type = S2CMove_IDLE;
-		clientInfo.wid_v = 0;
+		client_pos.direction = DIRECTION::NONE;
+		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
+		client_pos.wid_v = 0;
 	}
 	else if (packet->x == 1) {
-		if (clientInfo.wid_a <= 10.f)
-			clientInfo.wid_a += 0.1f;
-		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += clientInfo.wid_a;
-		ThreadInfo temp = clientInfo;
-		temp.x += temp.wid_v;
-		for (OBJECT& ft : StageMgr.Ft) {
-			if (ft.Ft_Collision(temp) && ft.Ft_Collision(clientInfo)) {
-				clientInfo.x -= clientInfo.wid_v;
-				clientInfo.wid_v = 0;
-				break;
+		if (client_pos.wid_a <= 10.f)
+			client_pos.wid_a += 0.1f;
+		if (client_pos.wid_v <= 10.f)
+			client_pos.wid_v += client_pos.wid_a;
+		Client temp = client_pos;
+		temp.x += static_cast<int>(temp.wid_v);
+		
+		for (OBJECT& ft : (*stage_item).Ft) {
+			if (ft.Ft_Collision(temp) && ft.Ft_Collision(client_pos)) {
+				client_pos.x -= static_cast<int>(client_pos.wid_v);
+				client_pos.wid_v = 0;
 			}
 		}
-		if (clientInfo.wid_v != 0) {
-			clientInfo.x += clientInfo.wid_v;
+
+		if (client_pos.wid_v != 0) {
+			client_pos.x += static_cast<int>(client_pos.wid_v);
 		}
-		if (clientInfo.x + 5 >= WINDOW_WID)
-			clientInfo.x = prevPosX;
-		clientInfo.direction = DIRECTION::RIGHT;
-		packet->type = S2CMove_RIGHT;
+
+		if (client_pos.x + 5 >= WINDOW_WID) {
+			client_pos.x = prevPosX;
+		}
+
+		client_pos.direction = DIRECTION::RIGHT;
+		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT);
 	}
 	else if (packet->x == -1) {
-		if (clientInfo.wid_a <= 10.f)
-			clientInfo.wid_a += 0.1f;
-		if (clientInfo.wid_v <= 10.f)
-			clientInfo.wid_v += clientInfo.wid_a;
-		ThreadInfo temp = clientInfo;
-		temp.x -= temp.wid_v;
-		for (OBJECT& ft : StageMgr.Ft) {
-			if (ft.Ft_Collision(temp) && ft.Ft_Collision(clientInfo)) {
-				clientInfo.x += clientInfo.wid_v;
-				clientInfo.wid_v = 0;
-				break;
+		if (client_pos.wid_a <= 10.f) {
+			client_pos.wid_a += 0.1f;
+		}
+		if (client_pos.wid_v <= 10.f) {
+			client_pos.wid_v += client_pos.wid_a;
+		}
+
+		Client temp = client_pos;
+		temp.x -= static_cast<int>(temp.wid_v);
+
+		for (OBJECT ft : (*stage_item).Ft) {
+			if (ft.Ft_Collision(temp) && ft.Ft_Collision(client_pos)) {
+				client_pos.x += static_cast<int>(client_pos.wid_v);
+				client_pos.wid_v = 0;
 			}
 		}
-		if (clientInfo.wid_v != 0) {
-			clientInfo.x -= clientInfo.wid_v;
+
+		if (client_pos.wid_v != 0) {
+			client_pos.x -= static_cast<int>(client_pos.wid_v);
 		}
-		if (clientInfo.x - 55 < 0)
-			clientInfo.x = prevPosX;
-		clientInfo.direction = DIRECTION::LEFT;
-		packet->type = S2CMove_LEFT;
+
+		if (client_pos.x - 55 < 0) {
+			client_pos.x = prevPosX;
+		}
+		client_pos.direction = DIRECTION::LEFT;
+		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_LEFT);
 	}
 
-	packet->x = clientInfo.x;
-	packet->y = clientInfo.y;
+	packet->x = client_pos.x;
+	packet->y = client_pos.y;
 
-	for (int i = 0; i < 3; i++) {
-		send(threadHandles[i].clientSocket, reinterpret_cast<char*>(packet), sizeof(MovePacket), 0);
+	for (Client& client : *clients) {
+		send(client.network_socket, reinterpret_cast<char*>(packet), sizeof(packet), 0);
 	}
 }

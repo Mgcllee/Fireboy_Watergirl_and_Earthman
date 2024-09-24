@@ -1,39 +1,48 @@
 #pragma once
 
 #include "stdafx.h"
-#include "PacketSender.h"
-#include "PacketReceiver.h"
+#include "Stage.h"
+// #include "PacketReceiver.h"
 #include "StagePosition.h"
+
+#ifndef CLIENT_H
+#define CLIENT_H
+
+class PacketReceiver;
 
 class Client : public StagePosition {
 public:
-  Client();
+	Client();
 
-  void run_client_thread();
+	void run_client_thread(array<Client, 3>* member, Stage* stage);
 
 
-  bool have_role();
-  STAGE_TYPE get_curr_stage();
+	bool have_role();
+	STAGE_TYPE get_curr_stage();
 
-  SOCKET network_socket;
+	SOCKET network_socket;
 
-  PLAYER_STATE player_state;
+	PLAYER_STATE player_state;
 
 public:
-  bool role;
+	bool role;
 
-  char recv_buffer[MAX_BUF_SIZE] = {0};
-  int currentSize;
-  int rest_packet_size = 0;
+	char recv_buffer[MAX_BUF_SIZE] = { 0 };
+	int currentSize;
+	int rest_packet_size = 0;
 
-  char user_ticket = -1;
+	char user_ticket = -1;
 
-  high_resolution_clock::time_point jumpStartTime;
-  high_resolution_clock::time_point jumpCurrentTime;
+	high_resolution_clock::time_point jumpStartTime;
+	high_resolution_clock::time_point jumpCurrentTime;
 
-  STAGE_TYPE curr_stage_type;
-  int score = 0;
+	STAGE_TYPE curr_stage_type;
+	int score = 0;
 
 private:
-	PacketReceiver packet_receiver;
+	array<Client, 3>* clients;
+	Stage* stage_item;
+	PacketReceiver* packet_receiver;
 };
+
+#endif 

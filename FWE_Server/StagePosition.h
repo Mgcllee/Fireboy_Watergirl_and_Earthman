@@ -11,9 +11,9 @@ enum DIRECTION {
 	RIGHT
 };
 
-struct StagePosition
-{
-	short x, y;
+class StagePosition {
+public:
+	int x, y;
 	short ground = 730;
 	short hei = 100, wid = 60;
 

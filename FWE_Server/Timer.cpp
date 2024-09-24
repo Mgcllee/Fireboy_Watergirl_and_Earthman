@@ -1,5 +1,7 @@
 #include "Timer.h"
 
+/*
+
 Timer::Timer()
 {
 	isRunning = false;
@@ -136,3 +138,5 @@ void Timer::start_timer()
 			}
 		});
 }
+
+*/

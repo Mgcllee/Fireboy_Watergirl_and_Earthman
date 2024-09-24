@@ -11,9 +11,14 @@
 #include <utility>
 
 #include <iostream>
+#include <string>
+
 #include <WS2tcpip.h>
 #include <WinSock2.h>
+
 #pragma comment(lib, "ws2_32")
+
+#include "protocol.h"
 
 using namespace std;
 using namespace chrono;

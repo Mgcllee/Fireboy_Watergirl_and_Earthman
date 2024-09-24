@@ -2,43 +2,15 @@
 
 #include "stdafx.h"
 #include "object.h"
-#include "StagePosition.h"
 
 #define WINDOW_WID			1200
 #define WINDOW_HEI			800
 #define GROUND_POS_Y		730
 
-class PLAYER {
-public:
-	int id;					
-	short role;				
-	int x, y;				
-	int hei = 100, wid = 60;
+#ifndef STAGE_H
+#define STAGE_H
 
-	int direction;			
-	float wid_v{};
-	float wid_a{};
-
-	int ground = 730;		
-	float g = 3.f;			
-	float v = 0;			
-	short Frame = 0;		
-
-	int C_img_Frame{};
-	int C_img_x{}, C_img_y{};
-	int C_img_X_Size_01{}, C_img_Y_Size_01{};
-	int C_img_X_Size_02{}, C_img_Y_Size_02{};
-
-	bool on = true;
-	bool is_Jumping = true;
-	bool is_Push = true;
-	bool Down = true;
-
-	PLAYER() : id(-1), role('f') {}
-	~PLAYER() {
-
-	}
-};
+class Client;
 
 class Stage
 {
@@ -54,9 +26,9 @@ public:
 
 	OBJECT Ground{ WINDOW_WID / 2, WINDOW_HEI, WINDOW_WID, WINDOW_HEI - GROUND_POS_Y, 0, 0, true };
 	
-	std::queue<OBJECT> jewely;
-	std::vector<OBJECT> Trap;
-	std::vector<OBJECT> Ft;	
+	queue<OBJECT> jewely;
+	vector<OBJECT> Trap;
+	vector<OBJECT> Ft;	
 
 	OBJECT Die;		
 	OBJECT door;	
@@ -67,7 +39,7 @@ public:
 public:
 	void title() {}
 	void lobby() {}
-	void reset_position(int index, array<StagePosition, 3>& positions)
+	void reset_position(int index, array<Client, 3>* positions)
 	{
 		switch (index)
 		{
@@ -85,7 +57,9 @@ public:
 		}
 	}
 private:
-	void Stage_1(array<StagePosition, 3>& positions);
-	void Stage_2(array<StagePosition, 3>& positions);
-	void Stage_3(array<StagePosition, 3>& positions);
+	void Stage_1(array<Client, 3>* positions);
+	void Stage_2(array<Client, 3>* positions);
+	void Stage_3(array<Client, 3>* positions);
 };
+
+#endif

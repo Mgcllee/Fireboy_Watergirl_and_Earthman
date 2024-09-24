@@ -9,8 +9,9 @@
 class StageMaker
 {
 public:
-	StageMaker();
+	StageMaker(SOCKET* listen_socket);
 
+	void run_game_stage_thread(array<Client, 3>* game_member, Stage* game_stage);
 	void reset_game_stage();
 
 	void check_all_client_role();
@@ -27,9 +28,6 @@ public:
 	void show_player_score();
 
 private:
-	void run_game_stage_thread();
-
-private:
 	int stage_index;
 
 	mutex select_mutex;
@@ -43,11 +41,11 @@ private:
 	double timeoutSeconds = 50;
 
 
-	array<char, 3> playerRole = { 'f', 'f', 'f' };
-	array<char, 3> selectPlayerRole = { 'n', 'n', 'n' };
+	array<atomic<char>, 3> playerRole = { 'f', 'f', 'f' };
+	array<atomic<char>, 3> selectPlayerRole = { 'n', 'n', 'n' };
 
-	ClientAccepter client_accepter;
-	array<Client, 3> clients;
+	ClientAccepter* client_accepter;
+	array<Client, 3>* clients;
 
-	Stage stage_item;
+	Stage* stage_item;
 };

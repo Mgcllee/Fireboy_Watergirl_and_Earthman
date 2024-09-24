@@ -1,33 +1,34 @@
 #include "ClientAccepter.h"
 
-ClientAccepter::ClientAccepter(SOCKET& in_listen_socket)
+ClientAccepter::ClientAccepter(SOCKET* in_listen_socket)
 	: listen_socket(in_listen_socket) {
 
 }
 
 ClientAccepter::~ClientAccepter() {}
 
-bool ClientAccepter::accept_all_client(array<Client, 3>& clients) {	
+bool ClientAccepter::accept_all_client(array<Client, 3>* clients) {	
 	int user_ticket = 0;
-	for (Client& client : clients) {
+	for (Client& client : *clients) {
 		SOCKADDR_IN client_addr;
 		int addr_size = sizeof(client_addr);
-		client.socket = accept(
-			listen_socket, reinterpret_cast<sockaddr*>(&client_addr), &addr_size);
+		client.network_socket = accept(
+			*listen_socket, reinterpret_cast<sockaddr*>(&client_addr), &addr_size);
 
 		u_long blockingMode = 1;
-		ioctlsocket(client.socket, FIONBIO, &blockingMode);
+		ioctlsocket(client.network_socket, FIONBIO, &blockingMode);
 
 		int option = TRUE;
-		setsockopt(client.socket, IPPROTO_TCP, TCP_NODELAY,
+		setsockopt(client.network_socket, IPPROTO_TCP, TCP_NODELAY,
 			(const char*)&option, sizeof(option));
 
-		if (client.socket == INVALID_SOCKET) {
-			closesocket(client.socket);
+		if (client.network_socket == INVALID_SOCKET) {
+			closesocket(client.network_socket);
 			return false;
 		} else {
 			client.player_state = PLAYER_STATE::PLAYER_ACCEPT;
-			ClientAcceptSyncPacket::sync_send_packet(clients, user_ticket);
+			ClientAcceptSyncPacket client_accepter(clients);
+			client_accepter.sync_send_packet(&user_ticket);
 			user_ticket += 1;
 		}
 	}

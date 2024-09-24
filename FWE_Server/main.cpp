@@ -4,11 +4,13 @@
 #include "GameMaker.h"
 
 int main() {
-	NetworkSettings network_settings(INADDR_ANY, PORT_NUM);
+	NetworkSettings* network_settings = new NetworkSettings(ULONG(INADDR_ANY), USHORT(PORT_NUM));
 
-	GameMaker game_maker;
-	game_maker.run_game();
-	game_maker.cleanup_game();
+	SOCKET* listen_socket = network_settings->get_listen_socket();
+	GameMaker* game_maker = new GameMaker(listen_socket);
+	game_maker->run_game();
+	game_maker->cleanup_game();
 
+	network_settings->close_listen_socket();
 	return 0;
 }

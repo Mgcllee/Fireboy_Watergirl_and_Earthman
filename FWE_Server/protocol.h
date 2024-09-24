@@ -1,6 +1,9 @@
 // FBWG Packet information
 
-#define PORT_NUM				9000
+#pragma once
+
+#define PORT_NUM		9000
+#define MAX_BUF_SIZE	1024
 
 enum class PACKET_TYPE_S2C {
 	Loading = 0,
@@ -33,37 +36,45 @@ enum class PACKET_TYPE_C2S {
 
 struct S2CPlayerPacket {
 	char type;
+	char size;
 	char id;
 };
 
 struct S2CChangeStagePacket { 
 	char type;
-	short stageNum;
+	char size;
+	int stageNum;
 };
 
 struct C2SRolePacket {
 	char type;
+	char size;
+	char id;
 	char role;
 };
 
 struct S2CRolePacket {
 	char type;
+	char size;
 	char id;
 	char role;
 };
 
 struct MovePacket {
 	char type;
+	char size;
 	char id;
-	short x, y;
+	int x, y;
 };
 
 struct typePacket {
 	char type;
+	char size;
 };
 
 struct S2CStageTimePassPacket {
 	char type;
+	char size;
 	int timePassed;
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 class Client;
+
 class OBJECT {
 	bool On = false;			
 

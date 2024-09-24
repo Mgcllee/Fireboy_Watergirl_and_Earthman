@@ -1,5 +1,5 @@
 #include"object.h"
-#include"ThreadInfo.h"
+#include"Client.h"
 #include<iostream>
 
 bool OBJECT::Collision(Client& pl) {

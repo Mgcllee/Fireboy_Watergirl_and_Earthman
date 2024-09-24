@@ -1,29 +1,30 @@
 #pragma once
 
 #include "Stage.h"
+#include "Client.h"
 
-void Stage::Stage_1(array<StagePosition, 3>& positions) {
-	for (StagePosition& pl : positions) {
+void Stage::Stage_1(array<Client, 3> *positions) {
+	for (Client& pl : *positions) {
 		pl.isJump = false;
 	}
 
-	positions[0].x = 600;
-	positions[0].y = 730;
-	positions[0].v = 0.f;
-	positions[0].wid_v = 0.f;
-	positions[0].onBoard = Ground;
+	(*positions)[0].x = 600;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
+	(*positions)[0].onBoard = Ground;
 
-	positions[1].x = 700;
-	positions[1].y = 730;
-	positions[1].v = 0.f;
-	positions[1].wid_v = 0.f;
-	positions[1].onBoard = Ground;
+	(*positions)[1].x = 700;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
+	(*positions)[1].onBoard = Ground;
 
-	positions[2].x = 500;
-	positions[2].y = 730;
-	positions[2].v = 0.f;
-	positions[2].wid_v = 0.f;
-	positions[2].onBoard = Ground;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
+	(*positions)[2].onBoard = Ground;
 
 	Die.SetVisible(false);
 
@@ -53,31 +54,31 @@ void Stage::Stage_1(array<StagePosition, 3>& positions) {
 
 }
 
-void Stage::Stage_2(array<StagePosition, 3>& positions) {
+void Stage::Stage_2(array<Client, 3> *positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : positions)
+	for (Client& pl : (*positions))
 		pl.isJump = false;
 
-	positions[0].x = 600;
-	positions[0].y = 730;
-	positions[0].v = 0.f;
-	positions[0].wid_v = 0.f;
-	positions[0].ground = 730;
+	(*positions)[0].x = 600;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
+	(*positions)[0].ground = 730;
 
-	positions[1].x = 700;
-	positions[1].y = 730;
-	positions[1].v = 0.f;
-	positions[1].wid_v = 0.f;
-	positions[1].ground = 730;
+	(*positions)[1].x = 700;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
+	(*positions)[1].ground = 730;
 
-	positions[2].x = 500;
-	positions[2].y = 730;
-	positions[2].v = 0.f;
-	positions[2].wid_v = 0.f;
-	positions[2].ground = 730;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
+	(*positions)[2].ground = 730;
 
 	door = OBJECT{ 700, 400 - 4, 60, 100, 0, 0, TRUE };
 
@@ -101,29 +102,29 @@ void Stage::Stage_2(array<StagePosition, 3>& positions) {
 	jewely.emplace(OBJECT{ 450, 370, 28, 25, 1160, 29, TRUE });
 }
 
-void Stage::Stage_3(array<StagePosition, 3>& positions) {
+void Stage::Stage_3(array<Client, 3> *positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : positions) {
+	for (Client& pl : (*positions)) {
 		pl.isJump = false;
 	}
 
-	positions[0].x = 550;
-	positions[0].y = 730;
-	positions[0].v = 0.f;
-	positions[0].wid_v = 0.f;
+	(*positions)[0].x = 550;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
 
-	positions[1].x = 600;
-	positions[1].y = 730;
-	positions[1].v = 0.f;
-	positions[1].wid_v = 0.f;
+	(*positions)[1].x = 600;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
 
-	positions[2].x = 500;
-	positions[2].y = 730;
-	positions[2].v = 0.f;
-	positions[2].wid_v = 0.f;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
 
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
