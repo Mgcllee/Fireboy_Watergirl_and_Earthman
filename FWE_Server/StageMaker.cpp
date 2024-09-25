@@ -46,14 +46,11 @@ bool StageMaker::check_next_stage_condition() {
 }
 
 void StageMaker::check_all_client_role() {
-	select_mutex.lock();
 	for (Client& client : *clients) {
 		if (false == client.have_role()) {
-			select_mutex.unlock();
 			return;
 		}
 	}
-	select_mutex.unlock();
 
 	stage_index = STAGE_TYPE::STAGE_01;
 	if (check_next_stage_condition()) {

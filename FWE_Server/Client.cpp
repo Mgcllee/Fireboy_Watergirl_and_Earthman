@@ -18,10 +18,11 @@ void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET ac
 	packet_receiver = new PacketReceiver(clients, stage);
 
 	while (network_socket != INVALID_SOCKET) {
-		int packet_size = recv(network_socket, recv_buffer + rest_packet_size,
-			MAX_BUF_SIZE - rest_packet_size, 0);
+		// int packet_size = recv(network_socket, recv_buffer + rest_packet_size, MAX_BUF_SIZE - rest_packet_size, 0);
+		int packet_size = recv(network_socket, recv_buffer, MAX_BUF_SIZE, 0);
 
 		if (packet_size > 0) {
+			// rest_packet_size += packet_size;
 			packet_receiver->construct_packet(this, packet_size);
 		}
 	}

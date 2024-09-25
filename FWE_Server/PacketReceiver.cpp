@@ -11,19 +11,17 @@ PacketReceiver::PacketReceiver(array<Client, 3>* member, Stage* game_stage)
 }
 
 void PacketReceiver::construct_packet(Client* client, int recv_packet_size) {
-	int rest_size = recv_packet_size + client->rest_packet_size;
 	int curr_packet_size = 0;
 
 	char* recv_buufer = reinterpret_cast<char*>(client->recv_buffer);
-	while (rest_size != 0) {
+	while (recv_packet_size != 0) {
 		curr_packet_size = (recv_buufer[1]);
-		if (rest_size < curr_packet_size) {
-			client->rest_packet_size = rest_size;
+		if (recv_packet_size < curr_packet_size) {
 			return;
 		} else {
 			process_packet(recv_buufer);
-			memcpy(recv_buufer, recv_buufer + curr_packet_size, rest_size - curr_packet_size);
-			rest_size -= curr_packet_size;
+			memcpy(recv_buufer, recv_buufer + curr_packet_size, recv_packet_size - curr_packet_size);
+			recv_packet_size -= curr_packet_size;
 		}
 	}
 }
@@ -38,6 +36,7 @@ void PacketReceiver::process_packet(char* packet) {
 		}
 	case PACKET_TYPE_C2S::ChangRole: {
 		C2SChangRole change_role(clients, stage_item);
+		change_role.stage_item = stage_item;
 		change_role.recv_sync_packet(packet);
 		break;
 		}
@@ -115,7 +114,9 @@ void C2SChangRole::recv_sync_packet(void* packetStart)
 	sendPacket.type = static_cast<int>(PACKET_TYPE_S2C::ChangeRole);
 
 	for (Client& client : *clients) {
-		send(client.network_socket, reinterpret_cast<char*>(&sendPacket), sizeof(sendPacket), 0);
+		if (user_ticket != client.user_ticket) {
+			send(client.network_socket, reinterpret_cast<char*>(&sendPacket), sizeof(sendPacket), 0);
+		}
 	}
 }
 

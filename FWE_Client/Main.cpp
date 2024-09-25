@@ -187,6 +187,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			C2SRolePacket makePacket;
 			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::ChangRole);
+			makePacket.size = sizeof(C2SRolePacket);
 			//f w e
 			if (players[0].role == 'e') {
 				players[0].role = 'w';
@@ -199,7 +200,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			makePacket.role = static_cast<char>(players[0].role);
 			makePacket.id = static_cast<char>(myId);
-			SendPacket(&makePacket);
+			send(c_socket, reinterpret_cast<char*>(&makePacket), sizeof(makePacket), NULL);
+			// SendPacket(&makePacket);
 		}
 		break;
 		case BTN_RIGHT_ARROW:
@@ -207,6 +209,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//fwe
 			C2SRolePacket makePacket;
 			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::ChangRole);
+			makePacket.size = sizeof(C2SRolePacket);
 			if (players[0].role == 'e') {
 				players[0].role = 'f';
 			}
@@ -218,12 +221,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			makePacket.role = static_cast<char>(players[0].role);
 			makePacket.id = static_cast<char>(myId);
-			SendPacket(&makePacket);
+			send(c_socket, reinterpret_cast<char*>(&makePacket), sizeof(makePacket), NULL);
+			// SendPacket(&makePacket);
 		}
 		break;
 		case BTN_SELECT:
 		{
 			C2SRolePacket makePacket;
+			makePacket.size = sizeof(C2SRolePacket);
 			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::SelectRole);
 			makePacket.role = static_cast<char>(players[0].role);
 			makePacket.id = static_cast<char>(myId);
