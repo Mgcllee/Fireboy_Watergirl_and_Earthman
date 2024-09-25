@@ -6,15 +6,15 @@
 
 Client::Client()
 	: role(false)
+	, network_socket(INVALID_SOCKET)
 {
 	packet_receiver = new PacketReceiver(clients, stage_item);
 }
 
-void Client::run_client_thread(array<Client, 3>* member, Stage* stage) {
-	for (int ticket = 0; ticket < 3; ++ticket) {
-		(*clients)[ticket] = (*member)[ticket];
-	}
+void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET accepted_socket) {
+	clients = member;
 	stage_item = stage;
+	network_socket = accepted_socket;
 
 	while (network_socket != INVALID_SOCKET) {
 		int packet_size = recv(network_socket, recv_buffer + rest_packet_size,

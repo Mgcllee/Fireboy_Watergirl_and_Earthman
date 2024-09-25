@@ -14,7 +14,7 @@ class Client : public StagePosition {
 public:
 	Client();
 
-	void run_client_thread(array<Client, 3>* member, Stage* stage);
+	void run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET accepted_socket);
 
 
 	bool have_role();

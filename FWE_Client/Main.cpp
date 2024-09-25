@@ -1,9 +1,10 @@
 #pragma once
-#include"stdafx.h"
+
+#include "../FWE_Server/protocol.h"
+#include "stdafx.h"
 #include "ImageMgr.h"
 #include "StageMgr.h"
-#include "../FWE_Server/protocol.h"
-#include <string>
+
 HINSTANCE g_hInst;
 ImageMgr myImageMgr;
 StageMgr myStageMgr;
@@ -19,7 +20,7 @@ int currneClientNum = 1;
 int prevSize = 0;
 int myId = -1;
 bool doorVisible = false;
-char recvBuf[MAX_BUF_SIZE] = { 0 };
+char recvBuf[MAX_BUF_SIZE];
 static BOOL isArrow = true;
 int currentJewelyNum = 0;
 bool myCharacterOn = true;
@@ -197,6 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				players[0].role = 'e';
 			}
 			makePacket.role = static_cast<char>(players[0].role);
+			makePacket.id = static_cast<char>(myId);
 			SendPacket(&makePacket);
 		}
 		break;
@@ -215,6 +217,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				players[0].role = 'w';
 			}
 			makePacket.role = static_cast<char>(players[0].role);
+			makePacket.id = static_cast<char>(myId);
 			SendPacket(&makePacket);
 		}
 		break;
@@ -223,8 +226,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			C2SRolePacket makePacket;
 			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::SelectRole);
 			makePacket.role = static_cast<char>(players[0].role);
+			makePacket.id = static_cast<char>(myId);
 			SendPacket(&makePacket);
-
 		}
 		break;
 		case BTN_QUIT:

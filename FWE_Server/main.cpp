@@ -12,7 +12,7 @@ int main() {
 	SOCKET* listen_socket = network_settings->get_listen_socket();
 	ClientAccepter client_accepter(listen_socket);
 	while (false == client_accepter.accept_all_client(clients)) {
-		// TODO: write log
+		network_settings->reset_listen_socket();
 	}
 
 	game_maker->run_game();

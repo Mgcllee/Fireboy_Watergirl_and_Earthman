@@ -40,10 +40,6 @@ private:
 	bool gameEnd = false;
 	double timeoutSeconds = 50;
 
-
-	array<atomic<char>, 3> playerRole = { 'f', 'f', 'f' };
-	array<atomic<char>, 3> selectPlayerRole = { 'n', 'n', 'n' };
-
 	array<Client, 3>* clients;
 
 	Stage* stage_item;

@@ -57,7 +57,8 @@ ClientAcceptSyncPacket::ClientAcceptSyncPacket(array<Client, 3>* member)
 void ClientAcceptSyncPacket::sync_send_packet(void* request_client_ticket) {
 	int player_ready_counter = 0;
 	for (Client& client : *clients) {
-		if (PLAYER_STATE::PLAYER_ACCEPT == client.player_state) {
+		if (PLAYER_STATE::PLAYER_ACCEPT == client.player_state
+			&& INVALID_SOCKET != client.network_socket) {
 			player_ready_counter += 1;
 		}
 	}
@@ -74,9 +75,10 @@ void ClientAcceptSyncPacket::sync_send_packet(void* request_client_ticket) {
 	else {
 		S2CPlayerPacket packet;
 		for (Client& client : *clients) {
-			if (client.user_ticket == *reinterpret_cast<int*>(&request_client_ticket)) {
+			int recv_user_ticket = *reinterpret_cast<int*>(request_client_ticket);
+			if (client.user_ticket == recv_user_ticket) {
 				packet.type = static_cast<int>(PACKET_TYPE_S2C::Loading);
-				packet.id = *reinterpret_cast<int*>(&request_client_ticket);
+				packet.id = *reinterpret_cast<int*>(request_client_ticket);
 				send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
 			}
 			else {

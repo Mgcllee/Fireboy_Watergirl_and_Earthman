@@ -29,7 +29,8 @@ void PacketReceiver::construct_packet(Client* client, int recv_packet_size) {
 }
 
 void PacketReceiver::process_packet(char* packet) {
-	switch (static_cast<PACKET_TYPE_C2S>(packet[0])) {
+	PACKET_TYPE_C2S packet_type = static_cast<PACKET_TYPE_C2S>(packet[0]);
+	switch (packet_type) {
 	case PACKET_TYPE_C2S::SelectRole: {
 		ClientSelectRole select_role(clients, stage_item);
 		select_role.recv_sync_packet(packet);
@@ -71,21 +72,19 @@ void ClientSelectRole::recv_sync_packet(void* recv_packet)
 {
 	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(recv_packet);
 	int user_ticket = static_cast<int>(packet->id);
-	Client select_client = (*clients)[user_ticket];
 
-	// TODO: update select palyer role varialbe logic
 	bool change = true;
-	/*for (int i = 0; i < 3; i++) {
-		if (selectPlayerRole[i].load() == packet->role) {
+	for (int i = 0; i < 3; i++) {
+		if ((*stage_item->selectPlayerRole)[i].load() == packet->role) {
 			change = false;
-			selectPlayerRole[select_client.user_ticket].store(packet->role);
+			(*stage_item->selectPlayerRole)[user_ticket].store(packet->role);
 			break;
 		}
-	}*/
+	}
 	
 	if (change) {
 		S2CRolePacket sendPacket;
-		sendPacket.id = select_client.user_ticket;
+		sendPacket.id = user_ticket;
 		sendPacket.role = packet->role;
 		sendPacket.type = static_cast<int>(PACKET_TYPE_S2C::SelectRole);
 
@@ -103,10 +102,10 @@ C2SChangRole::C2SChangRole(array<Client, 3>* member, Stage* game_stage)
 void C2SChangRole::recv_sync_packet(void* packetStart)
 {
 	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
-	int user_ticket = static_cast<int>(((*clients)[packet->id]).user_ticket);
+	int user_ticket = static_cast<int>(packet->id);
 
 	// TODO: playerRole update
-	// playerRole[user_ticket].store(packet->role);
+	(*stage_item->playerRole)[user_ticket].store(packet->role);
 
 	S2CRolePacket sendPacket;
 	sendPacket.id = user_ticket;

@@ -36,6 +36,9 @@ public:
 
 	int maxJewelyNum = 0;
 
+	array<atomic<char>, 3>* playerRole;
+	array<atomic<char>, 3>* selectPlayerRole;
+
 public:
 	void title() {}
 	void lobby() {}

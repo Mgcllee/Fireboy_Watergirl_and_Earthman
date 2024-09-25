@@ -12,6 +12,8 @@ public:
 
 	SOCKET* get_listen_socket();
 
+	void reset_listen_socket();
+
 	void close_listen_socket();
 
 private:

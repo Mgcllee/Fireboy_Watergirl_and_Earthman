@@ -17,4 +17,7 @@ private:
 
 	Stage game_stage;
 	array<Client, 3> clients;
+
+	array<atomic<char>, 3> playerRole = { 'f', 'f', 'f' };
+	array<atomic<char>, 3> selectPlayerRole = { 'n', 'n', 'n' };
 };
