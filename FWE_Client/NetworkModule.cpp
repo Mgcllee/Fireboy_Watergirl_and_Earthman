@@ -44,7 +44,8 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-	switch (reinterpret_cast<char*>(buf)[0]) {
+	PACKET_TYPE_C2S packet_type = static_cast<PACKET_TYPE_C2S>(buf[0]);
+	switch (static_cast<int>(packet_type)) {
 	case static_cast<int>(PACKET_TYPE_S2C::Loading):
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);

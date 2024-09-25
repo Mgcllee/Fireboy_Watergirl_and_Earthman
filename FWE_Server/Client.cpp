@@ -8,13 +8,14 @@ Client::Client()
 	: role(false)
 	, network_socket(INVALID_SOCKET)
 {
-	packet_receiver = new PacketReceiver(clients, stage_item);
 }
 
 void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET accepted_socket) {
 	clients = member;
-	stage_item = stage;
 	network_socket = accepted_socket;
+
+	stage_item = stage;
+	packet_receiver = new PacketReceiver(clients, stage);
 
 	while (network_socket != INVALID_SOCKET) {
 		int packet_size = recv(network_socket, recv_buffer + rest_packet_size,
@@ -22,9 +23,9 @@ void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET ac
 
 		if (packet_size > 0) {
 			packet_receiver->construct_packet(this, packet_size);
-			packet_receiver->process_packet(recv_buffer);
 		}
 	}
+	printf("%d Client DONE\n", user_ticket);
 }
 
 bool Client::have_role() {

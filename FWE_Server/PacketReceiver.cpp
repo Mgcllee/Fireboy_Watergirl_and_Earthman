@@ -104,8 +104,10 @@ void C2SChangRole::recv_sync_packet(void* packetStart)
 	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(packetStart);
 	int user_ticket = static_cast<int>(packet->id);
 
+	char select_role = packet->role;
+
 	// TODO: playerRole update
-	(*stage_item->playerRole)[user_ticket].store(packet->role);
+	(*stage_item->playerRole)[user_ticket].store(select_role);
 
 	S2CRolePacket sendPacket;
 	sendPacket.id = user_ticket;

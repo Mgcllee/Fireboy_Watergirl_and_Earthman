@@ -2,7 +2,6 @@
 
 #include "Stage.h"
 #include "StagePosition.h"
-// #include "Client.h"
 
 #ifndef PACKET_RECEIVER_H
 #define PACKET_RECEIVER_H
@@ -44,4 +43,4 @@ public:
 	void recv_sync_packet(void* packet) override;
 };
 
-#endif // PACKET_RECEIVER_H
+#endif

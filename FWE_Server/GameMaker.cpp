@@ -21,10 +21,6 @@ void GameMaker::create_game_threads() {
 		client_threads[user_ticket] = thread(&Client::run_client_thread,
 			new Client, &clients, &game_stage, clients[user_ticket].network_socket);
 	}
-
-	for (thread& client_thread : client_threads) {
-		
-	}
 }
 
 void GameMaker::join_game_threads() {
