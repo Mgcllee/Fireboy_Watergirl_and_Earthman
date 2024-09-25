@@ -22,7 +22,7 @@ bool ClientAccepter::accept_all_client(array<Client, 3>* clients) {
 			*listen_socket, reinterpret_cast<sockaddr*>(&client_addr), &addr_size);
 
 		if (client.network_socket == INVALID_SOCKET) {
-			closesocket(client.network_socket);
+			// closesocket(client.network_socket);
 			return false;
 		} else {
 			u_long blockingMode = 1;

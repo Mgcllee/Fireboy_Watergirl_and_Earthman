@@ -25,7 +25,6 @@ void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET ac
 			packet_receiver->construct_packet(this, packet_size);
 		}
 	}
-	printf("%d Client DONE\n", user_ticket);
 }
 
 bool Client::have_role() {

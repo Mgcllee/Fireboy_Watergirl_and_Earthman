@@ -63,29 +63,6 @@ void ClientAcceptSyncPacket::sync_send_packet(void* request_client_ticket) {
 		}
 	}
 
-	int recv_user_ticket = *reinterpret_cast<int*>(request_client_ticket);
-	printf("recv_user_ticket: %d(%d)\n", recv_user_ticket, player_ready_counter);
-	S2CPlayerPacket packet;
-	for (Client& client : *clients) {
-		if (client.user_ticket == recv_user_ticket) {
-			packet.type = static_cast<int>(PACKET_TYPE_S2C::Loading);
-			packet.id = client.user_ticket;
-			printf("\tnew_player.id: %d\n", packet.id);
-			send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
-		}
-		else if (client.user_ticket != -1) {
-			packet.type = static_cast<char>(PACKET_TYPE_S2C::AddPlayer);
-			packet.id = client.user_ticket;
-			printf("\told_player.id: %d\n", client.user_ticket);
-
-			for (Client& sync_client : *clients) {
-				if (sync_client.user_ticket != client.user_ticket) {
-					send(sync_client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
-				}
-			}
-		}
-	}
-
 	if (player_ready_counter == 3) {
 		S2CChangeStagePacket packet;
 		packet.stageNum = STAGE_TYPE::STAGE_ROLE;
@@ -93,6 +70,32 @@ void ClientAcceptSyncPacket::sync_send_packet(void* request_client_ticket) {
 
 		for (Client& client : *clients) {
 			send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
+		}
+	}
+	else {
+		int recv_user_ticket = *reinterpret_cast<int*>(request_client_ticket);
+		S2CPlayerPacket packet;
+		for (Client& client : *clients) {
+			if (client.user_ticket == recv_user_ticket) {
+				packet.type = static_cast<char>(PACKET_TYPE_S2C::Loading);
+				packet.id = recv_user_ticket;
+				send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
+
+				for (Client& old_client : *clients) {
+					if ((old_client.network_socket != INVALID_SOCKET)
+						&& (old_client.user_ticket != recv_user_ticket)) {
+						packet.type = static_cast<char>(PACKET_TYPE_S2C::AddPlayer);
+						packet.id = old_client.user_ticket;
+						
+						send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
+					}
+				}
+			}
+			else if (client.network_socket != INVALID_SOCKET) {
+				packet.type = static_cast<char>(PACKET_TYPE_S2C::AddPlayer);
+				packet.id = recv_user_ticket;
+				send(client.network_socket, reinterpret_cast<const char*>(&packet), sizeof(packet), 0);
+			}
 		}
 	}
 }
