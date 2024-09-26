@@ -136,7 +136,8 @@ void C2SMove::recv_sync_packet(void* position_packet)
 	else if (packet->y == SHRT_MIN) {
 		client_pos.direction = DIRECTION::NONE;
 		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
-		client_pos.wid_v = 0;
+		client_pos.wid_a = 0.f;
+		client_pos.wid_v = 0.f;
 	}
 	else if (packet->x == 1) {
 		if (client_pos.wid_a <= 10.f)
@@ -154,7 +155,7 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 
 		if (client_pos.wid_v != 0) {
-			client_pos.x += static_cast<int>(client_pos.wid_v * 20.0f);
+			client_pos.x += static_cast<int>(client_pos.wid_v);
 		}
 
 		if (client_pos.x + 5 >= WINDOW_WID) {
@@ -183,7 +184,7 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 
 		if (client_pos.wid_v != 0) {
-			client_pos.x -= static_cast<int>(client_pos.wid_v) * 20.0f;
+			client_pos.x -= static_cast<int>(client_pos.wid_v);
 		}
 
 		if (client_pos.x - 55 < 0) {
