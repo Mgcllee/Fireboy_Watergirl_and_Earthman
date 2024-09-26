@@ -121,6 +121,10 @@ C2SMove::C2SMove(array<Client, 3>* member, Stage* game_stage)
 
 void C2SMove::recv_sync_packet(void* position_packet)
 {
+	while (false) {
+
+	}
+
 	MovePacket* packet = reinterpret_cast<MovePacket*>(position_packet);
 	Client& client_pos = (*clients)[packet->id];
 	short prevPosX = client_pos.x;
@@ -132,6 +136,7 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
 		client_pos.v = 0.f;
 		client_pos.isJump = true;
+		failling_interpolation(client_pos);
 	}
 	else if (packet->y == SHRT_MIN) {
 		client_pos.direction = DIRECTION::NONE;
@@ -200,5 +205,126 @@ void C2SMove::recv_sync_packet(void* position_packet)
 
 	for (Client& client : *clients) {
 		send(client.network_socket, reinterpret_cast<char*>(&send_packet), sizeof(send_packet), 0);
+	}
+}
+
+
+void C2SMove::failling_interpolation(Client& client) {
+	for (Client& client : *clients) {
+		if (false == client.Falling && client.onBoard.FT_Collide_Fall(client)) {
+			client.isJump = true;
+			client.Falling = true;
+			client.jumpStartTime = high_resolution_clock::now();
+			client.jumpCurrentTime = high_resolution_clock::now();
+		}
+
+		if (!client.isJump) {
+			client.isJump = true;
+			client.jumpStartTime = high_resolution_clock::now();
+			client.jumpCurrentTime = high_resolution_clock::now();
+			client.v = 0.f;
+			client.y = client.ground;
+		}
+
+		auto startDuration = high_resolution_clock::now() - client.jumpStartTime;
+		auto currentDuration = high_resolution_clock::now() - client.jumpCurrentTime;
+		MovePacket mPacket;
+		mPacket.id = client.user_ticket;
+		mPacket.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
+
+		if (client.Falling || duration_cast<milliseconds>(startDuration).count() > 270) {
+			if (client.v < FLT_EPSILON)
+				client.v = 0.f;
+
+			if (duration_cast<milliseconds>(currentDuration).count() > 30) {
+				int prevPosX = client.x;
+				if (client.direction == DIRECTION::LEFT) {
+					if ((client.x - static_cast<int>(client.wid_v) < WINDOW_WID - client.wid)
+						&& (client.x - static_cast<int>(client.wid_v) > client.wid))
+						client.x -= static_cast<int>(client.wid_v);
+					else
+						client.x += static_cast<int>(client.wid_v);
+				}
+				else if (client.direction == DIRECTION::RIGHT) {
+					if ((client.x + static_cast<int>(client.wid_v) < WINDOW_WID - client.wid / 2)
+						&& (client.x + static_cast<int>(client.wid_v) > client.wid))
+						client.x += static_cast<int>(client.wid_v);
+					else
+						client.x -= static_cast<int>(client.wid_v);
+				}
+
+				if (client.x + 5 >= WINDOW_WID)
+					client.x = prevPosX;
+				if (client.x - 55 < 0)
+					client.x = prevPosX;
+				mPacket.x = client.x;
+
+				mPacket.x = client.x;
+				client.v += client.g;
+				client.y += static_cast<int>(client.v);
+
+				for (OBJECT& ft : (*stage_item).Ft) {
+					if (ft.Ft_Collision(client)) {
+						client.direction = DIRECTION::NONE;
+						client.v = 0.f;
+						client.isJump = false;
+						client.Falling = false;
+						client.onBoard = ft;
+						client.y = client.ground = ft.y - ft.hei;
+						mPacket.type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
+						break;
+					}
+				}
+				mPacket.y = client.y;
+				client.jumpCurrentTime = high_resolution_clock::now();
+
+				for (Client& send_client : *clients) {
+					send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+				}
+			}
+		}
+		else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !client.Falling) {
+			int prevPosX = client.x;
+			if (client.direction == DIRECTION::LEFT) {
+				if ((client.x - static_cast<int>(client.wid_v) < WINDOW_WID - client.wid)
+					&& (client.x - static_cast<int>(client.wid_v) > client.wid))
+					client.x -= static_cast<int>(client.wid_v);
+				else
+					client.x += static_cast<int>(client.wid_v);
+			}
+			else if (client.direction == DIRECTION::RIGHT) {
+				if ((client.x + static_cast<int>(client.wid_v) < WINDOW_WID - client.wid / 2)
+					&& (client.x + static_cast<int>(client.wid_v) > client.wid))
+					client.x += static_cast<int>(client.wid_v);
+				else
+					client.x -= static_cast<int>(client.wid_v);
+			}
+
+			if (client.x + 5 >= WINDOW_WID)
+				client.x = prevPosX;
+			if (client.x - 55 < 0)
+				client.x = prevPosX;
+			mPacket.x = client.x;
+
+			client.v -= client.g;
+			client.y += int(1.3f * client.v);
+
+			for (OBJECT& ft : (*stage_item).Ft) {
+				if ((ft.y < client.y) && ft.Collision(client)) {
+					client.y -= int(1.3f * client.v);
+
+					client.v = 0.f;
+					client.y += ft.hei;
+					client.Falling = true;
+					break;
+				}
+			}
+
+			mPacket.y = client.y;
+			client.jumpCurrentTime = high_resolution_clock::now();
+			for (Client& send_client : *clients) {
+				send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+			}
+		}
 	}
 }

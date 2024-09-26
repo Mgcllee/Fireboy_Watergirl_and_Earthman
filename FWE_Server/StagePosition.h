@@ -26,9 +26,6 @@ public:
 	float g = 4.5f;
 	float v = 0.f;
 
-	HANDLE jumpEventHandle = NULL;
-	HANDLE intDoor = NULL;
-
 	OBJECT onBoard;
 	bool isJump = false;
 	bool isArrive = true;

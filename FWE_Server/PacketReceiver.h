@@ -41,6 +41,8 @@ public:
 	C2SMove(array<Client, 3>* member, Stage* game_stage);
 
 	void recv_sync_packet(void* packet) override;
+
+	void failling_interpolation(Client& client_pos);
 };
 
 #endif

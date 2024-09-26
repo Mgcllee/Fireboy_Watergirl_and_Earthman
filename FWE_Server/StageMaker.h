@@ -19,13 +19,14 @@ public:
 	
 	bool check_door();
 	bool check_jewely();
-	void move_interpolation();
 
 	void cleanup_game();
 
 	bool check_next_stage_condition();
 
 	void show_player_score();
+
+	void sync_jump();
 
 private:
 	int stage_index;
