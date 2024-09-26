@@ -121,10 +121,6 @@ C2SMove::C2SMove(array<Client, 3>* member, Stage* game_stage)
 
 void C2SMove::recv_sync_packet(void* position_packet)
 {
-	while (false) {
-
-	}
-
 	MovePacket* packet = reinterpret_cast<MovePacket*>(position_packet);
 	Client& client_pos = (*clients)[packet->id];
 	short prevPosX = client_pos.x;
@@ -133,6 +129,10 @@ void C2SMove::recv_sync_packet(void* position_packet)
 	send_packet.size = sizeof(MovePacket);
 
 	if (packet->y == SHRT_MAX) {
+		if (client_pos.isJump || client_pos.Falling) {
+			return;
+		}
+
 		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
 		client_pos.v = 0.f;
 		client_pos.isJump = true;
@@ -169,6 +169,14 @@ void C2SMove::recv_sync_packet(void* position_packet)
 
 		client_pos.direction = DIRECTION::RIGHT;
 		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT);
+
+		if (false == client_pos.Falling && client_pos.onBoard.FT_Collide_Fall(client_pos)) {
+			client_pos.isJump = false;
+			client_pos.Falling = true;
+			client_pos.jumpStartTime = high_resolution_clock::now();
+			client_pos.jumpCurrentTime = high_resolution_clock::now();
+			failling_interpolation(client_pos);
+		}
 	}
 	else if (packet->x == -1) {
 		if (client_pos.wid_a <= 10.f) {
@@ -197,6 +205,14 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 		client_pos.direction = DIRECTION::LEFT;
 		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_LEFT);
+
+		if (false == client_pos.Falling && client_pos.onBoard.FT_Collide_Fall(client_pos)) {
+			client_pos.isJump = false;
+			client_pos.Falling = true;
+			client_pos.jumpStartTime = high_resolution_clock::now();
+			client_pos.jumpCurrentTime = high_resolution_clock::now();
+			failling_interpolation(client_pos);
+		}
 	}
 
 	send_packet.id = client_pos.user_ticket;
@@ -210,27 +226,24 @@ void C2SMove::recv_sync_packet(void* position_packet)
 
 
 void C2SMove::failling_interpolation(Client& client) {
-	for (Client& client : *clients) {
-		if (false == client.Falling && client.onBoard.FT_Collide_Fall(client)) {
-			client.isJump = true;
-			client.Falling = true;
-			client.jumpStartTime = high_resolution_clock::now();
-			client.jumpCurrentTime = high_resolution_clock::now();
-		}
+	client.jumpStartTime = high_resolution_clock::now();
+	client.jumpCurrentTime = high_resolution_clock::now();
 
-		if (!client.isJump) {
-			client.isJump = true;
-			client.jumpStartTime = high_resolution_clock::now();
-			client.jumpCurrentTime = high_resolution_clock::now();
-			client.v = 0.f;
+	MovePacket mPacket;
+	mPacket.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
+	mPacket.size = sizeof(MovePacket);
+	mPacket.id = client.user_ticket;
+
+	while (true) {
+		if (false == client.Falling && false == client.isJump) {
+			client.isJump = false;
+			client.Falling = false;
 			client.y = client.ground;
+			break;
 		}
 
 		auto startDuration = high_resolution_clock::now() - client.jumpStartTime;
 		auto currentDuration = high_resolution_clock::now() - client.jumpCurrentTime;
-		MovePacket mPacket;
-		mPacket.id = client.user_ticket;
-		mPacket.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
 
 		if (client.Falling || duration_cast<milliseconds>(startDuration).count() > 270) {
 			if (client.v < FLT_EPSILON)
@@ -257,9 +270,7 @@ void C2SMove::failling_interpolation(Client& client) {
 					client.x = prevPosX;
 				if (client.x - 55 < 0)
 					client.x = prevPosX;
-				mPacket.x = client.x;
 
-				mPacket.x = client.x;
 				client.v += client.g;
 				client.y += static_cast<int>(client.v);
 
@@ -275,9 +286,10 @@ void C2SMove::failling_interpolation(Client& client) {
 						break;
 					}
 				}
-				mPacket.y = client.y;
 				client.jumpCurrentTime = high_resolution_clock::now();
 
+				mPacket.x = client.x;
+				mPacket.y = client.y;
 				for (Client& send_client : *clients) {
 					send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 				}
@@ -285,6 +297,7 @@ void C2SMove::failling_interpolation(Client& client) {
 		}
 		else if (duration_cast<milliseconds>(currentDuration).count() > 30 && !client.Falling) {
 			int prevPosX = client.x;
+
 			if (client.direction == DIRECTION::LEFT) {
 				if ((client.x - static_cast<int>(client.wid_v) < WINDOW_WID - client.wid)
 					&& (client.x - static_cast<int>(client.wid_v) > client.wid))
@@ -304,10 +317,9 @@ void C2SMove::failling_interpolation(Client& client) {
 				client.x = prevPosX;
 			if (client.x - 55 < 0)
 				client.x = prevPosX;
-			mPacket.x = client.x;
 
 			client.v -= client.g;
-			client.y += int(1.3f * client.v);
+			client.y += (1.3f * client.v);
 
 			for (OBJECT& ft : (*stage_item).Ft) {
 				if ((ft.y < client.y) && ft.Collision(client)) {
@@ -320,8 +332,10 @@ void C2SMove::failling_interpolation(Client& client) {
 				}
 			}
 
-			mPacket.y = client.y;
 			client.jumpCurrentTime = high_resolution_clock::now();
+
+			mPacket.x = client.x;
+			mPacket.y = client.y;
 			for (Client& send_client : *clients) {
 				send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 			}

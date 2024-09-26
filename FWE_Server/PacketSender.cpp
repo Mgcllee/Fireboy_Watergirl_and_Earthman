@@ -39,7 +39,8 @@ ClientMovePacket::ClientMovePacket(array<Client, 3>* member)
 void ClientMovePacket::sync_send_packet(void* next_position) {
 	for (Client& client : *clients) {
 		MovePacket setPosition;
-		setPosition.type = static_cast<int>(PACKET_TYPE_S2C::Move_LEFT);
+		setPosition.type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
+		setPosition.size = sizeof(MovePacket);
 		setPosition.id = client.user_ticket;
 		setPosition.x = client.x;
 		setPosition.y = client.y;

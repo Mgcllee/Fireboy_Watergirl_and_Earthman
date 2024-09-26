@@ -69,8 +69,8 @@ void StageMaker::show_game_stage(int stage_number) {
 
 	stage_item->reset_position(stage_index, clients);
 	
-	/*ClientMovePacket move(clients);
-	move.sync_send_packet(NULL);*/
+	ClientMovePacket move(clients);
+	move.sync_send_packet(NULL);
 }
 
 void StageMaker::reset_game_stage() {
