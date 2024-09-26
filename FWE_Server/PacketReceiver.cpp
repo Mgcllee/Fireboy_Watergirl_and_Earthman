@@ -73,20 +73,13 @@ void ClientSelectRole::recv_sync_packet(void* recv_packet)
 	C2SRolePacket* packet = reinterpret_cast<C2SRolePacket*>(recv_packet);
 	int user_ticket = static_cast<int>(packet->id);
 
-	bool change = true;
-	for (int i = 0; i < 3; i++) {
-		if ((*stage_item->selectPlayerRole)[i].load() == packet->role) {
-			change = false;
-			(*stage_item->selectPlayerRole)[user_ticket].store(packet->role);
-			break;
-		}
-	}
-	
-	if (change) {
+	if ((*stage_item->playerRole)[user_ticket].load() == packet->role) {
 		S2CRolePacket sendPacket;
 		sendPacket.id = user_ticket;
 		sendPacket.role = packet->role;
 		sendPacket.type = static_cast<int>(PACKET_TYPE_S2C::SelectRole);
+
+		(*clients)[user_ticket].role = true;
 
 		for (Client& client : *clients) {
 			send(client.network_socket, reinterpret_cast<char*>(&sendPacket), sizeof(S2CRolePacket), 0);

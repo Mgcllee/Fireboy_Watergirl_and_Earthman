@@ -47,7 +47,7 @@ bool StageMaker::check_next_stage_condition() {
 
 void StageMaker::check_all_client_role() {
 	for (Client& client : *clients) {
-		if (false == client.have_role()) {
+		if (false == client.role) {
 			return;
 		}
 	}
