@@ -13,35 +13,38 @@ void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* gam
 	while (stage_index == STAGE_TYPE::STAGE_ROLE) {
 		check_all_client_role();
 	}
-
+	
 	while (true) {
-		if (check_next_stage_condition()) {
+		/*if (check_next_stage_condition()) {
 			show_game_stage(stage_index);
 
 			if (stage_index == STAGE_TYPE::STAGE_TITLE) {
 				break;
 			}
 			reset_game_stage();
-		}
+		}*/
 
-		move_interpolation();
-		
+		// move_interpolation();
+
 		check_jewely();
 		check_door();
+
 	}
 
 	cleanup_game();
 }
 
 bool StageMaker::check_next_stage_condition() {
-	select_mutex.lock();
+	return true;
+
+	//select_mutex.lock();
 	for (Client& client : *clients) {
 		if (stage_index == client.get_curr_stage()) {
-			select_mutex.unlock();
+			//select_mutex.unlock();
 			return false;
 		}
 	}
-	select_mutex.unlock();
+	//select_mutex.unlock();
 	return true;
 }
 
@@ -61,20 +64,13 @@ void StageMaker::check_all_client_role() {
 void StageMaker::show_game_stage(int stage_number) {
 	reset_game_stage();
 
-	if (stage_index != STAGE_TYPE::RESULT) {
-		stage_index += 1;
-	}
-	else {
-		stage_index = STAGE_TYPE::STAGE_TITLE;
-	}
-
 	StageUpdatePacket stage_update(clients); 
 	stage_update.sync_send_packet(&stage_index);
 
 	stage_item->reset_position(stage_index, clients);
 	
-	ClientMovePacket move(clients);
-	move.sync_send_packet(NULL);
+	/*ClientMovePacket move(clients);
+	move.sync_send_packet(NULL);*/
 }
 
 void StageMaker::reset_game_stage() {
@@ -137,24 +133,27 @@ bool StageMaker::check_door() {
 				}
 			}
 		}
-		
 	}
 
+	// check next stage 
+	if (stage_index != STAGE_TYPE::RESULT) {
+		stage_index += 1;
+	}
+	else {
+		stage_index = STAGE_TYPE::STAGE_TITLE;
+	}
 }
 
 void StageMaker::move_interpolation() {
 	for (Client& client : *clients) {
-		if (false == client.Falling
-			&& client.onBoard.FT_Collide_Fall(client)) {
+		if (false == client.Falling && client.onBoard.FT_Collide_Fall(client)) {
 			client.isJump = true;
 			client.Falling = true;
 			client.jumpStartTime = high_resolution_clock::now();
 			client.jumpCurrentTime = high_resolution_clock::now();
 		}
-
-
 	}
-
+	
 	for(Client& client : *clients) {
 		if (!client.isJump) {
 			client.isJump = true;
@@ -217,8 +216,9 @@ void StageMaker::move_interpolation() {
 				}
 				mPacket.y = client.y;
 				client.jumpCurrentTime = high_resolution_clock::now();
-				for (int j = 0; j < 3; j++) {
-					send(client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+				
+				for(Client& send_client : *clients ) {
+					send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 				}
 			}
 		}
@@ -261,8 +261,8 @@ void StageMaker::move_interpolation() {
 
 			mPacket.y = client.y;
 			client.jumpCurrentTime = high_resolution_clock::now();
-			for (int j = 0; j < 3; j++) {
-				send(client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
+			for (Client& send_client : *clients) {
+				send(send_client.network_socket, reinterpret_cast<char*>(&mPacket), sizeof(MovePacket), 0);
 			}
 		}
 	}

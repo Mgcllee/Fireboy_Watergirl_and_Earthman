@@ -125,13 +125,17 @@ void C2SMove::recv_sync_packet(void* position_packet)
 	Client& client_pos = (*clients)[packet->id];
 	short prevPosX = client_pos.x;
 	
+	MovePacket send_packet;
+	send_packet.size = sizeof(MovePacket);
+
 	if (packet->y == SHRT_MAX) {
-		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
+		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_JUMP);
 		client_pos.v = 0.f;
+		client_pos.isJump = true;
 	}
 	else if (packet->y == SHRT_MIN) {
 		client_pos.direction = DIRECTION::NONE;
-		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
+		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_IDLE);
 		client_pos.wid_v = 0;
 	}
 	else if (packet->x == 1) {
@@ -150,7 +154,7 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 
 		if (client_pos.wid_v != 0) {
-			client_pos.x += static_cast<int>(client_pos.wid_v);
+			client_pos.x += static_cast<int>(client_pos.wid_v * 20.0f);
 		}
 
 		if (client_pos.x + 5 >= WINDOW_WID) {
@@ -158,7 +162,7 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 
 		client_pos.direction = DIRECTION::RIGHT;
-		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT);
+		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT);
 	}
 	else if (packet->x == -1) {
 		if (client_pos.wid_a <= 10.f) {
@@ -179,20 +183,21 @@ void C2SMove::recv_sync_packet(void* position_packet)
 		}
 
 		if (client_pos.wid_v != 0) {
-			client_pos.x -= static_cast<int>(client_pos.wid_v);
+			client_pos.x -= static_cast<int>(client_pos.wid_v) * 20.0f;
 		}
 
 		if (client_pos.x - 55 < 0) {
 			client_pos.x = prevPosX;
 		}
 		client_pos.direction = DIRECTION::LEFT;
-		packet->type = static_cast<int>(PACKET_TYPE_S2C::Move_LEFT);
+		send_packet.type = static_cast<int>(PACKET_TYPE_S2C::Move_LEFT);
 	}
 
-	packet->x = client_pos.x;
-	packet->y = client_pos.y;
+	send_packet.id = client_pos.user_ticket;
+	send_packet.x = client_pos.x;
+	send_packet.y = client_pos.y;
 
 	for (Client& client : *clients) {
-		send(client.network_socket, reinterpret_cast<char*>(packet), sizeof(packet), 0);
+		send(client.network_socket, reinterpret_cast<char*>(&send_packet), sizeof(send_packet), 0);
 	}
 }
