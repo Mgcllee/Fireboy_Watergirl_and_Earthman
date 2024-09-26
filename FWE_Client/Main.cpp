@@ -232,7 +232,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			makePacket.type = static_cast<int>(PACKET_TYPE_C2S::SelectRole);
 			makePacket.role = static_cast<char>(players[0].role);
 			makePacket.id = static_cast<char>(myId);
-			SendPacket(&makePacket);
+			send(c_socket, reinterpret_cast<char*>(&makePacket), sizeof(makePacket), NULL);
+			// SendPacket(&makePacket);
 		}
 		break;
 		case BTN_QUIT:

@@ -31,6 +31,7 @@ void PacketReceiver::process_packet(char* packet) {
 	switch (packet_type) {
 	case PACKET_TYPE_C2S::SelectRole: {
 		ClientSelectRole select_role(clients, stage_item);
+		select_role.stage_item = stage_item;
 		select_role.recv_sync_packet(packet);
 		break;
 		}
