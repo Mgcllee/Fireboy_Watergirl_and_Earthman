@@ -22,8 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{43bd7d28-2277-4f9b-9714-81461b52392e}</ProjectGuid>
-    <RootNamespace>FBWGServer</RootNamespace>
+    <RootNamespace>FWEServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>FWE_Server</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -127,17 +128,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientAccepter.cpp" />
+    <ClCompile Include="GameMaker.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NetworkSettings.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="PacketReceiver.cpp" />
+    <ClCompile Include="PacketWorker.cpp" />
+    <ClCompile Include="ServerSettings.cpp" />
+    <ClCompile Include="PacketSender.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="StageMaker.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientAccepter.h" />
+    <ClInclude Include="GameMaker.h" />
+    <ClInclude Include="NetworkSettings.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="PacketReceiver.h" />
+    <ClInclude Include="PacketWorker.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="ServerSettings.h" />
+    <ClInclude Include="PacketSender.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="StageMaker.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="ThreadInfo.h" />
+    <ClInclude Include="StagePosition.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

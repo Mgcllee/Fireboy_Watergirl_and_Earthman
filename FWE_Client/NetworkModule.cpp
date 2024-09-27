@@ -1,7 +1,7 @@
 #pragma once
 #include<WS2tcpip.h>
 #include "stdafx.h"
-#include "../FBWG_Server/protocol.h"
+#include "../FWE_Server/protocol.h"
 #include "StageMgr.h"
 
 bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
@@ -16,7 +16,7 @@ bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 	server_addr.sin_port = htons(PORT_NUM);
 	inet_pton(AF_INET, SERVER_ADDR.c_str(), &server_addr.sin_addr);
 
-
+	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (connect(c_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		int aa = WSAGetLastError();
 		if (aa != 0) {
@@ -44,16 +44,22 @@ void ProcessPacket(char* buf)
 {
 	if (buf == nullptr)
 		return;
-	switch (reinterpret_cast<char*>(buf)[0]) {
-	case S2CLoading:
+	PACKET_TYPE_C2S packet_type = static_cast<PACKET_TYPE_C2S>(buf[0]);
+	switch (static_cast<int>(packet_type)) {
+	case static_cast<int>(PACKET_TYPE_S2C::Loading):
 	{
+		currneClientNum = 1;
+		for (int ticket = 0; ticket < 3; ++ticket) {
+			players[ticket] = PLAYER();
+		}
+
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		myId = packet->id;
 		players[0].id = myId;
 		SetEvent(changeStageEvent);
 	}
 	break;
-	case S2CAddPlayer:
+	case static_cast<int>(PACKET_TYPE_S2C::AddPlayer):
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		for (int i = 1; i < 3; i++)
@@ -64,7 +70,7 @@ void ProcessPacket(char* buf)
 		currneClientNum++;
 	}
 	break;
-	case S2CSelectRole:
+	case static_cast<int>(PACKET_TYPE_S2C::SelectRole):
 	{
 		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
 		for (int i = 0; i < 3; i++)
@@ -114,7 +120,7 @@ void ProcessPacket(char* buf)
 
 	}
 	break;
-	case S2CChangeRole:
+	case static_cast<int>(PACKET_TYPE_S2C::ChangeRole):
 	{
 		S2CRolePacket* packet = reinterpret_cast<S2CRolePacket*>(buf);
 		for (int i = 0; i < 3; i++)
@@ -124,7 +130,7 @@ void ProcessPacket(char* buf)
 			}
 	}
 	break;
-	case S2CMove_IDLE:
+	case static_cast<int>(PACKET_TYPE_S2C::Move_IDLE):
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
@@ -142,7 +148,7 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CMove_JUMP:
+	case static_cast<int>(PACKET_TYPE_S2C::Move_JUMP):
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
@@ -155,7 +161,7 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CMove_LEFT:
+	case static_cast<int>(PACKET_TYPE_S2C::Move_LEFT):
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
@@ -168,7 +174,7 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CMove_RIGHT:
+	case static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT):
 	{
 		MovePacket* packet = reinterpret_cast<MovePacket*>(buf);
 		for (int i = 0; i < 3; ++i) {
@@ -181,13 +187,13 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CEndout:
+	case static_cast<int>(PACKET_TYPE_S2C::Endout):
 	{
 		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		exit(1);
 		break;
 	}
-	case S2CChangeStage:
+	case static_cast<int>(PACKET_TYPE_S2C::ChangeStage):
 	{
 		S2CChangeStagePacket* packet = reinterpret_cast<S2CChangeStagePacket*>(buf);
 		stageIndex = packet->stageNum;
@@ -200,23 +206,23 @@ void ProcessPacket(char* buf)
 		doorVisible = false;
 		break;
 	}
-	case S2CStageTimePass:
+	case static_cast<int>(PACKET_TYPE_S2C::StageTimePass):
 	{
 		S2CStageTimePassPacket* packet = reinterpret_cast<S2CStageTimePassPacket*>(buf);
 		StageMgr::StageTimepass = packet->timePassed;
 
 	}
 	break;
-	case S2CStageTimeout:
+	case static_cast<int>(PACKET_TYPE_S2C::StageTimeout):
 	{
 		typePacket* packet = reinterpret_cast<typePacket*>(buf);
 		StageMgr::IsTimeoutStageEnd = true;
 	}
 	break;
-	case S2CDoorVisible:
+	case static_cast<int>(PACKET_TYPE_S2C::DoorVisible):
 		doorVisible = true;
 		break;
-	case S2CIntoDoor:
+	case static_cast<int>(PACKET_TYPE_S2C::IntoDoor):
 	{
 		//Client Into Door = true; => PlayerInfo에서 bool넣어서 판단하고 애니메이션 해서 비지블 관리
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
@@ -229,7 +235,7 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CEatJewely:
+	case static_cast<int>(PACKET_TYPE_S2C::EatJewely):
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		for (int i = 0; i < 3; i++) {
@@ -245,7 +251,7 @@ void ProcessPacket(char* buf)
 		}
 	}
 	break;
-	case S2CPlayerOut:
+	case static_cast<int>(PACKET_TYPE_S2C::PlayerOut):
 	{
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		for (int i = 0; i < 3; i++) {
@@ -271,22 +277,22 @@ void SendPacket(void* buf)
 	char* packet = nullptr;
 	int size = 0;
 	switch (reinterpret_cast<char*>(buf)[0]) {
-	case C2SSelectRole:
+	case static_cast<int>(PACKET_TYPE_C2S::SelectRole):
 		size = sizeof(C2SRolePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
 		break;
-	case C2SChangRole:
+	case static_cast<int>(PACKET_TYPE_C2S::ChangRole):
 		size = sizeof(C2SRolePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
 		break;
-	case C2SMove:
+	case static_cast<int>(PACKET_TYPE_C2S::Move):
 		size = sizeof(MovePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
 		break;
-	case C2SEndout:
+	case static_cast<int>(PACKET_TYPE_C2S::Endout):
 		size = sizeof(typePacket);
 		packet = new char[size];
 		memcpy(packet, buf, size);
@@ -300,7 +306,7 @@ void SendPacket(void* buf)
 	if (packet != nullptr) {
 		send(c_socket, packet, size, NULL);
 		delete[] packet;
-		if (reinterpret_cast<char*>(buf)[0] == C2SEndout)
+		if (reinterpret_cast<char*>(buf)[0] == static_cast<int>(PACKET_TYPE_C2S::Endout))
 		{
 			exit(1);
 		}
@@ -342,34 +348,34 @@ int GetPacketSize(char packetType)
 	int retVal = -1;
 	switch (packetType)
 	{
-	case S2CLoading:
-	case S2CAddPlayer:
-	case S2CIntoDoor:
-	case S2CEatJewely:
-	case S2CPlayerOut:
+	case static_cast<int>(PACKET_TYPE_S2C::Loading):
+	case static_cast<int>(PACKET_TYPE_S2C::AddPlayer):
+	case static_cast<int>(PACKET_TYPE_S2C::IntoDoor):
+	case static_cast<int>(PACKET_TYPE_S2C::EatJewely):
+	case static_cast<int>(PACKET_TYPE_S2C::PlayerOut):
 		retVal = sizeof(S2CPlayerPacket);
 		break;
-	case S2CChangeRole:
-	case S2CSelectRole:
+	case static_cast<int>(PACKET_TYPE_S2C::ChangeRole):
+	case static_cast<int>(PACKET_TYPE_S2C::SelectRole):
 		retVal = sizeof(S2CRolePacket);
 		break;
-	case S2CChangeStage:
+	case static_cast<int>(PACKET_TYPE_S2C::ChangeStage):
 		retVal = sizeof(S2CChangeStagePacket);
 		break;
-	case S2CStageTimePass:
+	case static_cast<int>(PACKET_TYPE_S2C::StageTimePass):
 		retVal = sizeof(S2CStageTimePassPacket);
 		break;
-	case S2CStageTimeout:
+	case static_cast<int>(PACKET_TYPE_S2C::StageTimeout):
 		retVal = sizeof(typePacket);
 		break;
-	case S2CMove_IDLE:
-	case S2CMove_JUMP:
-	case S2CMove_LEFT:
-	case S2CMove_RIGHT:
+	case static_cast<int>(PACKET_TYPE_S2C::Move_IDLE):
+	case static_cast<int>(PACKET_TYPE_S2C::Move_JUMP):
+	case static_cast<int>(PACKET_TYPE_S2C::Move_LEFT):
+	case static_cast<int>(PACKET_TYPE_S2C::Move_RIGHT):
 		retVal = sizeof(MovePacket);
 		break;
-	case S2CDoorVisible:
-	case S2CEndout:
+	case static_cast<int>(PACKET_TYPE_S2C::DoorVisible):
+	case static_cast<int>(PACKET_TYPE_S2C::Endout):
 		retVal = sizeof(typePacket);
 		break;
 	default:

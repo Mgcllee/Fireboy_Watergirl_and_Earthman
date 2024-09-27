@@ -1,13 +1,17 @@
 #pragma once
+
+#include "Stage.h"
+#include "Object.h"
+#include "Player.h"
+
+#include <iostream>
+#include <string>
 #include <tchar.h>
-#include"Stage.h"
-#include"Object.h"
-#include"Player.h"
-#include<iostream>
+
 #pragma comment(lib,"winmm.lib")
 #pragma comment (lib, "msimg32.lib")
 
-#define MAX_BUF_SIZE		256
+// #define MAX_BUF_SIZE		256
 
 #define BTN_START			100
 #define BTN_RESTART			200
@@ -49,7 +53,6 @@ extern HWND	g_hWnd;
 extern MCI_PLAY_PARMS	mciPlayParms;
 extern BOOL				keybuffer[256];
 extern int currneClientNum;
-extern char recvBuf[MAX_BUF_SIZE];
 extern int prevSize;
 extern int myId;
 extern int stageIndex;

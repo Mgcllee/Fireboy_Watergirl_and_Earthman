@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "../FBWG_Server/protocol.h"
+#include "../FWE_Server/protocol.h"
 #include "Stage.h"
 
 void Move()
@@ -10,7 +10,8 @@ void Move()
 	}
 	
 	MovePacket move;
-	move.type = C2SMove;
+	move.type = static_cast<int>(PACKET_TYPE_C2S::Move);
+	move.size = sizeof(MovePacket);
 	move.id = myId;
 
 	if (keybuffer[VK_UP]) {
@@ -38,6 +39,8 @@ void Move()
 		SetEvent(idleStateEvent);
 		move.y = SHRT_MIN;
 	}
-	SendPacket(&move);
+
+	send(c_socket, reinterpret_cast<char*>(&move), sizeof(move), 0);
+	// SendPacket(&move);
 
 }

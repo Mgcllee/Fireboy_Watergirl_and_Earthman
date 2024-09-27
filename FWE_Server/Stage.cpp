@@ -1,25 +1,30 @@
 #pragma once
-#include "stdafx.h"
+
 #include "Stage.h"
+#include "Client.h"
 
-void Stage::Stage_1() {
-	for (ThreadInfo& pl : threadHandles)
+void Stage::Stage_1(array<Client, 3> *positions) {
+	for (Client& pl : *positions) {
 		pl.isJump = false;
+	}
 
-	threadHandles[0].x = 600;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	(*positions)[0].x = 600;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
+	(*positions)[0].onBoard = Ground;
 
-	threadHandles[1].x = 700;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	(*positions)[1].x = 700;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
+	(*positions)[1].onBoard = Ground;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
+	(*positions)[2].onBoard = Ground;
 
 	Die.SetVisible(false);
 
@@ -32,12 +37,6 @@ void Stage::Stage_1() {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
-	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
-
-	maxJewelyNum = 2;
-
-
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
@@ -47,29 +46,37 @@ void Stage::Stage_1() {
 	Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
 
+	maxJewelyNum = 2;
+	jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 }
-void Stage::Stage_2() {
+
+void Stage::Stage_2(array<Client, 3> *positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : threadHandles)
+	for (Client& pl : (*positions))
 		pl.isJump = false;
 
-	threadHandles[0].x = 600;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	(*positions)[0].x = 600;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
+	(*positions)[0].ground = 730;
 
-	threadHandles[1].x = 700;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	(*positions)[1].x = 700;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
+	(*positions)[1].ground = 730;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
+	(*positions)[2].ground = 730;
+
 	door = OBJECT{ 700, 400 - 4, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
@@ -82,7 +89,7 @@ void Stage::Stage_2() {
 	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
-	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 750, 370, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 840, 570, 28, 25, 1160, 29, TRUE });
@@ -92,29 +99,29 @@ void Stage::Stage_2() {
 	jewely.emplace(OBJECT{ 450, 370, 28, 25, 1160, 29, TRUE });
 }
 
-void Stage::Stage_3() {
+void Stage::Stage_3(array<Client, 3> *positions) {
 	for (int i = 0; i < jewely.size(); i++)
 		jewely.pop();
 	Ft.clear();
 
-	for (ThreadInfo& pl : threadHandles) {
+	for (Client& pl : (*positions)) {
 		pl.isJump = false;
 	}
 
-	threadHandles[0].x = 550;
-	threadHandles[0].y = 730;
-	threadHandles[0].v = 0.f;
-	threadHandles[0].wid_v = 0.f;
+	(*positions)[0].x = 550;
+	(*positions)[0].y = 730;
+	(*positions)[0].v = 0.f;
+	(*positions)[0].wid_v = 0.f;
 
-	threadHandles[1].x = 600;
-	threadHandles[1].y = 730;
-	threadHandles[1].v = 0.f;
-	threadHandles[1].wid_v = 0.f;
+	(*positions)[1].x = 600;
+	(*positions)[1].y = 730;
+	(*positions)[1].v = 0.f;
+	(*positions)[1].wid_v = 0.f;
 
-	threadHandles[2].x = 500;
-	threadHandles[2].y = 730;
-	threadHandles[2].v = 0.f;
-	threadHandles[2].wid_v = 0.f;
+	(*positions)[2].x = 500;
+	(*positions)[2].y = 730;
+	(*positions)[2].v = 0.f;
+	(*positions)[2].wid_v = 0.f;
 
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
@@ -129,7 +136,7 @@ void Stage::Stage_3() {
 	Ft.emplace_back(OBJECT{ 900, 580, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
-	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 1000, 350, 28, 25, 1160, 29, FALSE });

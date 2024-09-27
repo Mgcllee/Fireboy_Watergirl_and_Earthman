@@ -1,6 +1,7 @@
 #pragma once
 
-class ThreadInfo;
+class Client;
+
 class OBJECT {
 	bool On = false;			
 
@@ -34,8 +35,8 @@ public:
 			return false;
 		}
 	}
-	bool Collision(ThreadInfo& pl);
-	bool FT_Collide_Fall(ThreadInfo& pl);
-	bool Ft_Collision(ThreadInfo& pl);
-	bool OBJECT_Collide(ThreadInfo& pl);
+	bool Collision(Client& pl);
+	bool FT_Collide_Fall(Client& pl);
+	bool Ft_Collision(Client& pl);
+	bool OBJECT_Collide(Client& pl);
 };

@@ -1,8 +1,8 @@
 #include"object.h"
-#include"ThreadInfo.h"
+#include"Client.h"
 #include<iostream>
 
-bool OBJECT::Collision(ThreadInfo& pl) {
+bool OBJECT::Collision(Client& pl) {
 	if (pl.x + 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) { 
 		if (pl.y - 60 < y && pl.y > y) {
 			return true;
@@ -11,7 +11,7 @@ bool OBJECT::Collision(ThreadInfo& pl) {
 	return false;
 }
 
-bool OBJECT::Ft_Collision(ThreadInfo& pl) {
+bool OBJECT::Ft_Collision(Client& pl) {
 	if (pl.x - 5 > x - wid / 2 && pl.x - 55 < x + wid / 2) {
 		if (pl.y - 60 < y - hei && pl.y > y - hei) 
 		{
@@ -21,14 +21,14 @@ bool OBJECT::Ft_Collision(ThreadInfo& pl) {
 	return false;
 }
 
-bool OBJECT::FT_Collide_Fall(ThreadInfo& pl) {
+bool OBJECT::FT_Collide_Fall(Client& pl) {
 	if (pl.x - 5 < x - wid / 2 || pl.x - 55 > x + wid / 2) {
 		return true;
 	}
 	return false;
 }
 
-bool OBJECT::OBJECT_Collide(ThreadInfo& pl)
+bool OBJECT::OBJECT_Collide(Client& pl)
 {
 	if (pl.x - 55 > x - wid / 2 && pl.x - 55 < x + wid / 2) { 
 		if (pl.y < y && pl.y > y - hei) {
