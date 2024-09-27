@@ -47,9 +47,15 @@ void PacketReceiver::process_packet(char* packet) {
 		break;
 		}
 	case PACKET_TYPE_C2S::Endout: {
-		for (Client& client : *clients) {
-			closesocket(client.network_socket);
+		typePacket* exit_client = reinterpret_cast<typePacket*>(packet);
+		closesocket((*clients)[exit_client->id].network_socket);
+		// (*clients)[exit_client->id].network_socket = INVALID_SOCKET;
+		(*clients)[exit_client->id].curr_stage_type = STAGE_TYPE::STAGE_TITLE;
+		break;
 		}
+	case PACKET_TYPE_C2S::StageRetry: {
+		C2SRetryGame retry_game(clients, stage_item);
+		retry_game.recv_packet(packet);
 		break;
 		}
 	}
@@ -342,3 +348,14 @@ void C2SMove::failling_interpolation(Client& client) {
 		}
 	}
 }
+
+C2SRetryGame::C2SRetryGame(array<Client, 3>* member, Stage* game_stage)
+	: PacketReceiver(member, game_stage)
+{
+}
+
+void C2SRetryGame::recv_packet(void* packet) {
+	typePacket* request_packet = reinterpret_cast<typePacket*>(packet);
+	(*clients)[request_packet->id].curr_stage_type = STAGE_TYPE::STAGE_RETRY;
+}
+

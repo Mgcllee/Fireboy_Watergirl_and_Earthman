@@ -30,6 +30,8 @@ HANDLE changeStageEvent = NULL;
 HANDLE idleStateEvent = NULL;
 HANDLE jumpEvent = NULL;
 
+HANDLE chandle;
+
 HWND g_hWnd;
 DWORD WINAPI ClientrecvThread(LPVOID arg);
 
@@ -76,7 +78,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdParam,
 		return 1;
 	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	HANDLE chandle;
 	chandle = CreateThread(NULL, 0, ClientrecvThread, NULL, 0, NULL);
 
 	selectMyCharacter = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -171,18 +172,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SetWindowText(server_addr, LPCWSTR());
 			}
 			break;
-		case BTN_RESTART:
-			//stageTime = 300;
-			for (PLAYER& pl : players)
-				pl.on = true;
-			SetTimer(hWnd, 3, 1000, NULL);
+		case BTN_RESTART: {
+			myStageMgr.ResetStage();
 			back = FALSE;
 			currentStage.time_over = FALSE;
-			myStageMgr.ResetStage();
 			DestroyWindow(retry_button);
 			DestroyWindow(end_button);
-			break;
 
+			currneClientNum = 1;
+			for (int ticket = 0; ticket < 3; ++ticket) {
+				players[ticket].id = -1;
+			}
+			
+			typePacket packet;
+			packet.type = static_cast<char>(PACKET_TYPE_C2S::StageRetry);
+			packet.size = sizeof(typePacket);
+			packet.id = myId;
+			send(c_socket, reinterpret_cast<char*>(&packet), sizeof(packet), 0);
+			closesocket(c_socket);
+
+			myId = -1;
+			if (NetworkInit(hWnd, c_s_addr)) {
+				DestroyWindow(start_button);
+				DestroyWindow(server_addr);
+
+				stageIndex = STAGE_LOADING;
+				SetEvent(changeStageEvent);
+			}
+			chandle = CreateThread(NULL, 0, ClientrecvThread, NULL, 0, NULL);
+			break;
+		}
 		case BTN_LEFT_ARROW:
 		{
 			C2SRolePacket makePacket;
@@ -244,10 +263,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			PostQuitMessage(0);
 			break;
 		case BTN_STOP:
-			PostQuitMessage(0);
 			typePacket endPacket;
 			endPacket.type = static_cast<int>(PACKET_TYPE_C2S::Endout);
+			endPacket.size = sizeof(typePacket);
+			endPacket.id = myId;
 			SendPacket(&endPacket);
+			PostQuitMessage(0);
 			break;
 		}
 
@@ -296,6 +317,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				end_button = CreateWindow(L"button", L"123123", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP, 700, 500, 200, 100, hWnd, (HMENU)BTN_QUIT, g_hInst, NULL);
 				SendMessage(end_button, BM_SETIMAGE, 0, (LPARAM)((HBITMAP)myImageMgr.endimg));
 				mciSendCommand(1, MCI_CLOSE, 0, (DWORD)NULL);
+
+				
 			}
 			break;
 		case 4:
@@ -406,7 +429,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI ClientrecvThread(LPVOID arg)
 {
-	while (true) {
+	while (c_socket != INVALID_SOCKET) {
 		int recvRetVal = recv(c_socket, recvBuf + prevSize, MAX_BUF_SIZE - prevSize, 0);
 		if (recvRetVal != 0 && recvRetVal != -1) {
 			ConstructPacket(recvBuf, recvRetVal);

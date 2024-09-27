@@ -7,10 +7,8 @@ void GameMaker::run_game() {
 	game_stage.playerRole = &playerRole;
 	game_stage.selectPlayerRole = &selectPlayerRole;
 
-	while (true) {
-		create_game_threads();
-		join_game_threads();
-	}
+	create_game_threads();
+	join_game_threads();
 }
 
 void GameMaker::create_game_threads() {
@@ -19,16 +17,26 @@ void GameMaker::create_game_threads() {
 
 	for (int user_ticket = 0; user_ticket < 3; ++user_ticket) {
 		client_threads[user_ticket] = thread(&Client::run_client_thread,
-			new Client, &clients, &game_stage, clients[user_ticket].network_socket);
+			new Client, &clients, &game_stage, user_ticket);
 	}
 }
 
 void GameMaker::join_game_threads() {
+	stage_maker_thread.join();
+
 	for (thread& client_thread : client_threads) {
 		client_thread.join();
 	}
+}
 
-	stage_maker_thread.join();
+void GameMaker::cleanup_game() {
+	for (Client& client : clients) {
+		if (client.network_socket != INVALID_SOCKET) {
+			closesocket(client.network_socket);
+			client.network_socket = INVALID_SOCKET;
+		}
+	}
+	WSACleanup();
 }
 
 array<Client, 3>* GameMaker::get_clients() {

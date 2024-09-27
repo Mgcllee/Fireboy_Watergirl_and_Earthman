@@ -45,4 +45,11 @@ public:
 	void failling_interpolation(Client& client_pos);
 };
 
+class C2SRetryGame : public PacketReceiver {
+public:
+	C2SRetryGame(array<Client, 3>* member, Stage* game_stage);
+
+	void recv_packet(void* packet) override;
+};
+
 #endif

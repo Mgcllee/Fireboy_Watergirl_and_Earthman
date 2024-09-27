@@ -16,7 +16,7 @@ bool NetworkInit(HWND& hWnd, std::string SERVER_ADDR) {
 	server_addr.sin_port = htons(PORT_NUM);
 	inet_pton(AF_INET, SERVER_ADDR.c_str(), &server_addr.sin_addr);
 
-
+	c_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (connect(c_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) == SOCKET_ERROR) {
 		int aa = WSAGetLastError();
 		if (aa != 0) {
@@ -48,6 +48,11 @@ void ProcessPacket(char* buf)
 	switch (static_cast<int>(packet_type)) {
 	case static_cast<int>(PACKET_TYPE_S2C::Loading):
 	{
+		currneClientNum = 1;
+		for (int ticket = 0; ticket < 3; ++ticket) {
+			players[ticket] = PLAYER();
+		}
+
 		S2CPlayerPacket* packet = reinterpret_cast<S2CPlayerPacket*>(buf);
 		myId = packet->id;
 		players[0].id = myId;

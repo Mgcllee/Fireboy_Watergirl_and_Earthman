@@ -14,6 +14,7 @@ enum class PACKET_TYPE_S2C {
 	AddPlayer,
 	StageTimePass,
 	StageTimeout,
+	StageRetry,
 	Move_IDLE,
 	Move_JUMP,
 	Move_LEFT,
@@ -21,13 +22,14 @@ enum class PACKET_TYPE_S2C {
 	EatJewely,
 	IntoDoor,
 	Endout,
-	PlayerOut
+	PlayerOut 
 };
 
 enum class PACKET_TYPE_C2S {
 	ChangRole = 0,
 	SelectRole,
 	Move,
+	StageRetry,
 	Endout
 };
 
@@ -70,6 +72,7 @@ struct MovePacket {
 struct typePacket {
 	char type;
 	char size;
+	char id;
 };
 
 struct S2CStageTimePassPacket {

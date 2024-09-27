@@ -10,22 +10,20 @@ Client::Client()
 {
 }
 
-void Client::run_client_thread(array<Client, 3>* member, Stage* stage, SOCKET accepted_socket) {
+void Client::run_client_thread(array<Client, 3>* member, Stage* stage, int user_ticket) {
 	clients = member;
-	network_socket = accepted_socket;
-
 	stage_item = stage;
+	
 	packet_receiver = new PacketReceiver(clients, stage);
 
-	while (network_socket != INVALID_SOCKET) {
-		// int packet_size = recv(network_socket, recv_buffer + rest_packet_size, MAX_BUF_SIZE - rest_packet_size, 0);
-		int packet_size = recv(network_socket, recv_buffer, MAX_BUF_SIZE, 0);
-
+	while ((*clients)[user_ticket].network_socket != INVALID_SOCKET
+		&& (*clients)[user_ticket].curr_stage_type != STAGE_TYPE::STAGE_RETRY) {
+		int packet_size = recv((*clients)[user_ticket].network_socket, recv_buffer, MAX_BUF_SIZE, 0);
 		if (packet_size > 0) {
-			// rest_packet_size += packet_size;
 			packet_receiver->construct_packet(this, packet_size);
 		}
 	}
+	printf("[%d] Client done\n", user_ticket);
 }
 
 bool Client::have_role() {

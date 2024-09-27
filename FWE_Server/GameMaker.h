@@ -8,6 +8,7 @@ public:
 	void run_game();
 	void create_game_threads();
 	void join_game_threads();
+	void cleanup_game();
 	
 	array<Client, 3>* get_clients();
 

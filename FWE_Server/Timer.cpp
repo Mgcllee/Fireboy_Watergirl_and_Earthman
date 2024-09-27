@@ -51,8 +51,7 @@ long long Timer::GetElapsedTime()
 
 void Timer::start_timer()
 {
-	if (IsRunning() == true)
-	{
+	if (IsRunning() == true) {
 		return;
 	}
 
@@ -60,7 +59,7 @@ void Timer::start_timer()
 		{
 			S2CStageTimePassPacket packet;
 			packet.type = static_cast<char>(PACKET_TYPE_S2C::StageTimePass);
-			packet.timePassed = GetElapsedTime() / (double)1000;
+			packet.timePassed = static_cast<int>(GetElapsedTime() / 1000);
 
 			for (Client& client : *clients) {
 				send(client.network_socket, reinterpret_cast<char*>(&packet), sizeof(packet), 0);

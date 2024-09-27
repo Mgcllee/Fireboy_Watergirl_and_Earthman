@@ -16,30 +16,13 @@ void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* gam
 		check_all_client_role();
 	}
 	
-	while (true) {
-		if (check_next_stage_condition()) {
-
-			if (stage_index != STAGE_TYPE::RESULT) {
-				stage_index += 1;
-			}
-			else {
-				stage_index = STAGE_TYPE::STAGE_TITLE;
-			}
-
+	while (false == check_retry_game_condition()) {
+		if (check_jewely() && check_door() 
+			&& check_next_stage_condition()) {
+			update_stage_index();
 			show_game_stage(stage_index);
-
-			if (stage_index == STAGE_TYPE::STAGE_TITLE) {
-				break;
-			}
-			reset_game_stage();
-		}
-
-		if (check_jewely() && check_door()) {
-			
 		}
 	}
-
-	cleanup_game();
 }
 
 bool StageMaker::check_next_stage_condition() {
@@ -50,6 +33,30 @@ bool StageMaker::check_next_stage_condition() {
 		}
 	}
 	return (ready_client_counter == 3 ? true : false);
+}
+
+void StageMaker::update_stage_index() {
+	if (stage_index != STAGE_TYPE::RESULT) {
+		stage_index += 1;
+	}
+	else {
+		stage_index = STAGE_TYPE::STAGE_TITLE;
+	}
+}
+
+bool StageMaker::check_retry_game_condition() {
+	if (stage_index == STAGE_TYPE::STAGE_TITLE
+		|| timer->isTimeOut || timer->gameEnd) {
+		return true;
+	}
+	else {
+		for (Client& clinet : *clients) {
+			if (clinet.curr_stage_type == STAGE_TYPE::STAGE_LOADING) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void StageMaker::check_all_client_role() {
@@ -66,7 +73,7 @@ void StageMaker::check_all_client_role() {
 }
 
 void StageMaker::show_game_stage(int stage_number) {
-	reset_game_stage();
+	reset_stage_timer();
 
 	for (Client& client : *clients) {
 		client.curr_stage_type = STAGE_TYPE(stage_index);
@@ -81,7 +88,7 @@ void StageMaker::show_game_stage(int stage_number) {
 	move.sync_send_packet(NULL);
 }
 
-void StageMaker::reset_game_stage() {
+void StageMaker::reset_stage_timer() {
 	timer->Reset();
 	timer->start_timer();
 }
@@ -161,11 +168,4 @@ bool StageMaker::check_door() {
 	else {
 		return false;
 	}
-}
-
-void StageMaker::cleanup_game() {
-	for (Client& client : *clients) {
-		closesocket(client.network_socket);
-	}
-	WSACleanup();
 }
