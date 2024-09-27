@@ -24,9 +24,7 @@ public:
 
 	bool check_next_stage_condition();
 
-	void show_player_score();
-
-	void sync_jump();
+	bool show_player_score();
 
 private:
 	int stage_index;

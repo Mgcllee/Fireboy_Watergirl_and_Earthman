@@ -37,8 +37,9 @@ void Stage::Stage_1(array<Client, 3> *positions) {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	currentVisibleJewely = OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
+	currentVisibleJewely = jewely.front();
 
 	maxJewelyNum = 2;
 

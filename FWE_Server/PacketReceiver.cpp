@@ -319,7 +319,7 @@ void C2SMove::failling_interpolation(Client& client) {
 				client.x = prevPosX;
 
 			client.v -= client.g;
-			client.y += (1.3f * client.v);
+			client.y += int(1.3f * client.v);
 
 			for (OBJECT& ft : (*stage_item).Ft) {
 				if ((ft.y < client.y) && ft.Collision(client)) {

@@ -24,8 +24,6 @@ void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* gam
 			reset_game_stage();
 		}*/
 
-		// move_interpolation();
-
 		check_jewely();
 		check_door();
 
@@ -35,17 +33,15 @@ void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* gam
 }
 
 bool StageMaker::check_next_stage_condition() {
-	return true;
-
 	//select_mutex.lock();
 	for (Client& client : *clients) {
-		if (stage_index == client.get_curr_stage()) {
+		if (stage_index != client.get_curr_stage()) {
 			//select_mutex.unlock();
-			return false;
+			return true;
 		}
 	}
 	//select_mutex.unlock();
-	return true;
+	return false;
 }
 
 void StageMaker::check_all_client_role() {
@@ -67,7 +63,7 @@ void StageMaker::show_game_stage(int stage_number) {
 	StageUpdatePacket stage_update(clients); 
 	stage_update.sync_send_packet(&stage_index);
 
-	stage_item->reset_position(stage_index, clients);
+	(*stage_item).reset_position(stage_index, clients);
 	
 	ClientMovePacket move(clients);
 	move.sync_send_packet(NULL);
@@ -78,41 +74,39 @@ void StageMaker::reset_game_stage() {
 	_timer.start_timer();
 }
 
-void StageMaker::show_player_score() {
-	// each player score calcu
+bool StageMaker::show_player_score() {
 	for (Client& client : *clients) {
-		if (stage_item->currentVisibleJewely.OBJECT_Collide(client)) {
-			S2CPlayerPacket jewelyPacket;
-			jewelyPacket.type = static_cast<int>(PACKET_TYPE_S2C::EatJewely);
-			jewelyPacket.id = client.user_ticket;
-			
+		if ((*stage_item).jewely.front().OBJECT_Collide(client)) {
 			client.score += 1;
 
-			for (Client& client : *clients) {
-				send(client.network_socket, reinterpret_cast<char*>(&jewelyPacket), sizeof(S2CPlayerPacket), 0);
+			S2CPlayerPacket packet;
+			packet.type = static_cast<int>(PACKET_TYPE_S2C::EatJewely);
+			packet.id = client.user_ticket;
+			for (Client& sync_client : *clients) {
+				send(sync_client.network_socket, reinterpret_cast<char*>(&packet), sizeof(S2CPlayerPacket), 0);
 			}
+			return true;
 		}
 	}
+	return false;
 }
 
-bool StageMaker::check_jewely()
-{
-	if (false == stage_item->jewely.empty()) {
-		stage_item->currentVisibleJewely = stage_item->jewely.front();
-		stage_item->jewely.pop();
-	}
-	else {
-		return false;
+bool StageMaker::check_jewely() {
+	if (false == (*stage_item).jewely.empty()) {
+		if (show_player_score()) {
+			currentJewelyNum++;
+			(*stage_item).jewely.pop();
+			// (*stage_item).currentVisibleJewely = (*stage_item).jewely.front();
+		}
 	}
 
-	currentJewelyNum++;
 	return true;
 }
 
 bool StageMaker::check_door() {
 	if (!isVisibleDoor
-		&& (currentJewelyNum == stage_item->maxJewelyNum)
-		&& (!isVisibleDoor && currentJewelyNum == stage_item->maxJewelyNum)) {
+		&& (currentJewelyNum == (*stage_item).maxJewelyNum)
+		&& (!isVisibleDoor && currentJewelyNum == (*stage_item).maxJewelyNum)) {
 		StageDoorOpenSyncPacket door_open(clients);
 		door_open.sync_send_packet(NULL);
 		isVisibleDoor = true;
@@ -123,7 +117,7 @@ bool StageMaker::check_door() {
 	// each player check into door
 	if (isVisibleDoor) {
 		for (Client& client : *clients) {
-			if (stage_item->door.OBJECT_Collide(client)) {
+			if ((*stage_item).door.OBJECT_Collide(client)) {
 				S2CPlayerPacket intoDoorPacket;
 				intoDoorPacket.id = client.user_ticket;
 				intoDoorPacket.type = static_cast<int>(PACKET_TYPE_S2C::IntoDoor);
