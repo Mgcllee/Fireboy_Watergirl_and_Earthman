@@ -37,13 +37,6 @@ void Stage::Stage_1(array<Client, 3> *positions) {
 		t = OBJECT{ 0, 0, 20, 20, 230, 23, FALSE };
 	}
 
-	jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
-	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
-	currentVisibleJewely = jewely.front();
-
-	maxJewelyNum = 2;
-
-
 	door = OBJECT{ 700, 740, 60, 100, 0, 0, TRUE };
 
 	Ft.push_back(Ground);
@@ -53,6 +46,9 @@ void Stage::Stage_1(array<Client, 3> *positions) {
 	Ft.emplace_back(OBJECT{ 900, 550, 112, 24, 0, 0, TRUE });
 	Ft.emplace_back(OBJECT{ 1100, 630, 112, 24, 0, 0, TRUE });
 
+	maxJewelyNum = 2;
+	jewely.emplace(OBJECT{ 300, 450, 28, 25, 1160, 29, TRUE });
+	jewely.emplace(OBJECT{ 900, 450, 28, 25, 1160, 29, FALSE });
 }
 
 void Stage::Stage_2(array<Client, 3> *positions) {
@@ -93,7 +89,7 @@ void Stage::Stage_2(array<Client, 3> *positions) {
 	Ft.emplace_back(OBJECT{ 680, 420, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
-	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 150, 470, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 750, 370, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 840, 570, 28, 25, 1160, 29, TRUE });
@@ -140,7 +136,7 @@ void Stage::Stage_3(array<Client, 3> *positions) {
 	Ft.emplace_back(OBJECT{ 900, 580, 112, 24, 0, 0, TRUE });
 
 	maxJewelyNum = 8;
-	currentVisibleJewely = OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE };
+	jewely.emplace(OBJECT{ 450, 550, 28, 25, 1160, 29, TRUE });
 	jewely.emplace(OBJECT{ 150, 450, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 750, 350, 28, 25, 1160, 29, FALSE });
 	jewely.emplace(OBJECT{ 1000, 350, 28, 25, 1160, 29, FALSE });

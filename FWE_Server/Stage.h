@@ -31,8 +31,7 @@ public:
 	vector<OBJECT> Ft;	
 
 	OBJECT Die;		
-	OBJECT door;	
-	OBJECT currentVisibleJewely;
+	OBJECT door;
 
 	int maxJewelyNum = 0;
 
