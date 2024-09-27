@@ -8,6 +8,8 @@ StageMaker::StageMaker()
 void StageMaker::run_game_stage_thread(array<Client, 3>* game_member, Stage* game_stage) {
 	clients = game_member;
 	stage_item = game_stage;
+
+	timer = new Timer(game_member);
 	
 	stage_index = STAGE_TYPE::STAGE_ROLE;
 	while (stage_index == STAGE_TYPE::STAGE_ROLE) {
@@ -80,8 +82,8 @@ void StageMaker::show_game_stage(int stage_number) {
 }
 
 void StageMaker::reset_game_stage() {
-	_timer.Reset();
-	_timer.start_timer();
+	timer->Reset();
+	timer->start_timer();
 }
 
 bool StageMaker::show_player_score() {

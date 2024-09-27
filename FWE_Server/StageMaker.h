@@ -35,9 +35,7 @@ private:
 	bool isVisibleDoor = false;
 	mutex jewelyMutex;
 
-	Timer _timer;
-	bool gameEnd = false;
-	double timeoutSeconds = 50;
+	Timer* timer;
 
 	array<Client, 3>* clients;
 
